@@ -47,13 +47,18 @@ class CategoriaTest {
     }
 
     @Test
-    @DisplayName("Deve considerar categorias diferentes quando id ou nome mudar")
+    @DisplayName("Deve considerar categorias diferentes quando IDs mudarem ou comparadas com null/outros tipos")
     void testEqualsDiferentes() {
         Categoria cat1 = new Categoria(1L, "Lazer");
-        Categoria cat2 = new Categoria(2L, "Lazer");
-        Categoria cat3 = new Categoria(1L, "Saúde");
+        Categoria cat2 = new Categoria(2L, "Lazer"); // ID diferente
 
+        // Testa IDs diferentes
         assertThat(cat1).isNotEqualTo(cat2);
-        assertThat(cat1).isNotEqualTo(cat3);
+        
+        // Testa cobertura do: if (o == null)
+        assertThat(cat1).isNotEqualTo(null);
+        
+        // Testa cobertura do: if (getClass() != o.getClass())
+        assertThat(cat1).isNotEqualTo(new Object()); 
     }
 }

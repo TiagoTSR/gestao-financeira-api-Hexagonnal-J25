@@ -98,4 +98,26 @@ class LancamentoTest {
         assertThat(lancamento.getDataPagamento()).isNull();
         assertThat(lancamento.getObservacao()).isNull();
     }
+    
+    @Test
+    @DisplayName("Deve considerar dois lançamentos iguais quando possuírem o mesmo ID")
+    void testEqualsAndHashCode() {
+        // Lançamentos com o mesmo ID
+        Lancamento lancamento1 = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+        Lancamento lancamento2 = new Lancamento(ID, "Outra Descrição", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, CATEGORIA, PESSOA);
+
+        assertThat(lancamento1).isEqualTo(lancamento2);
+        assertThat(lancamento1.hashCode()).isEqualTo(lancamento2.hashCode());
+    }
+
+    @Test
+    @DisplayName("Deve considerar lançamentos diferentes quando IDs mudarem ou comparados com null/outros tipos")
+    void testEqualsDiferentes() {
+        Lancamento lancamento1 = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+        Lancamento lancamento2 = new Lancamento(2L, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA); // ID diferente
+
+        assertThat(lancamento1).isNotEqualTo(lancamento2);
+        assertThat(lancamento1).isNotEqualTo(null);
+        assertThat(lancamento1).isNotEqualTo(new Object());
+    }
 }

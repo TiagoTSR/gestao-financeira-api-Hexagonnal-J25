@@ -60,4 +60,26 @@ class PessoaTest {
         assertThat(pessoa.getEndereco()).isNull();
         assertThat(pessoa.getNome()).isEqualTo(NOME);
     }
+    
+    @Test
+    @DisplayName("Deve considerar duas pessoas iguais quando possuírem o mesmo ID")
+    void testEqualsAndHashCode() {
+        // Pessoas com o mesmo ID, mesmo que os outros dados sejam diferentes
+        Pessoa pessoa1 = new Pessoa(ID, "Maria Oliveira", ENDERECO, true);
+        Pessoa pessoa2 = new Pessoa(ID, "Outro Nome", null, false);
+
+        assertThat(pessoa1).isEqualTo(pessoa2);
+        assertThat(pessoa1.hashCode()).isEqualTo(pessoa2.hashCode());
+    }
+
+    @Test
+    @DisplayName("Deve considerar pessoas diferentes quando IDs mudarem ou comparadas com null/outros tipos")
+    void testEqualsDiferentes() {
+        Pessoa pessoa1 = new Pessoa(ID, NOME, ENDERECO, ATIVO);
+        Pessoa pessoa2 = new Pessoa(2L, NOME, ENDERECO, ATIVO); // ID diferente
+
+        assertThat(pessoa1).isNotEqualTo(pessoa2);
+        assertThat(pessoa1).isNotEqualTo(null);
+        assertThat(pessoa1).isNotEqualTo(new Object()); // Garantindo que false retorne para outras classes
+    }
 }
