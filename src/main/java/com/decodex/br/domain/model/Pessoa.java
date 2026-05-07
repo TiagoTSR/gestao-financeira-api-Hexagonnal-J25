@@ -47,5 +47,20 @@ public class Pessoa {
 	public Boolean getAtivo() {
 		return ativo;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (o == null || getClass() != o.getClass()) return false;
+	    
+	    Pessoa pessoa = (Pessoa) o;
+	    
+	    return id != null && id.equals(pessoa.id);
+	}
+
+	@Override
+	public int hashCode() {
+	    return getClass().hashCode();
+	}
     
  }

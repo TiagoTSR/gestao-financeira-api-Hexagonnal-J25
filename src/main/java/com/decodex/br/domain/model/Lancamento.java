@@ -100,5 +100,20 @@ public class Lancamento {
 	public Pessoa getPessoa() {
 		return pessoa;
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (o == null || getClass() != o.getClass()) return false;
+	    
+	    Lancamento lancamento = (Lancamento) o;
+	    
+	    return id != null && id.equals(lancamento.id);
+	}
+
+	@Override
+	public int hashCode() {
+	    return getClass().hashCode();
+	}
     
 }

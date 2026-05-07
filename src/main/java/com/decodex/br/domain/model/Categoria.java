@@ -1,7 +1,5 @@
 package com.decodex.br.domain.model;
 
-import java.util.Objects;
-
 public class Categoria {
 
 	private Long id;
@@ -28,20 +26,17 @@ public class Categoria {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(id, nome);
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (o == null || getClass() != o.getClass()) return false;
+	    
+	    Categoria categoria = (Categoria) o;
+	    
+	    return id != null && id.equals(categoria.id);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Categoria other = (Categoria) obj;
-		return Objects.equals(id, other.id) && Objects.equals(nome, other.nome);
-	}    
-	
+	public int hashCode() {
+	    return getClass().hashCode();
+	}
 }
