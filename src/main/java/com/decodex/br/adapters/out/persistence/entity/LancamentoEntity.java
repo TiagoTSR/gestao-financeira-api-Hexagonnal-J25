@@ -3,39 +3,57 @@ package com.decodex.br.adapters.out.persistence.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.decodex.br.domain.model.Categoria;
-import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "Lancamento")
+@Table(name = "lancamento")
 public class LancamentoEntity {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
+	@NotBlank
+    @Column(length = 120)
     private String descricao;
-
+	
+	@NotNull
+    @Column(name = "data_vencimento")
     private LocalDate dataVencimento;
-
+	
+	@Column(name = "data_pagamento")
     private LocalDate dataPagamento;
-
+	
+	@NotNull
+    @Column(precision = 15, scale = 2)
     private BigDecimal valor;
-
+	
+	@Column(length = 255)
     private String observacao;
-
+	
+	@NotNull
+    @Enumerated(EnumType.STRING)
     private TipoLancamento tipo;
-
-    private Categoria categoria;
-
-    private Pessoa pessoa;
+    
+    @JoinColumn(name = "categoria_id")
+    private CategoriaEntity categoria;
+    
+    @ManyToOne
+    @JoinColumn(name = "pessoa_id")
+    private PessoaEntity pessoa;
 
 	public Long getId() {
 		return id;
@@ -93,20 +111,35 @@ public class LancamentoEntity {
 		this.tipo = tipo;
 	}
 
-	public Categoria getCategoria() {
+	public CategoriaEntity getCategoria() {
 		return categoria;
 	}
 
-	public void setCategoria(Categoria categoria) {
+	public void setCategoria(CategoriaEntity categoria) {
 		this.categoria = categoria;
 	}
 
-	public Pessoa getPessoa() {
+	public PessoaEntity getPessoa() {
 		return pessoa;
 	}
 
-	public void setPessoa(Pessoa pessoa) {
+	public void setPessoa(PessoaEntity pessoa) {
 		this.pessoa = pessoa;
 	}
-    
+
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+
+	    if (!(o instanceof LancamentoEntity)) return false;
+
+	    LancamentoEntity other = (LancamentoEntity) o;
+
+	    return id != null && id.equals(other.id);
+	}
+
+	@Override
+	public int hashCode() {
+	    return getClass().hashCode();
+	}
 }
