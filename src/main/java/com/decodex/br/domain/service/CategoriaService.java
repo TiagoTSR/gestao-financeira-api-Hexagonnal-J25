@@ -1,0 +1,50 @@
+package com.decodex.br.domain.service;
+
+import java.util.List;
+
+import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
+
+public class CategoriaService implements CategoriaUseCase {
+
+	private final CategoriaRepositoryPort repository;
+
+    public CategoriaService(CategoriaRepositoryPort repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public List<Categoria> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public Categoria findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrado: " + id));
+    }
+
+    @Override
+    public Categoria create(Categoria categoria) {
+        return repository.save(categoria);
+    }
+
+    @Override
+    public Categoria update(Long id, Categoria categoriaDetails) {
+        Categoria existing = findById(id);
+
+        existing = new Categoria(
+                existing.getId(),
+                categoriaDetails.getNome()
+        );
+
+        return repository.save(existing);
+    }
+
+    @Override
+    public void delete(Long id) {
+        findById(id);
+        repository.deleteById(id);
+    }
+}
