@@ -1,0 +1,184 @@
+version: 2
+
+updates:
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "develop"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+
+    open-pull-requests-limit: 5
+
+    commit-message:
+      prefix: "build(deps)"
+      include: "scope"
+
+    labels:
+      - "dependencies"
+      - "java"
+      - "maven"
+
+    assignees:
+      - "TiagoTSR"
+
+    reviewers:
+      - "TiagoTSR"
+
+    rebase-strategy: "auto"
+
+    allow:
+      - dependency-type: "direct"
+
+    groups:
+
+      spring:
+        patterns:
+          - "org.springframework*"
+          - "org.springframework.boot*"
+          - "org.springframework.security*"
+          - "org.springframework.cloud*"
+
+      hibernate:
+        patterns:
+          - "org.hibernate*"
+
+      jackson:
+        patterns:
+          - "com.fasterxml.jackson*"
+
+      testing:
+        patterns:
+          - "org.junit*"
+          - "org.mockito*"
+          - "org.assertj*"
+
+      database:
+        patterns:
+          - "org.postgresql*"
+          - "com.mysql*"
+          - "com.h2database*"
+
+      build-plugins:
+        patterns:
+          - "org.apache.maven.plugins*"
+
+    ignore:
+
+      - dependency-name: "org.springframework.boot:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.springframework:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.springframework.security:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.hibernate:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.mockito:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.junit:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "org.apache.maven.plugins:*"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "*"
+        versions:
+          - "*-SNAPSHOT"
+          - "*-RC*"
+          - "*-M*"
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    target-branch: "develop"
+
+    schedule:
+      interval: "daily"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+
+    open-pull-requests-limit: 3
+
+    labels:
+      - "security"
+      - "dependencies"
+
+    assignees:
+      - "TiagoTSR"
+
+    reviewers:
+      - "TiagoTSR"
+
+    commit-message:
+      prefix: "fix(security)"
+
+    applies-to: security-updates
+
+ 
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+
+    open-pull-requests-limit: 5
+
+    commit-message:
+      prefix: "ci(deps)"
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+    assignees:
+      - "TiagoTSR"
+
+    reviewers:
+      - "TiagoTSR"
+
+    rebase-strategy: "auto"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+
+    schedule:
+      interval: "daily"
+      time: "08:00"
+      timezone: "America/Sao_Paulo"
+
+    open-pull-requests-limit: 3
+
+    labels:
+      - "security"
+      - "github-actions"
+
+    assignees:
+      - "TiagoTSR"
+
+    reviewers:
+      - "TiagoTSR"
+
+    commit-message:
+      prefix: "fix(security)"
+
+    applies-to: security-updates
