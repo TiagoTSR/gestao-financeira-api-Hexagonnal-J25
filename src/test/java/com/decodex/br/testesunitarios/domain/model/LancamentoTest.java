@@ -70,6 +70,15 @@ class LancamentoTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Data de vencimento não pode ser nula");
     }
+    
+    @Test
+    @DisplayName("Deve lançar exceção quando tipo for nulo")
+    void deveLancarExcecaoQuandoTipoNulo() {
+        assertThatThrownBy(() -> new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO,
+                VALOR, OBSERVACAO, null, CATEGORIA, PESSOA))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Tipo não pode ser nulo");
+    }
 
     @Test
     @DisplayName("Deve lançar exceção quando categoria for nula")

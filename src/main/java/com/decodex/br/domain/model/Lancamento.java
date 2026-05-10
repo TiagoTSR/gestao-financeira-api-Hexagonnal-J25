@@ -32,7 +32,7 @@ public class Lancamento {
 		this.dataPagamento = dataPagamento;
 		this.valor = valor;
 		this.observacao = observacao;
-		this.tipo = tipo;
+		this.tipo = validarTipo(tipo); 
 		this.categoria = validarCategoria(categoria);
 		this.pessoa = validarPessoa(pessoa);
 	}
@@ -49,6 +49,13 @@ public class Lancamento {
             throw new IllegalArgumentException("Data de vencimento não pode ser nula");
         }
         return dataVencimento;
+    }
+    
+    private TipoLancamento validarTipo(TipoLancamento tipo) {
+        if (tipo == null) {
+            throw new IllegalArgumentException("Tipo não pode ser nulo");
+        }
+        return tipo;
     }
 
     private Categoria validarCategoria(Categoria categoria) {
