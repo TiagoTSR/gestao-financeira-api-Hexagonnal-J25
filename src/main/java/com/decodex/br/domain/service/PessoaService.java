@@ -34,12 +34,9 @@ public class PessoaService implements PessoaUseCase {
     public Pessoa update(Long id, Pessoa pessoaDetails) {
         Pessoa existing = findById(id);
 
-        existing = new Pessoa(
-                existing.getId(),
-                pessoaDetails.getNome(),
-                pessoaDetails.getEndereco(),
-                pessoaDetails.getAtivo()
-        );
+        existing.alterarNome(pessoaDetails.getNome());
+        existing.alterarEndereço(pessoaDetails.getEndereco());
+        existing.alterarAtivo(pessoaDetails.getAtivo());
 
         return repository.save(existing);
     }
