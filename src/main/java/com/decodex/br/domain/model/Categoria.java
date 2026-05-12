@@ -16,6 +16,10 @@ public class Categoria {
         }
         return valor;
     }
+	
+	public void alterarNome(String novoNome) {
+	       this.nome = validarNomeCategoria(novoNome, novoNome);
+	}
 
 	public Long getId() {
 		return id;

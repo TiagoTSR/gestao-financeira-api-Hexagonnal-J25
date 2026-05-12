@@ -30,7 +30,7 @@ public class Lancamento {
 		this.descricao = validarDescricao(descricao);
 		this.dataVencimento = validarDataVencimento(dataVencimento);
 		this.dataPagamento = dataPagamento;
-		this.valor = valor;
+		this.valor = validarValor(valor);
 		this.observacao = observacao;
 		this.tipo = validarTipo(tipo); 
 		this.categoria = validarCategoria(categoria);
@@ -43,13 +43,20 @@ public class Lancamento {
         }
         return descricao;
     }
-
+    
     private LocalDate validarDataVencimento(LocalDate dataVencimento) {
         if (dataVencimento == null) {
             throw new IllegalArgumentException("Data de vencimento não pode ser nula");
         }
         return dataVencimento;
     }
+    
+    private BigDecimal validarValor(BigDecimal valor) {
+        if (valor == null) {
+            throw new IllegalArgumentException("Valor não pode ser nula");
+        }
+        return valor;
+    }    
     
     private TipoLancamento validarTipo(TipoLancamento tipo) {
         if (tipo == null) {
@@ -70,6 +77,41 @@ public class Lancamento {
             throw new IllegalArgumentException("Pessoa não pode ser nula");
         }
         return pessoa;
+    }
+    
+    public void alterarDescricao(String novaDescricao) {
+        this.descricao = validarDescricao(novaDescricao);
+    }
+
+    public void alterarDataVencimento(LocalDate novaDataVencimento) {
+        this.dataVencimento = validarDataVencimento(novaDataVencimento);
+    }
+
+    public void alterarDataPagamento(LocalDate novaDataPagamento) {
+        this.dataPagamento = novaDataPagamento;
+    }
+
+    public void alterarValor(BigDecimal novoValor) {
+        if (novoValor == null) {
+            throw new IllegalArgumentException("Valor não pode ser nulo");
+        }
+        this.valor = validarValor(novoValor);
+    }
+
+    public void alterarObservacao(String novaObservacao) {
+        this.observacao = novaObservacao;
+    }
+
+    public void alterarTipo(TipoLancamento novoTipo) {
+        this.tipo = validarTipo(novoTipo);
+    }
+
+    public void alterarCategoria(Categoria novaCategoria) {
+        this.categoria = validarCategoria(novaCategoria);
+    }
+
+    public void alterarPessoa(Pessoa novaPessoa) {
+        this.pessoa = validarPessoa(novaPessoa);
     }
 
 	public Long getId() {

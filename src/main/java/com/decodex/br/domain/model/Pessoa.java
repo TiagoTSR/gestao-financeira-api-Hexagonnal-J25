@@ -31,6 +31,18 @@ public class Pessoa {
         }
         return ativo;
     }
+	
+	public void alterarNome(String novoNome) {
+	       this.nome = validarNomePessoa(novoNome, novoNome);
+	}
+	
+	public void alterarEndereço(Endereco novaEndereço) {
+	       this.endereco = novaEndereço;
+	}
+	
+	public void alterarAtivo(Boolean alteracaoAtivo) {
+	       this.ativo = validarAtivo(alteracaoAtivo);
+	}
 
 	public Long getId() {
 		return id;
