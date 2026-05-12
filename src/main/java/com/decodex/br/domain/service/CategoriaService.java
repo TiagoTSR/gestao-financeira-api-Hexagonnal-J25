@@ -34,10 +34,7 @@ public class CategoriaService implements CategoriaUseCase {
     public Categoria update(Long id, Categoria categoriaDetails) {
         Categoria existing = findById(id);
 
-        existing = new Categoria(
-                existing.getId(),
-                categoriaDetails.getNome()
-        );
+        existing.alterarNome(categoriaDetails.getNome());
 
         return repository.save(existing);
     }
