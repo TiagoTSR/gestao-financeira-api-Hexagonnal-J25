@@ -34,17 +34,14 @@ public class LancamentoService implements LancamentoUseCase {
     public Lancamento update(Long id, Lancamento lancamentoDetails) {
         Lancamento existing = findById(id);
 
-        existing = new Lancamento(
-                existing.getId(),
-                lancamentoDetails.getDescricao(),
-                lancamentoDetails.getDataVencimento(),
-                lancamentoDetails.getDataPagamento(),
-                lancamentoDetails.getValor(),
-                lancamentoDetails.getObservacao(),
-                lancamentoDetails.getTipo(),
-                lancamentoDetails.getCategoria(),
-                lancamentoDetails.getPessoa()
-        );
+        existing.alterarDescricao(lancamentoDetails.getDescricao());
+        existing.alterarDataVencimento(lancamentoDetails.getDataVencimento());
+        existing.alterarDataPagamento(lancamentoDetails.getDataPagamento());
+        existing.alterarValor(lancamentoDetails.getValor());
+        existing.alterarObservacao(lancamentoDetails.getObservacao());
+        existing.alterarTipo(lancamentoDetails.getTipo());
+        existing.alterarCategoria(lancamentoDetails.getCategoria());
+        existing.alterarPessoa(lancamentoDetails.getPessoa());
 
         return repository.save(existing);
     }
