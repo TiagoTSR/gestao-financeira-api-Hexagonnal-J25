@@ -3,8 +3,6 @@ package com.decodex.br.application.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.decodex.br.domain.model.Categoria;
-import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 
 import jakarta.validation.constraints.NotBlank;
@@ -29,8 +27,8 @@ public record LancamentoCreateDTO(
 	    TipoLancamento tipo,
 	    
 	    @NotNull
-	    Categoria categoria,
+	    Long categoriaId,
 	    
 	    @NotNull
-	    Pessoa pessoa
+	    Long pessoaId
 ) {}
