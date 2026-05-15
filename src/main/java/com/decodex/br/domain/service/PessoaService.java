@@ -7,8 +7,8 @@ import com.decodex.br.domain.port.in.PessoaUseCase;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 
 public class PessoaService implements PessoaUseCase {
-	
-	private final PessoaRepositoryPort repository;
+    
+    private final PessoaRepositoryPort repository;
 
     public PessoaService(PessoaRepositoryPort repository) {
         this.repository = repository;
@@ -22,7 +22,7 @@ public class PessoaService implements PessoaUseCase {
     @Override
     public Pessoa findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrado: " + id));
+                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada: " + id));
     }
 
     @Override
@@ -32,8 +32,11 @@ public class PessoaService implements PessoaUseCase {
 
     @Override
     public Pessoa update(Long id, Pessoa pessoaDetails) {
+
         Pessoa existing = findById(id);
+        
         existing.atualizarCampos(pessoaDetails);
+        
         return repository.save(existing);
     }
 
@@ -42,5 +45,4 @@ public class PessoaService implements PessoaUseCase {
         findById(id);
         repository.deleteById(id);
     }
-
 }
