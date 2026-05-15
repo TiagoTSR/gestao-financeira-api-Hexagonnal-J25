@@ -6,6 +6,7 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 
+
 public class CategoriaService implements CategoriaUseCase {
 
 	private final CategoriaRepositoryPort repository;
@@ -33,9 +34,7 @@ public class CategoriaService implements CategoriaUseCase {
     @Override
     public Categoria update(Long id, Categoria categoriaDetails) {
         Categoria existing = findById(id);
-
-        existing.alterarNome(categoriaDetails.getNome());
-
+        existing.atualizarCampos(categoriaDetails);
         return repository.save(existing);
     }
 
