@@ -43,8 +43,8 @@ public class Pessoa {
 	       this.nome = validarNomePessoa(novoNome, novoNome);
 	}
 	
-	public void alterarEndereço(Endereco novaEndereço) {
-	       this.endereco = novaEndereço;
+	public void alterarEndereço(Endereco novoEndereço) {
+	       this.endereco = validarEndereco(novoEndereço);
 	}
 	
 	public void alterarAtivo(Boolean alteracaoAtivo) {
