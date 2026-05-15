@@ -1,18 +1,17 @@
 package com.decodex.br.application.dto.pessoa;
 
-import com.decodex.br.domain.model.Endereco;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record PessoaCreateDTO(
 		
-		@NotBlank
-	    String nome,
-
-	    Endereco endereco,
-	    
-	    @NotNull
-	    Boolean ativo
-
+		@NotBlank String nome,
+	    @NotBlank String logradouro,
+	    String numero,        
+	    String complemento,
+	    @NotBlank String bairro,
+	    @NotBlank String cep,
+	    @NotBlank String cidade,
+	    @NotBlank String estado,
+	    @NotNull Boolean ativo
 ) {}

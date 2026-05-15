@@ -1,15 +1,16 @@
 package com.decodex.br.application.dto.pessoa;
 
-import com.decodex.br.domain.model.Endereco;
-
 public record PessoaResponseDTO(
 	
-    Long id,
-	
-    String nome,
-
-    Endereco endereco,
-
-    Boolean ativo
+		Long id,
+	    String nome,
+	    String logradouro,
+	    String numero,
+	    String complemento,
+	    String bairro,
+	    String cep,
+	    String cidade,
+	    String estado,
+	    Boolean ativo
 
 ) {}
