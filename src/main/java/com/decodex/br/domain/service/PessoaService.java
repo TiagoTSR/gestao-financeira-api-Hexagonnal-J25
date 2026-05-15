@@ -33,11 +33,7 @@ public class PessoaService implements PessoaUseCase {
     @Override
     public Pessoa update(Long id, Pessoa pessoaDetails) {
         Pessoa existing = findById(id);
-
-        existing.alterarNome(pessoaDetails.getNome());
-        existing.alterarEndereço(pessoaDetails.getEndereco());
-        existing.alterarAtivo(pessoaDetails.getAtivo());
-
+        existing.atualizarCampos(pessoaDetails);
         return repository.save(existing);
     }
 
