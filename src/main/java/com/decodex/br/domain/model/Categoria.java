@@ -20,6 +20,10 @@ public class Categoria {
 	public void alterarNome(String novoNome) {
 	       this.nome = validarNomeCategoria(novoNome, novoNome);
 	}
+	
+	public void atualizarCampos(Categoria novosDados) {
+      alterarNome(novosDados.nome);
+    }
 
 	public Long getId() {
 		return id;
