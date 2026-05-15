@@ -1,7 +1,5 @@
 package com.decodex.br.adapters.out.persistence.entity;
 
-import com.decodex.br.domain.model.Endereco;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -26,7 +24,7 @@ public class PessoaEntity {
     private String nome;
 
     @Embedded
-    private Endereco endereco;
+    private EnderecoEmbeddable endereco;
 
     @NotNull
     @Column(nullable = false)
@@ -48,11 +46,11 @@ public class PessoaEntity {
         this.nome = nome;
     }
 
-    public Endereco getEndereco() {
+    public EnderecoEmbeddable getEndereco() {
         return endereco;
     }
 
-    public void setEndereco(Endereco endereco) {
+    public void setEndereco(EnderecoEmbeddable endereco) {
         this.endereco = endereco;
     }
 
