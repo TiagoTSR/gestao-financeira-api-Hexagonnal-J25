@@ -41,7 +41,9 @@ class PessoaServiceTest {
 
     @BeforeEach
     void setUp() {
-        endereco = new Endereco("Rua A", "123", null, "Centro", "12345-678", "São Paulo", "SP");
+        endereco = new Endereco(
+            "Rua A", "123", null, "Centro", "12345-678", "São Paulo", "SP"
+        );
         pessoa = new Pessoa(1L, "João Silva", endereco, true);
     }
 
@@ -73,8 +75,9 @@ class PessoaServiceTest {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findById(99L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Pessoa não encontrado: 99");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("Pessoa não encontrada: 99");
+
         verify(repository, times(1)).findById(99L);
     }
 
@@ -93,8 +96,13 @@ class PessoaServiceTest {
     @DisplayName("Deve atualizar pessoa existente")
     void update_ShouldUpdateFieldsAndSave() {
         Pessoa existing = new Pessoa(1L, "João Silva", endereco, true);
-        Pessoa updatedDetails = new Pessoa(null, "João Silva Atualizado", null, false);
-        Pessoa expectedUpdated = new Pessoa(1L, "João Silva Atualizado", null, false);
+
+        // ✅ endereco válido nos dados de atualização
+        Endereco novoEndereco = new Endereco(
+            "Rua B", "456", null, "Bairro Novo", "11111-111", "Rio", "RJ"
+        );
+        Pessoa updatedDetails = new Pessoa(null, "João Silva Atualizado", novoEndereco, false);
+        Pessoa expectedUpdated = new Pessoa(1L, "João Silva Atualizado", novoEndereco, false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(existing));
         when(repository.save(any(Pessoa.class))).thenReturn(expectedUpdated);
@@ -103,13 +111,14 @@ class PessoaServiceTest {
 
         assertThat(result.getNome()).isEqualTo("João Silva Atualizado");
         assertThat(result.getAtivo()).isFalse();
-        assertThat(result.getEndereco()).isNull();
+        assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua B"); // ✅ verifica endereco
+        assertThat(result.getEndereco().getCidade()).isEqualTo("Rio");
 
         verify(repository, times(1)).findById(1L);
-        verify(repository, times(1)).save(argThat(p -> 
+        verify(repository, times(1)).save(argThat(p ->
             p.getId().equals(1L) &&
             p.getNome().equals("João Silva Atualizado") &&
-            p.getEndereco() == null &&
+            p.getEndereco().getLogradouro().equals("Rua B") && // ✅ verifica campo do endereco
             p.getAtivo().equals(false)
         ));
     }
@@ -132,8 +141,8 @@ class PessoaServiceTest {
         when(repository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.delete(99L))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Pessoa não encontrado: 99");
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("Pessoa não encontrada: 99");
 
         verify(repository, times(1)).findById(99L);
         verify(repository, never()).deleteById(any());
