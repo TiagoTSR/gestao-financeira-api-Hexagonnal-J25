@@ -14,7 +14,7 @@ public class Pessoa {
 		super();
 		this.id = id;
 		this.nome = validarNomePessoa(nome, "Nome");
-		this.endereco = endereco;
+		this.endereco = validarEndereco(endereco);
 		this.ativo = validarAtivo(ativo);
 	}
 	
@@ -24,6 +24,13 @@ public class Pessoa {
         }
         return valor;
     }
+	
+	private Endereco validarEndereco(Endereco endereco) {
+	    if (endereco == null) {
+	        throw new IllegalArgumentException("Endereço não pode ser nulo");
+	    }
+	    return endereco;
+	}
 	
 	private Boolean validarAtivo(Boolean ativo) {
         if (ativo == null) {
@@ -43,6 +50,12 @@ public class Pessoa {
 	public void alterarAtivo(Boolean alteracaoAtivo) {
 	       this.ativo = validarAtivo(alteracaoAtivo);
 	}
+	
+	public void atualizarCampos(Pessoa novosDados) {
+		alterarNome(novosDados.nome);
+		alterarEndereço(novosDados.endereco);
+		alterarAtivo(novosDados.ativo);
+    }
 
 	public Long getId() {
 		return id;
