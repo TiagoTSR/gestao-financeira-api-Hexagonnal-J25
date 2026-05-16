@@ -1,19 +1,22 @@
 package com.decodex.br.testesIntegração.adapters.out.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.decodex.br.adapters.out.persistence.adapter.LancamentoRepositoryAdapter;
@@ -21,6 +24,7 @@ import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
@@ -43,20 +47,23 @@ class LancamentoRepositoryAdapterTest {
 
     @BeforeEach
     void setUp() {
-        // Monta objetos de domínio obrigatórios para o construtor de Lancamento
         Categoria categoria = new Categoria(1L, "Alimentação");
-        Pessoa pessoa = new Pessoa(1L, "João Silva", null, true);
+
+        Endereco endereco = new Endereco(
+            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
+        );
+        Pessoa pessoa = new Pessoa(1L, "João Silva", endereco, true);
 
         domainLancamento = new Lancamento(
-                1L,
-                "Conta de luz",
-                LocalDate.of(2025, 6, 10),   // dataVencimento — obrigatório
-                null,                         // dataPagamento  — opcional
-                new BigDecimal("350.00"),
-                "Observação teste",
-                TipoLancamento.DESPESA,
-                categoria,
-                pessoa
+            1L,
+            "Conta de luz",
+            LocalDate.of(2025, 6, 10),
+            null,
+            new BigDecimal("350.00"),
+            "Observação teste",
+            TipoLancamento.DESPESA,
+            categoria,
+            pessoa
         );
 
         lancamentoEntity = new LancamentoEntity();
