@@ -49,11 +49,11 @@ public class LancamentoEntity {
     private TipoLancamento tipo;
     
 	@ManyToOne
-    @JoinColumn(name = "categoria_id")
+    @JoinColumn(name = "categoria_id", nullable = false)
     private CategoriaEntity categoria;
     
     @ManyToOne
-    @JoinColumn(name = "pessoa_id")
+    @JoinColumn(name = "pessoa_id", nullable = false)
     private PessoaEntity pessoa;
 
 	public Long getId() {
