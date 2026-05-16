@@ -53,7 +53,7 @@ public class Lancamento {
     
     private BigDecimal validarValor(BigDecimal valor) {
         if (valor == null) {
-            throw new IllegalArgumentException("Valor não pode ser nula");
+            throw new IllegalArgumentException("Valor não pode ser nulo");
         }
         return valor;
     }    
@@ -92,9 +92,6 @@ public class Lancamento {
     }
 
     public void alterarValor(BigDecimal novoValor) {
-        if (novoValor == null) {
-            throw new IllegalArgumentException("Valor não pode ser nulo");
-        }
         this.valor = validarValor(novoValor);
     }
 
@@ -112,6 +109,17 @@ public class Lancamento {
 
     public void alterarPessoa(Pessoa novaPessoa) {
         this.pessoa = validarPessoa(novaPessoa);
+    }
+    
+    public void atualizarCampos(Lancamento novosDados) {
+    	alterarDescricao(novosDados.descricao);
+        alterarDataVencimento(novosDados.dataVencimento);
+        alterarDataPagamento(novosDados.dataPagamento);
+        alterarValor(novosDados.valor);
+        alterarObservacao(novosDados.observacao);
+        alterarTipo(novosDados.tipo);
+        alterarCategoria(novosDados.categoria);
+        alterarPessoa(novosDados.pessoa);
     }
 
 	public Long getId() {
