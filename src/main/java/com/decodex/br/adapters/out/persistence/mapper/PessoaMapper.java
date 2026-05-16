@@ -1,10 +1,13 @@
 package com.decodex.br.adapters.out.persistence.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
+@Component
 public class PessoaMapper {
 
     public Pessoa toDomain(PessoaEntity entity) {

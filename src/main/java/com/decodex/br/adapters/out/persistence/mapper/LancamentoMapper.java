@@ -1,8 +1,11 @@
 package com.decodex.br.adapters.out.persistence.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.domain.model.Lancamento;
 
+@Component
 public class LancamentoMapper {
 
     private final CategoriaMapper categoriaMapper = new CategoriaMapper();
