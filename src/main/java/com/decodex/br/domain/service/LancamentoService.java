@@ -33,16 +33,7 @@ public class LancamentoService implements LancamentoUseCase {
     @Override
     public Lancamento update(Long id, Lancamento lancamentoDetails) {
         Lancamento existing = findById(id);
-
-        existing.alterarDescricao(lancamentoDetails.getDescricao());
-        existing.alterarDataVencimento(lancamentoDetails.getDataVencimento());
-        existing.alterarDataPagamento(lancamentoDetails.getDataPagamento());
-        existing.alterarValor(lancamentoDetails.getValor());
-        existing.alterarObservacao(lancamentoDetails.getObservacao());
-        existing.alterarTipo(lancamentoDetails.getTipo());
-        existing.alterarCategoria(lancamentoDetails.getCategoria());
-        existing.alterarPessoa(lancamentoDetails.getPessoa());
-
+        existing.atualizarCampos(lancamentoDetails);
         return repository.save(existing);
     }
 
