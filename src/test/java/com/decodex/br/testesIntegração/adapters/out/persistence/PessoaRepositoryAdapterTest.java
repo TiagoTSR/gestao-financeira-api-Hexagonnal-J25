@@ -1,27 +1,28 @@
 package com.decodex.br.testesIntegração.adapters.out.persistence;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.decodex.br.adapters.out.persistence.adapter.PessoaRepositoryAdapter;
+import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
+import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,12 +43,24 @@ class PessoaRepositoryAdapterTest {
 
     @BeforeEach
     void setUp() {
-        // Endereco como null é válido no domínio (sem validação obrigatória)
-        domainPessoa = new Pessoa(1L, "João Silva", null, true);
+
+        Endereco endereco = new Endereco(
+            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
+        );
+        domainPessoa = new Pessoa(1L, "João Silva", endereco, true);
+
+        EnderecoEmbeddable enderecoEmbeddable = new EnderecoEmbeddable();
+        enderecoEmbeddable.setLogradouro("Rua A");
+        enderecoEmbeddable.setNumero("10");
+        enderecoEmbeddable.setBairro("Centro");
+        enderecoEmbeddable.setCep("00000-000");
+        enderecoEmbeddable.setCidade("São Paulo");
+        enderecoEmbeddable.setEstado("SP");
 
         pessoaEntity = new PessoaEntity();
         pessoaEntity.setId(1L);
         pessoaEntity.setNome("João Silva");
+        pessoaEntity.setEndereco(enderecoEmbeddable);
         pessoaEntity.setAtivo(true);
     }
 
@@ -63,6 +76,7 @@ class PessoaRepositoryAdapterTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getNome()).isEqualTo("João Silva");
+        assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua A");
         assertThat(result.getAtivo()).isTrue();
 
         verify(pessoaMapper).toEntity(domainPessoa);
@@ -81,6 +95,7 @@ class PessoaRepositoryAdapterTest {
         assertThat(result).isPresent();
         assertThat(result.get().getId()).isEqualTo(1L);
         assertThat(result.get().getNome()).isEqualTo("João Silva");
+        assertThat(result.get().getEndereco().getCidade()).isEqualTo("São Paulo");
         verify(pessoaRepository).findById(1L);
         verify(pessoaMapper).toDomain(pessoaEntity);
     }
@@ -107,7 +122,7 @@ class PessoaRepositoryAdapterTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getNome()).isEqualTo("João Silva");
-        assertThat(result.get(0).getAtivo()).isTrue();
+        assertThat(result.get(0).getEndereco().getLogradouro()).isEqualTo("Rua A");
         verify(pessoaRepository).findAll();
         verify(pessoaMapper).toDomain(pessoaEntity);
     }
