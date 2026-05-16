@@ -43,25 +43,25 @@ public class LancamentoDTOMapper {
 
     public static LancamentoResponseDTO toDTO(Lancamento lancamento) {
         if (lancamento == null) return null;
-        
-        var categoriaDTO = lancamento.getCategoria() != null 
-                ? CategoriaDTOMapper.toDTO(lancamento.getCategoria()) 
-                : null;
-                
-        var pessoaDTO = lancamento.getPessoa() != null 
-                ? PessoaDTOMapper.toDTO(lancamento.getPessoa()) 
+
+        var categoriaDTO = lancamento.getCategoria() != null
+                ? CategoriaDTOMapper.toDTO(lancamento.getCategoria())
                 : null;
 
-         return new LancamentoResponseDTO(
-             lancamento.getId(),
-             lancamento.getDescricao(),
-             lancamento.getDataVencimento(),
-             lancamento.getDataPagamento(),
-             lancamento.getValor(),
-             lancamento.getObservacao(),
-             lancamento.getTipo(),
-             categoriaDTO,
-             pessoaDTO   
-         );
+        var pessoaDTO = lancamento.getPessoa() != null
+                ? PessoaResumoMapper.toDTO(lancamento.getPessoa())
+                : null;
+
+        return new LancamentoResponseDTO(
+            lancamento.getId(),
+            lancamento.getDescricao(),
+            lancamento.getDataVencimento(),
+            lancamento.getDataPagamento(),
+            lancamento.getValor(),
+            lancamento.getObservacao(),
+            lancamento.getTipo(),
+            categoriaDTO,
+            pessoaDTO
+        );
     }
 }
