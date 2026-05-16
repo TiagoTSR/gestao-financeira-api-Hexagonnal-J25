@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
+import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
@@ -27,7 +28,6 @@ class LancamentoMapperTest {
 
     private CategoriaEntity categoriaEntity;
     private PessoaEntity pessoaEntity;
-
     private Categoria categoriaDomain;
     private Pessoa pessoaDomain;
 
@@ -42,13 +42,22 @@ class LancamentoMapperTest {
         categoriaDomain = new Categoria(1L, "Alimentação");
 
         Endereco endereco = new Endereco(
-            "Rua das Flores", "100", "Apto 201", "Centro",
-            "12345-678", "São Paulo", "SP"
+            "Rua das Flores", "100", "Apto 201", "Centro", "12345-678", "São Paulo", "SP"
         );
+
+        EnderecoEmbeddable enderecoEmbeddable = new EnderecoEmbeddable();
+        enderecoEmbeddable.setLogradouro("Rua das Flores");
+        enderecoEmbeddable.setNumero("100");
+        enderecoEmbeddable.setComplemento("Apto 201");
+        enderecoEmbeddable.setBairro("Centro");       // ✅
+        enderecoEmbeddable.setCep("12345-678");
+        enderecoEmbeddable.setCidade("São Paulo");
+        enderecoEmbeddable.setEstado("SP");
+
         pessoaEntity = new PessoaEntity();
         pessoaEntity.setId(2L);
         pessoaEntity.setNome("Maria Silva");
-        pessoaEntity.setEndereco(endereco);
+        pessoaEntity.setEndereco(enderecoEmbeddable);
         pessoaEntity.setAtivo(true);
 
         pessoaDomain = new Pessoa(2L, "Maria Silva", endereco, true);
@@ -57,7 +66,6 @@ class LancamentoMapperTest {
     @Test
     @DisplayName("Deve converter LancamentoEntity para Lancamento (domínio) com categoria e pessoa mapeados")
     void toDomain_ShouldMapAllFieldsIncludingNestedObjects() {
-   
         LancamentoEntity entity = new LancamentoEntity();
         entity.setId(100L);
         entity.setDescricao("Compra no supermercado");
@@ -78,31 +86,18 @@ class LancamentoMapperTest {
         assertThat(domain.getValor()).isEqualTo(new BigDecimal("250.75"));
         assertThat(domain.getObservacao()).isEqualTo("Pagamento com cartão");
         assertThat(domain.getTipo()).isEqualTo(TipoLancamento.DESPESA);
-
-        assertThat(domain.getCategoria()).isEqualTo(categoriaDomain);
-        assertThat(domain.getCategoria())
-        .usingRecursiveComparison()
-        .isEqualTo(categoriaDomain);
-
-        assertThat(domain.getPessoa())
-        .usingRecursiveComparison()
-        .isEqualTo(pessoaDomain);
+        assertThat(domain.getCategoria()).usingRecursiveComparison().isEqualTo(categoriaDomain);
+        assertThat(domain.getPessoa()).usingRecursiveComparison().isEqualTo(pessoaDomain);
     }
 
     @Test
     @DisplayName("Deve converter Lancamento (domínio) para LancamentoEntity com categoria e pessoa mapeados")
     void toEntity_ShouldMapAllFieldsIncludingNestedObjects() {
-   
         Lancamento domain = new Lancamento(
-            200L,
-            "Salário mensal",
-            LocalDate.of(2025, 6, 1),
-            LocalDate.of(2025, 5, 30),
-            new BigDecimal("5000.00"),
-            "Depósito em conta",
-            TipoLancamento.RECEITA,
-            categoriaDomain,
-            pessoaDomain
+            200L, "Salário mensal",
+            LocalDate.of(2025, 6, 1), LocalDate.of(2025, 5, 30),
+            new BigDecimal("5000.00"), "Depósito em conta",
+            TipoLancamento.RECEITA, categoriaDomain, pessoaDomain
         );
 
         LancamentoEntity entity = mapper.toEntity(domain);
@@ -114,40 +109,39 @@ class LancamentoMapperTest {
         assertThat(entity.getValor()).isEqualTo(new BigDecimal("5000.00"));
         assertThat(entity.getObservacao()).isEqualTo("Depósito em conta");
         assertThat(entity.getTipo()).isEqualTo(TipoLancamento.RECEITA);
-
-        assertThat(entity.getCategoria().getId()).isEqualTo(categoriaEntity.getId());
-        assertThat(entity.getCategoria().getNome()).isEqualTo(categoriaEntity.getNome());
-
-        assertThat(entity.getPessoa().getId()).isEqualTo(pessoaEntity.getId());
-        assertThat(entity.getPessoa().getNome()).isEqualTo(pessoaEntity.getNome());
-        assertThat(entity.getPessoa().getEndereco()).isEqualTo(pessoaEntity.getEndereco());
-        assertThat(entity.getPessoa().getAtivo()).isEqualTo(pessoaEntity.getAtivo());
+        assertThat(entity.getCategoria().getId()).isEqualTo(1L);
+        assertThat(entity.getCategoria().getNome()).isEqualTo("Alimentação");
+        assertThat(entity.getPessoa().getId()).isEqualTo(2L);
+        assertThat(entity.getPessoa().getNome()).isEqualTo("Maria Silva");
+        assertThat(entity.getPessoa().getEndereco().getLogradouro()).isEqualTo("Rua das Flores");
+        assertThat(entity.getPessoa().getEndereco().getBairro()).isEqualTo("Centro");    // ✅
+        assertThat(entity.getPessoa().getEndereco().getCidade()).isEqualTo("São Paulo");
+        assertThat(entity.getPessoa().getEndereco().getEstado()).isEqualTo("SP");
+        assertThat(entity.getPessoa().getAtivo()).isTrue();
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao converter LancamentoEntity para domínio quando Categoria for nula")
+    @DisplayName("Deve lançar exceção quando Categoria for nula")
     void toDomain_WhenCategoriaIsNull_ShouldThrowException() {
- 
         LancamentoEntity entity = new LancamentoEntity();
         entity.setId(300L);
         entity.setDescricao("Teste sem categoria");
         entity.setDataVencimento(LocalDate.now());
         entity.setValor(BigDecimal.TEN);
         entity.setTipo(TipoLancamento.DESPESA);
-        entity.setCategoria(null); 
+        entity.setCategoria(null);
         entity.setPessoa(pessoaEntity);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            mapper.toDomain(entity);
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            mapper.toDomain(entity)
+        );
 
         assertThat(exception.getMessage()).isEqualTo("Categoria não pode ser nula");
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao converter LancamentoEntity para domínio quando Pessoa for nula")
+    @DisplayName("Deve lançar exceção quando Pessoa for nula")
     void toDomain_WhenPessoaIsNull_ShouldThrowException() {
-
         LancamentoEntity entity = new LancamentoEntity();
         entity.setId(301L);
         entity.setDescricao("Teste sem pessoa");
@@ -157,27 +151,21 @@ class LancamentoMapperTest {
         entity.setCategoria(categoriaEntity);
         entity.setPessoa(null);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            mapper.toDomain(entity);
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+            mapper.toDomain(entity)
+        );
 
         assertThat(exception.getMessage()).isEqualTo("Pessoa não pode ser nula");
     }
 
     @Test
-    @DisplayName("Deve preservar a integridade bidirecional após conversão dupla")
+    @DisplayName("Deve preservar integridade bidirecional após conversão dupla")
     void shouldBeBidirectionalConsistent() {
-   
         Lancamento originalDomain = new Lancamento(
-            500L,
-            "Freelance",
-            LocalDate.of(2025, 7, 15),
-            null,
-            new BigDecimal("1200.00"),
-            "Projeto concluído",
-            TipoLancamento.RECEITA,
-            categoriaDomain,
-            pessoaDomain
+            500L, "Freelance",
+            LocalDate.of(2025, 7, 15), null,
+            new BigDecimal("1200.00"), "Projeto concluído",
+            TipoLancamento.RECEITA, categoriaDomain, pessoaDomain
         );
 
         LancamentoEntity entity = mapper.toEntity(originalDomain);
