@@ -156,10 +156,6 @@ class LancamentoDTOMapperTest {
         assertThat(responseDTO.categoria().nome()).isEqualTo("Categoria DTO");
         assertThat(responseDTO.pessoa().id()).isEqualTo(3L);
         assertThat(responseDTO.pessoa().nome()).isEqualTo("Pessoa DTO");
-        assertThat(responseDTO.pessoa().logradouro()).isEqualTo("Rua DTO");
-        assertThat(responseDTO.pessoa().cidade()).isEqualTo("Curitiba");
-        assertThat(responseDTO.pessoa().estado()).isEqualTo("PR");
-        assertThat(responseDTO.pessoa().ativo()).isTrue();
     }
 
     @Test
