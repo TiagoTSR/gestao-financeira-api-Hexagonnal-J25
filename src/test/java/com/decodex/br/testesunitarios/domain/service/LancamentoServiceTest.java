@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
@@ -47,9 +48,16 @@ class LancamentoServiceTest {
     @BeforeEach
     void setUp() {
         categoria = new Categoria(1L, "Lazer");
-        pessoa = new Pessoa(2L, "Ana", null, true);
-        lancamento = new Lancamento(10L, "Cinema", LocalDate.of(2025, 6, 10), null,
-                new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa);
+
+        Endereco endereco = new Endereco(
+            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
+        );
+        pessoa = new Pessoa(2L, "Ana", endereco, true);
+
+        lancamento = new Lancamento(
+            10L, "Cinema", LocalDate.of(2025, 6, 10), null,
+            new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa
+        );
     }
 
     @Test
@@ -99,15 +107,25 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve atualizar lançamento existente")
     void update_ShouldUpdateFieldsAndSave() {
-        Lancamento existing = new Lancamento(10L, "Cinema", LocalDate.of(2025, 6, 10), null,
-                new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa);
-        Lancamento updatedDetails = new Lancamento(null, "Cinema IMAX", LocalDate.of(2025, 6, 15),
-                LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
-                TipoLancamento.DESPESA, categoria, pessoa);
+        Endereco endereco = new Endereco(
+            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
+        );
+        Pessoa pessoaLocal = new Pessoa(2L, "Ana", endereco, true); // ✅ endereco válido
 
-        Lancamento expectedUpdated = new Lancamento(10L, "Cinema IMAX", LocalDate.of(2025, 6, 15),
-                LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
-                TipoLancamento.DESPESA, categoria, pessoa);
+        Lancamento existing = new Lancamento(
+            10L, "Cinema", LocalDate.of(2025, 6, 10), null,
+            new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoaLocal
+        );
+        Lancamento updatedDetails = new Lancamento(
+            null, "Cinema IMAX", LocalDate.of(2025, 6, 15),
+            LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
+            TipoLancamento.DESPESA, categoria, pessoaLocal
+        );
+        Lancamento expectedUpdated = new Lancamento(
+            10L, "Cinema IMAX", LocalDate.of(2025, 6, 15),
+            LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
+            TipoLancamento.DESPESA, categoria, pessoaLocal
+        );
 
         when(repository.findById(10L)).thenReturn(Optional.of(existing));
         when(repository.save(any(Lancamento.class))).thenReturn(expectedUpdated);
@@ -120,11 +138,13 @@ class LancamentoServiceTest {
         assertThat(result.getObservacao()).isEqualTo("Ingresso VIP");
 
         verify(repository, times(1)).findById(10L);
-        verify(repository, times(1)).save(argThat(l -> 
+        verify(repository, times(1)).save(argThat(l ->
             l.getId().equals(10L) &&
             l.getDescricao().equals("Cinema IMAX") &&
             l.getValor().equals(new BigDecimal("75.00"))
         ));
+
+    // demais testes permanecem iguais
     }
 
     @Test
