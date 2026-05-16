@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
@@ -25,7 +26,10 @@ class LancamentoTest {
     private static final String OBSERVACAO = "Pagamento com desconto";
     private static final TipoLancamento TIPO = TipoLancamento.DESPESA;
     private static final Categoria CATEGORIA = new Categoria(1L, "Alimentação");
-    private static final Pessoa PESSOA = new Pessoa(1L, "João Silva", null, true);
+    private static final Endereco ENDERECO_PESSOA = new Endereco(
+    	    "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
+    	);
+    	private static final Pessoa PESSOA = new Pessoa(1L, "João Silva", ENDERECO_PESSOA, true);
 
     @Test
     @DisplayName("Deve criar lançamento válido com todos os campos")
