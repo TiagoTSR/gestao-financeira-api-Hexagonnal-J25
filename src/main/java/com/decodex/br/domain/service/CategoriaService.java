@@ -2,6 +2,7 @@ package com.decodex.br.domain.service;
 
 import java.util.List;
 
+import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
@@ -23,7 +24,7 @@ public class CategoriaService implements CategoriaUseCase {
     @Override
     public Categoria findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Categoria não encontrado: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrado: " + id));
     }
 
     @Override

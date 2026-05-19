@@ -2,6 +2,7 @@ package com.decodex.br.domain.service;
 
 import java.util.List;
 
+import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
@@ -22,7 +23,7 @@ public class LancamentoService implements LancamentoUseCase {
     @Override
     public Lancamento findById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lancamento não encontrado: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Lancamento não encontrado: " + id));
     }
 
     @Override
