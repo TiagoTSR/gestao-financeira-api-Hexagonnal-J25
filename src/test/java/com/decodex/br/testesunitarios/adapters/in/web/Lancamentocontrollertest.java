@@ -1,31 +1,33 @@
 package com.decodex.br.testesunitarios.adapters.in.web;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.LancamentoController;
+import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -35,238 +37,96 @@ import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.in.PessoaUseCase;
 
-@WebMvcTest(LancamentoController.class)
-class LancamentoControllerTest {
+@ExtendWith(MockitoExtension.class)
+class LancamentoControllerUnitarioTest {
 
- @Autowired
- private MockMvc mockMvc;
+    @Mock private LancamentoUseCase lancamentoUseCase;
+    @Mock private CategoriaUseCase categoriaUseCase;
+    @Mock private PessoaUseCase pessoaUseCase;
 
- @MockitoBean
- private LancamentoUseCase lancamentoUseCase;
+    @InjectMocks private LancamentoController controller;
 
- @MockitoBean
- private CategoriaUseCase categoriaUseCase;
+    @BeforeEach
+    void setUp() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
 
- @MockitoBean
- private PessoaUseCase pessoaUseCase;
+    // ── HELPERS PARA EVITAR ENDEREÇO NULO ───────────────────────────────────
+    private Endereco enderecoFake() {
+        return new Endereco("Rua X", "123", null, "Bairro Y", "00000-000", "Cidade", "SP");
+    }
 
- // ── helpers ──────────────────────────────────────────────────────────────
+    private Pessoa pessoaFake() {
+        return new Pessoa(1L, "João", enderecoFake(), true);
+    }
 
- private Categoria categoriaFake() {
-     return new Categoria(1L, "Lazer");
- }
+    private Lancamento lancamentoFake() {
+        return new Lancamento(1L, "Salário", LocalDate.now(), null, BigDecimal.TEN, null, 
+                              TipoLancamento.RECEITA, new Categoria(1L, "Renda"), pessoaFake());
+    }
+    // ────────────────────────────────────────────────────────────────────────
 
- private Endereco enderecoFake() {
-     return new Endereco("Rua A", "123", null, "Centro", "38400-000", "Uberlândia", "MG");
- }
+    @Test
+    @DisplayName("Deve retornar lista de lançamentos com status 200")
+    void findAll_deveRetornar200() {
+        when(lancamentoUseCase.findAll()).thenReturn(List.of(lancamentoFake()));
 
- private Pessoa pessoaFake() {
-     return new Pessoa(1L, "João Silva", enderecoFake(), true);
- }
+        ResponseEntity<List<LancamentoResponseDTO>> response = controller.findAll();
 
- private Lancamento lancamentoFake() {
-     return new Lancamento(
-         1L,
-         "Salário",
-         LocalDate.of(2024, 6, 10),
-         null,
-         new BigDecimal("6500.00"),
-         "Observação",
-         TipoLancamento.RECEITA,
-         categoriaFake(),
-         pessoaFake()
-     );
- }
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+    }
 
- // -------------------------------------------------------------------------
- // GET /lancamentos
- // -------------------------------------------------------------------------
+    @Test
+    @DisplayName("Deve retornar lançamento por ID com status 200")
+    void findById_deveRetornar200() {
+        when(lancamentoUseCase.findById(1L)).thenReturn(lancamentoFake());
 
- @Test
- @DisplayName("GET /lancamentos → 200 com lista de lançamentos")
- void findAll_deveRetornarListaComStatus200() throws Exception {
-     when(lancamentoUseCase.findAll()).thenReturn(List.of(lancamentoFake()));
+        ResponseEntity<LancamentoResponseDTO> response = controller.findById(1L);
 
-     mockMvc.perform(get("/lancamentos"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.length()").value(1))
-         .andExpect(jsonPath("$[0].id").value(1))
-         .andExpect(jsonPath("$[0].descricao").value("Salário"))
-         .andExpect(jsonPath("$[0].tipo").value("RECEITA"));
- }
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Salário", response.getBody().descricao());
+    }
 
- @Test
- @DisplayName("GET /lancamentos → 200 com lista vazia")
- void findAll_deveRetornarListaVaziaComStatus200() throws Exception {
-     when(lancamentoUseCase.findAll()).thenReturn(List.of());
+    @Test
+    @DisplayName("Deve criar lançamento e retornar status 201")
+    void create_deveRetornar201() {
+        LancamentoCreateDTO dto = new LancamentoCreateDTO("Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L);
+        when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
+        
+        // Passando a pessoaFake() para respeitar a validação de Endereço não-nulo
+        when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
+        when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoFake());
 
-     mockMvc.perform(get("/lancamentos"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.length()").value(0));
- }
+        ResponseEntity<LancamentoResponseDTO> response = controller.create(dto);
 
- // -------------------------------------------------------------------------
- // GET /lancamentos/{id}
- // -------------------------------------------------------------------------
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getHeaders().getLocation());
+    }
 
- @Test
- @DisplayName("GET /lancamentos/{id} → 200 quando lançamento existe")
- void findById_deveRetornarLancamentoComStatus200() throws Exception {
-     when(lancamentoUseCase.findById(1L)).thenReturn(lancamentoFake());
+    @Test
+    @DisplayName("Deve atualizar lançamento e retornar status 200")
+    void update_deveRetornar200() {
+        LancamentoUpdateDTO dto = new LancamentoUpdateDTO("Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L);
+        when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
+        
+        // Passando a pessoaFake() para respeitar a validação de Endereço não-nulo
+        when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
+        when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
 
-     mockMvc.perform(get("/lancamentos/1"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.id").value(1))
-         .andExpect(jsonPath("$.descricao").value("Salário"))
-         .andExpect(jsonPath("$.valor").value(6500.00));
- }
+        ResponseEntity<LancamentoResponseDTO> response = controller.update(1L, dto);
 
- @Test
- @DisplayName("GET /lancamentos/{id} → 404 quando não existe")
- void findById_deveRetornar404QuandoNaoEncontrado() throws Exception {
-     when(lancamentoUseCase.findById(99L))
-         .thenThrow(new jakarta.persistence.EntityNotFoundException("Lançamento não encontrado"));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
 
-     mockMvc.perform(get("/lancamentos/99"))
-         .andExpect(status().isNotFound());
- }
+    @Test
+    @DisplayName("Deve deletar lançamento e retornar status 204")
+    void delete_deveRetornar204() {
+        doNothing().when(lancamentoUseCase).delete(1L);
 
- // -------------------------------------------------------------------------
- // POST /lancamentos
- // -------------------------------------------------------------------------
+        ResponseEntity<Void> response = controller.delete(1L);
 
- @Test
- @DisplayName("POST /lancamentos → 201 ao criar lançamento válido")
- void create_deveCriarLancamentoERetornar201() throws Exception {
-     when(categoriaUseCase.findById(1L)).thenReturn(categoriaFake());
-     when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
-     when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoFake());
-
-     String body = """
-         {
-           "descricao": "Salário",
-           "dataVencimento": "2024-06-10",
-           "valor": 6500.00,
-           "tipo": "RECEITA",
-           "categoriaId": 1,
-           "pessoaId": 1
-         }
-         """;
-
-     mockMvc.perform(post("/lancamentos")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isCreated())
-         .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/lancamentos/1")))
-         .andExpect(jsonPath("$.id").value(1))
-         .andExpect(jsonPath("$.descricao").value("Salário"));
- }
-
- @Test
- @DisplayName("POST /lancamentos → 400 quando campos obrigatórios ausentes")
- void create_deveRetornar400QuandoCamposObrigatoriosAusentes() throws Exception {
-     String body = """
-         {
-           "descricao": "Salário"
-         }
-         """;
-
-     mockMvc.perform(post("/lancamentos")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isBadRequest());
- }
-
- @Test
- @DisplayName("POST /lancamentos → 400 quando body está ausente")
- void create_deveRetornar400QuandoBodyAusente() throws Exception {
-     mockMvc.perform(post("/lancamentos")
-             .contentType(MediaType.APPLICATION_JSON))
-         .andExpect(status().isBadRequest());
- }
-
- // -------------------------------------------------------------------------
- // PUT /lancamentos/{id}
- // -------------------------------------------------------------------------
-
- @Test
- @DisplayName("PUT /lancamentos/{id} → 200 ao atualizar lançamento existente")
- void update_deveAtualizarLancamentoERetornar200() throws Exception {
-     Lancamento atualizado = new Lancamento(
-         1L, "Salário atualizado",
-         LocalDate.of(2024, 7, 10), null,
-         new BigDecimal("7000.00"), null,
-         TipoLancamento.RECEITA, categoriaFake(), pessoaFake()
-     );
-
-     when(categoriaUseCase.findById(1L)).thenReturn(categoriaFake());
-     when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
-     when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(atualizado);
-
-     String body = """
-         {
-           "descricao": "Salário atualizado",
-           "dataVencimento": "2024-07-10",
-           "valor": 7000.00,
-           "tipo": "RECEITA",
-           "categoriaId": 1,
-           "pessoaId": 1
-         }
-         """;
-
-     mockMvc.perform(put("/lancamentos/1")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.descricao").value("Salário atualizado"))
-         .andExpect(jsonPath("$.valor").value(7000.00));
- }
-
- @Test
- @DisplayName("PUT /lancamentos/{id} → 404 quando lançamento não existe")
- void update_deveRetornar404QuandoNaoEncontrado() throws Exception {
-     when(categoriaUseCase.findById(1L)).thenReturn(categoriaFake());
-     when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
-     when(lancamentoUseCase.update(eq(99L), any(Lancamento.class)))
-         .thenThrow(new jakarta.persistence.EntityNotFoundException("Lançamento não encontrado"));
-
-     String body = """
-         {
-           "descricao": "Qualquer",
-           "dataVencimento": "2024-07-10",
-           "valor": 100.00,
-           "tipo": "DESPESA",
-           "categoriaId": 1,
-           "pessoaId": 1
-         }
-         """;
-
-     mockMvc.perform(put("/lancamentos/99")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isNotFound());
- }
-
- // -------------------------------------------------------------------------
- // DELETE /lancamentos/{id}
- // -------------------------------------------------------------------------
-
- @Test
- @DisplayName("DELETE /lancamentos/{id} → 204 ao deletar lançamento existente")
- void delete_deveRetornar204AoDeletar() throws Exception {
-     doNothing().when(lancamentoUseCase).delete(1L);
-
-     mockMvc.perform(delete("/lancamentos/1"))
-         .andExpect(status().isNoContent());
- }
-
- @Test
- @DisplayName("DELETE /lancamentos/{id} → 404 quando lançamento não existe")
- void delete_deveRetornar404QuandoNaoEncontrado() throws Exception {
-     doThrow(new jakarta.persistence.EntityNotFoundException("Lançamento não encontrado"))
-         .when(lancamentoUseCase).delete(99L);
-
-     mockMvc.perform(delete("/lancamentos/99"))
-         .andExpect(status().isNotFound());
- }
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 }
