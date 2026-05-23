@@ -27,7 +27,7 @@ public class LancamentoEntity {
 	private Long id;
 	
 	@NotBlank
-    @Column(length = 120)
+    @Column(length = 80)
     private String descricao;
 	
 	@NotNull
