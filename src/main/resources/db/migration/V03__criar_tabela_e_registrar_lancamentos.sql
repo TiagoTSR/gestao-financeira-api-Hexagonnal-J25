@@ -1,11 +1,11 @@
 CREATE TABLE lancamento (
     id BIGSERIAL PRIMARY KEY,
-    descricao VARCHAR(50) NOT NULL,
+    descricao VARCHAR(80) NOT NULL,
     data_vencimento DATE NOT NULL,
     data_pagamento DATE,
-    valor DECIMAL(10,2) NOT NULL,
-    observacao VARCHAR(100),
-    tipo VARCHAR(20) NOT NULL,
+    valor DECIMAL(15,2) NOT NULL,
+    observacao VARCHAR(255),
+    tipo VARCHAR(7) NOT NULL,
     categoria_id BIGINT NOT NULL,
     pessoa_id BIGINT NOT NULL,
 
