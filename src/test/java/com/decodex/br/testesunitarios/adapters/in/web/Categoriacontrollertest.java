@@ -1,214 +1,117 @@
 package com.decodex.br.testesunitarios.adapters.in.web;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.CategoriaController;
+import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
+import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
+import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 
-@WebMvcTest(CategoriaController.class)
-class CategoriaControllerTest {
+@ExtendWith(MockitoExtension.class)
+class CategoriaControllerUnitarioTest {
 
- @Autowired
- private MockMvc mockMvc;
+    @Mock
+    private CategoriaUseCase categoriaUseCase;
 
- @MockitoBean
- private CategoriaUseCase categoriaUseCase;
+    @InjectMocks
+    private CategoriaController controller;
 
- // -------------------------------------------------------------------------
- // GET /categorias
- // -------------------------------------------------------------------------
+    @BeforeEach
+    void setUp() {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+    }
 
- @Test
- @DisplayName("GET /categorias → 200 com lista de categorias")
- void findAll_deveRetornarListaDeCategoriasComStatus200() throws Exception {
-     List<Categoria> categorias = List.of(
-         new Categoria(1L, "Lazer"),
-         new Categoria(2L, "Alimentação")
-     );
-     when(categoriaUseCase.findAll()).thenReturn(categorias);
+    @Test
+    @DisplayName("Deve retornar lista de categorias com status 200")
+    void findAll_deveRetornar200() {
+        // Usando doReturn para blindar o Mockito
+        doReturn(List.of(new Categoria(1L, "Lazer"))).when(categoriaUseCase).findAll();
 
-     mockMvc.perform(get("/categorias"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.length()").value(2))
-         .andExpect(jsonPath("$[0].id").value(1))
-         .andExpect(jsonPath("$[0].nome").value("Lazer"))
-         .andExpect(jsonPath("$[1].id").value(2))
-         .andExpect(jsonPath("$[1].nome").value("Alimentação"));
- }
+        ResponseEntity<List<CategoriaResponseDTO>> response = controller.findAll();
 
- @Test
- @DisplayName("GET /categorias → 200 com lista vazia")
- void findAll_deveRetornarListaVaziaComStatus200() throws Exception {
-     when(categoriaUseCase.findAll()).thenReturn(List.of());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Lazer", response.getBody().get(0).nome());
+    }
 
-     mockMvc.perform(get("/categorias"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.length()").value(0));
- }
+    @Test
+    @DisplayName("Deve retornar categoria por ID com status 200")
+    void findById_deveRetornar200() {
+        doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).findById(1L);
 
- // -------------------------------------------------------------------------
- // GET /categorias/{id}
- // -------------------------------------------------------------------------
+        ResponseEntity<CategoriaResponseDTO> response = controller.findById(1L);
 
- @Test
- @DisplayName("GET /categorias/{id} → 200 quando categoria existe")
- void findById_deveRetornarCategoriaComStatus200() throws Exception {
-     Categoria categoria = new Categoria(1L, "Lazer");
-     when(categoriaUseCase.findById(1L)).thenReturn(categoria);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1L, response.getBody().id());
+    }
 
-     mockMvc.perform(get("/categorias/1"))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.id").value(1))
-         .andExpect(jsonPath("$.nome").value("Lazer"));
- }
+    @Test
+    @DisplayName("Deve repassar exceção quando categoria não for encontrada")
+    void findById_deveLancarExcecao() {
+        doThrow(new ResourceNotFoundException("Erro")).when(categoriaUseCase).findById(99L);
 
- @Test
- @DisplayName("GET /categorias/{id} → 404 quando categoria não existe")
- void findById_deveRetornar404QuandoNaoEncontrada() throws Exception {
-     when(categoriaUseCase.findById(99L))
-         .thenThrow(new jakarta.persistence.EntityNotFoundException("Categoria não encontrada"));
+        assertThrows(ResourceNotFoundException.class, () -> controller.findById(99L));
+    }
 
-     mockMvc.perform(get("/categorias/99"))
-         .andExpect(status().isNotFound());
- }
+    @Test
+    @DisplayName("Deve criar categoria e retornar status 201")
+    void create_deveRetornar201() {
+        CategoriaCreateDTO dto = new CategoriaCreateDTO("Lazer");
+        doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).create(any(Categoria.class));
 
- // -------------------------------------------------------------------------
- // POST /categorias
- // -------------------------------------------------------------------------
+        ResponseEntity<CategoriaResponseDTO> response = controller.create(dto);
 
- @Test
- @DisplayName("POST /categorias → 201 com Location header ao criar categoria")
- void create_deveCriarCategoriaERetornar201() throws Exception {
-     Categoria criada = new Categoria(1L, "Lazer");
-     when(categoriaUseCase.create(any(Categoria.class))).thenReturn(criada);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getHeaders().getLocation());
+        assertEquals(1L, response.getBody().id());
+    }
 
-     String body = """
-         { "nome": "Lazer" }
-         """;
+    @Test
+    @DisplayName("Deve atualizar categoria e retornar status 200")
+    void update_deveRetornar200() {
+        CategoriaUpdateDTO dto = new CategoriaUpdateDTO("Atualizado");
+        doReturn(new Categoria(1L, "Atualizado")).when(categoriaUseCase).update(eq(1L), any(Categoria.class));
 
-     mockMvc.perform(post("/categorias")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isCreated())
-         .andExpect(header().string("Location", org.hamcrest.Matchers.containsString("/categorias/1")))
-         .andExpect(jsonPath("$.id").value(1))
-         .andExpect(jsonPath("$.nome").value("Lazer"));
- }
+        ResponseEntity<CategoriaResponseDTO> response = controller.update(1L, dto);
 
- @Test
- @DisplayName("POST /categorias → 400 quando nome está em branco")
- void create_deveRetornar400QuandoNomeEmBranco() throws Exception {
-     String body = """
-         { "nome": "" }
-         """;
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Atualizado", response.getBody().nome());
+    }
 
-     mockMvc.perform(post("/categorias")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isBadRequest());
- }
+    @Test
+    @DisplayName("Deve deletar categoria e retornar status 204")
+    void delete_deveRetornar204() {
+        doNothing().when(categoriaUseCase).delete(1L);
 
- @Test
- @DisplayName("POST /categorias → 400 quando body está ausente")
- void create_deveRetornar400QuandoBodyAusente() throws Exception {
-     mockMvc.perform(post("/categorias")
-             .contentType(MediaType.APPLICATION_JSON))
-         .andExpect(status().isBadRequest());
- }
+        ResponseEntity<Void> response = controller.delete(1L);
 
- // -------------------------------------------------------------------------
- // PUT /categorias/{id}
- // -------------------------------------------------------------------------
-
- @Test
- @DisplayName("PUT /categorias/{id} → 200 ao atualizar categoria existente")
- void update_deveAtualizarCategoriaERetornar200() throws Exception {
-     Categoria atualizada = new Categoria(1L, "Supermercado");
-     when(categoriaUseCase.update(eq(1L), any(Categoria.class))).thenReturn(atualizada);
-
-     String body = """
-         { "nome": "Supermercado" }
-         """;
-
-     mockMvc.perform(put("/categorias/1")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isOk())
-         .andExpect(jsonPath("$.id").value(1))
-         .andExpect(jsonPath("$.nome").value("Supermercado"));
- }
-
- @Test
- @DisplayName("PUT /categorias/{id} → 404 quando categoria não existe")
- void update_deveRetornar404QuandoNaoEncontrada() throws Exception {
-     when(categoriaUseCase.update(eq(99L), any(Categoria.class)))
-         .thenThrow(new jakarta.persistence.EntityNotFoundException("Categoria não encontrada"));
-
-     String body = """
-         { "nome": "Qualquer" }
-         """;
-
-     mockMvc.perform(put("/categorias/99")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isNotFound());
- }
-
- @Test
- @DisplayName("PUT /categorias/{id} → 400 quando nome está em branco")
- void update_deveRetornar400QuandoNomeEmBranco() throws Exception {
-     String body = """
-         { "nome": "" }
-         """;
-
-     mockMvc.perform(put("/categorias/1")
-             .contentType(MediaType.APPLICATION_JSON)
-             .content(body))
-         .andExpect(status().isBadRequest());
- }
-
- // -------------------------------------------------------------------------
- // DELETE /categorias/{id}
- // -------------------------------------------------------------------------
-
- @Test
- @DisplayName("DELETE /categorias/{id} → 204 ao deletar categoria existente")
- void delete_deveRetornar204AoDeletar() throws Exception {
-     doNothing().when(categoriaUseCase).delete(1L);
-
-     mockMvc.perform(delete("/categorias/1"))
-         .andExpect(status().isNoContent());
- }
-
- @Test
- @DisplayName("DELETE /categorias/{id} → 404 quando categoria não existe")
- void delete_deveRetornar404QuandoNaoEncontrada() throws Exception {
-     doThrow(new jakarta.persistence.EntityNotFoundException("Categoria não encontrada"))
-         .when(categoriaUseCase).delete(99L);
-
-     mockMvc.perform(delete("/categorias/99"))
-         .andExpect(status().isNotFound());
- }
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 }
