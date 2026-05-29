@@ -9,6 +9,9 @@ replay_pid*
 # Logs
 *.log
 
+# Environment
+.env
+
 # IDEs
 .idea/
 *.iml
