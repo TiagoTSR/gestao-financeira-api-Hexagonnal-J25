@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  meu-postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER_LOCAL}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_LOCAL}
+    ports:
+      - "5432:5432"
+
+  minha-api-spring:
+    image: gestao-financeira-api:latest
+    container_name: spring_api
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - meu-postgres
+    env_file:
+      - .env
+    environment:
+      DB_URL2: jdbc:postgresql://meu-postgres:5432/${POSTGRES_DB_NAME}
+      DB_USER1: ${POSTGRES_USER_LOCAL}
+      DB_PASSWORD1: ${POSTGRES_PASSWORD_LOCAL}
