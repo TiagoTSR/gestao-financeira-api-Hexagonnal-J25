@@ -1,0 +1,28 @@
+# Pastas do Maven e binários
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs e arquivos temporários
+*.log
+*.tmp
+*.bak
+
+# Pastas de IDEs
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+
+# Controle de versão
+.git/
+.gitignore
+
+# Ambiente local e arquivos do SO
+venv/
+.DS_Store
+Thumbs.db
+
+# Testes (opcional, se quiser garantir que não vão para a imagem)
+src/test/
