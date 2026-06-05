@@ -4,6 +4,10 @@ WORKDIR /app
 # Copia apenas arquivos de configuração do Maven para baixar dependências
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+
+# Garante permissão de execução no mvnw
+RUN chmod +x mvnw
+
 # Baixa as dependências (isso será cacheado)
 RUN ./mvnw dependency:go-offline
 # Copia o código fonte e compila
