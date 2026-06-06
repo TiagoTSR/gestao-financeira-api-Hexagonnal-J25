@@ -1,53 +1,66 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 
 @Component
 public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
 
-    private final PessoaRepository pessoaRepository;
-    private final PessoaMapper pessoaMapper;
+    private final PessoaRepository repository;
+    private final PessoaMapper mapper;
     
     public PessoaRepositoryAdapter(
-            PessoaRepository pessoaRepository,
-            PessoaMapper pessoaMapper) {
+            PessoaRepository repository,
+            PessoaMapper mapper) {
 
-        this.pessoaRepository = pessoaRepository;
-        this.pessoaMapper = pessoaMapper;
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public Pessoa save(Pessoa pessoa) {
-        return pessoaMapper.toDomain(
-            pessoaRepository.save(pessoaMapper.toEntity(pessoa))
+        return mapper.toDomain(
+            repository.save(mapper.toEntity(pessoa))
         );
     }
 
     @Override
     public Optional<Pessoa> findById(Long id) {
-        return pessoaRepository.findById(id)
-            .map(pessoaMapper::toDomain);
+        return repository.findById(id)
+            .map(mapper::toDomain);
     }
 
     @Override
-    public List<Pessoa> findAll() {
-        return pessoaRepository.findAll()
-            .stream()
-            .map(pessoaMapper::toDomain)
-            .collect(Collectors.toList());
+    public PageResult<Pessoa> findAll(PageRequest request) {
+
+        Page<PessoaEntity> page = repository.findAll(
+            org.springframework.data.domain.PageRequest.of(
+                request.page(),
+                request.size()
+            )
+        );
+
+        return new PageResult<>(
+            page.getContent().stream().map(mapper::toDomain).toList(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages()
+        );
     }
 
     @Override
     public void deleteById(Long id) {
-        pessoaRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }

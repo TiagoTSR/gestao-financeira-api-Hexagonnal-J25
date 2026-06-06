@@ -1,11 +1,7 @@
 package com.decodex.br.testesunitarios.adapters.out.persistence.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.decodex.br.adapters.out.persistence.adapter.PessoaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
@@ -25,8 +24,8 @@ import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
-
-
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários - PessoaRepositoryAdapter")
@@ -46,7 +45,6 @@ class PessoaRepositoryAdapterTest {
 
     @BeforeEach
     void setUp() {
-
         Endereco endereco = new Endereco(
             "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
         );
@@ -116,17 +114,25 @@ class PessoaRepositoryAdapterTest {
     }
 
     @Test
-    @DisplayName("Deve listar todas as pessoas")
-    void findAll_ShouldReturnAll() {
-        when(pessoaRepository.findAll()).thenReturn(List.of(pessoaEntity));
+    @DisplayName("Deve listar pessoas com paginação")
+    void findAll_ShouldReturnPageResult() {
+        PageRequest pageRequest = new PageRequest(0, 10);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        Page<PessoaEntity> page = new PageImpl<>(List.of(pessoaEntity), pageable, 1);
+
+        when(pessoaRepository.findAll(pageable)).thenReturn(page);
         when(pessoaMapper.toDomain(pessoaEntity)).thenReturn(domainPessoa);
 
-        List<Pessoa> result = adapter.findAll();
+        PageResult<Pessoa> result = adapter.findAll(pageRequest);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getNome()).isEqualTo("João Silva");
-        assertThat(result.get(0).getEndereco().getLogradouro()).isEqualTo("Rua A");
-        verify(pessoaRepository).findAll();
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().get(0).getNome()).isEqualTo("João Silva");
+        assertThat(result.content().get(0).getEndereco().getLogradouro()).isEqualTo("Rua A");
+        assertThat(result.page()).isZero();
+        assertThat(result.size()).isEqualTo(10);
+        assertThat(result.totalElements()).isEqualTo(1L);
+        assertThat(result.totalPages()).isEqualTo(1);
+        verify(pessoaRepository).findAll(pageable);
         verify(pessoaMapper).toDomain(pessoaEntity);
     }
 
