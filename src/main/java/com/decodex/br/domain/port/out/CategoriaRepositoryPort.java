@@ -1,9 +1,10 @@
 package com.decodex.br.domain.port.out;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 public interface CategoriaRepositoryPort {
 	
@@ -11,7 +12,7 @@ public interface CategoriaRepositoryPort {
 
     Optional<Categoria> findById(Long id);
 
-    List<Categoria> findAll();
+    PageResult<Categoria> findAll(PageRequest pageRequest);
 
     void deleteById(Long id);
 

@@ -22,6 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.service.CategoriaService;
 
@@ -36,21 +38,28 @@ class CategoriaServiceTest {
     private CategoriaService service;
 
     private Categoria categoria;
+    private PageRequest pageRequest;
 
     @BeforeEach
     void setUp() {
         categoria = new Categoria(1L, "Alimentação");
+        pageRequest = new PageRequest(0, 10);
     }
 
     @Test
-    @DisplayName("Deve listar todas as categorias")
-    void findAll_ShouldReturnList() {
-        when(repository.findAll()).thenReturn(List.of(categoria));
+    @DisplayName("Deve listar categorias paginadas")
+    void findAll_ShouldReturnPageResult() {
+        PageResult<Categoria> pageResult = new PageResult<>(
+            List.of(categoria), 0, 10, 1L, 1
+        );
+        when(repository.findAll(pageRequest)).thenReturn(pageResult);
 
-        List<Categoria> result = service.findAll();
+        PageResult<Categoria> result = service.findAll(pageRequest);
 
-        assertThat(result).hasSize(1).contains(categoria);
-        verify(repository, times(1)).findAll();
+        assertThat(result.content()).hasSize(1).contains(categoria);
+        assertThat(result.page()).isZero();
+        assertThat(result.totalElements()).isEqualTo(1L);
+        verify(repository, times(1)).findAll(pageRequest);
     }
 
     @Test

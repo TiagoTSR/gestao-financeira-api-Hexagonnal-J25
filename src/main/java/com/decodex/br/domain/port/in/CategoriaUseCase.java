@@ -1,12 +1,12 @@
 package com.decodex.br.domain.port.in;
 
-import java.util.List;
-
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 public interface CategoriaUseCase {
 	
-	List<Categoria> findAll();
+	PageResult<Categoria> findAll(PageRequest pageRequest);
 
     Categoria findById(Long id);
 

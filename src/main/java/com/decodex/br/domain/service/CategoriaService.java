@@ -1,9 +1,9 @@
 package com.decodex.br.domain.service;
 
-import java.util.List;
-
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 
@@ -16,9 +16,8 @@ public class CategoriaService implements CategoriaUseCase {
         this.repository = repository;
     }
 
-    @Override
-    public List<Categoria> findAll() {
-        return repository.findAll();
+    public PageResult<Categoria> findAll(PageRequest pageRequest) {
+        return repository.findAll(pageRequest);
     }
 
     @Override
