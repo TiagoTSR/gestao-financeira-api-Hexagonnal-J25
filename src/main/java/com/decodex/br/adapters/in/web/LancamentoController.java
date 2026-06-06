@@ -1,7 +1,6 @@
 package com.decodex.br.adapters.in.web;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,6 +21,8 @@ import com.decodex.br.application.mapper.LancamentoDTOMapper;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.in.PessoaUseCase;
@@ -45,13 +47,20 @@ public class LancamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LancamentoResponseDTO>> findAll() {
-        List<LancamentoResponseDTO> response = lancamentoUseCase.findAll()
-            .stream()
-            .map(LancamentoDTOMapper::toDTO)
-            .toList();
+    public PageResult<LancamentoResponseDTO> findAll(
+    		 @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity.ok(response);
+         if (page < 0) {
+             throw new IllegalArgumentException("O número da página não pode ser negativo.");
+         }
+
+         if (size <= 0) {
+             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
+         }
+
+        return lancamentoUseCase.findAll(new PageRequest(page, size))
+                .map(LancamentoDTOMapper::toDTO);
     }
 
     @GetMapping("/{id}")

@@ -28,11 +28,9 @@ import com.decodex.br.adapters.in.web.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
-import com.decodex.br.domain.model.Categoria;
-import com.decodex.br.domain.model.Endereco;
-import com.decodex.br.domain.model.Lancamento;
-import com.decodex.br.domain.model.Pessoa;
-import com.decodex.br.domain.model.TipoLancamento;
+import com.decodex.br.domain.model.*;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.in.PessoaUseCase;
@@ -52,7 +50,6 @@ class LancamentoControllerUnitarioTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     }
 
-    // ── HELPERS PARA EVITAR ENDEREÇO NULO ───────────────────────────────────
     private Endereco enderecoFake() {
         return new Endereco("Rua X", "123", null, "Bairro Y", "00000-000", "Cidade", "SP");
     }
@@ -65,17 +62,21 @@ class LancamentoControllerUnitarioTest {
         return new Lancamento(1L, "Salário", LocalDate.now(), null, BigDecimal.TEN, null, 
                               TipoLancamento.RECEITA, new Categoria(1L, "Renda"), pessoaFake());
     }
-    // ────────────────────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("Deve retornar lista de lançamentos com status 200")
+    @DisplayName("Deve retornar lista paginada de lançamentos com status 200")
     void findAll_deveRetornar200() {
-        when(lancamentoUseCase.findAll()).thenReturn(List.of(lancamentoFake()));
+        PageResult<Lancamento> pageResult = new PageResult<>(
+            List.of(lancamentoFake()), 0, 10, 1L, 1
+        );
+        when(lancamentoUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
 
-        ResponseEntity<List<LancamentoResponseDTO>> response = controller.findAll();
+        PageResult<LancamentoResponseDTO> response = controller.findAll(0, 10);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
+        assertEquals(1, response.content().size());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals("Salário", response.content().get(0).descricao());
     }
 
     @Test
@@ -92,10 +93,10 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve criar lançamento e retornar status 201")
     void create_deveRetornar201() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO("Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L);
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
+        );
         when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        
-        // Passando a pessoaFake() para respeitar a validação de Endereço não-nulo
         when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
         when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoFake());
 
@@ -108,10 +109,10 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve atualizar lançamento e retornar status 200")
     void update_deveRetornar200() {
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO("Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L);
+        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
+        );
         when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        
-        // Passando a pessoaFake() para respeitar a validação de Endereço não-nulo
         when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
         when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
 
@@ -124,9 +125,7 @@ class LancamentoControllerUnitarioTest {
     @DisplayName("Deve deletar lançamento e retornar status 204")
     void delete_deveRetornar204() {
         doNothing().when(lancamentoUseCase).delete(1L);
-
         ResponseEntity<Void> response = controller.delete(1L);
-
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }
