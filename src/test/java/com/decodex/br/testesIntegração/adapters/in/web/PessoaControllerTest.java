@@ -27,6 +27,8 @@ import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.PessoaUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -46,16 +48,11 @@ class PessoaControllerTest {
     @MockitoBean
     private PessoaUseCase pessoaUseCase;
 
-    // -------------------------------------------------------------------------
-    // POST /pessoas
-    // -------------------------------------------------------------------------
-
     @Test
     @DisplayName("Deve retornar 201 Created ao criar pessoa válida")
     void create_DeveRetornar201() throws Exception {
-        // Arrange
         PessoaCreateDTO requestDTO = new PessoaCreateDTO(
-            "João Silva", "Rua das Flores", "10", null, "Centro", 
+            "João Silva", "Rua das Flores", "10", null, "Centro",
             "01000-000", "São Paulo", "SP", true
         );
 
@@ -64,7 +61,6 @@ class PessoaControllerTest {
 
         when(pessoaUseCase.create(any(Pessoa.class))).thenReturn(pessoaSalva);
 
-        // Act & Assert
         mockMvc.perform(post("/pessoas")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
@@ -72,7 +68,6 @@ class PessoaControllerTest {
             .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/pessoas/1")))
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.nome").value("João Silva"))
-            // Valida se o DTO achatou o endereço corretamente na raiz do JSON
             .andExpect(jsonPath("$.logradouro").value("Rua das Flores"))
             .andExpect(jsonPath("$.cidade").value("São Paulo"))
             .andExpect(jsonPath("$.ativo").value(true));
@@ -81,9 +76,8 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao enviar pessoa com dados incompletos")
     void create_DeveRetornar400_QuandoDadosInvalidos() throws Exception {
-        // Nome vazio e Estado nulo para forçar os erros do @NotBlank e @NotNull
         PessoaCreateDTO requestDTO = new PessoaCreateDTO(
-            "", "Rua das Flores", "10", null, "Centro", 
+            "", "Rua das Flores", "10", null, "Centro",
             "01000-000", "São Paulo", null, true
         );
 
@@ -91,14 +85,9 @@ class PessoaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isBadRequest())
-            // Valida se o GlobalExceptionHandler retornou os erros para os dois campos
             .andExpect(jsonPath("$.nome").exists())
             .andExpect(jsonPath("$.estado").exists());
     }
-
-    // -------------------------------------------------------------------------
-    // GET /pessoas/{id}
-    // -------------------------------------------------------------------------
 
     @Test
     @DisplayName("Deve retornar 200 OK ao buscar pessoa existente")
@@ -115,34 +104,34 @@ class PessoaControllerTest {
             .andExpect(jsonPath("$.logradouro").value("Rua X"));
     }
 
-    // -------------------------------------------------------------------------
-    // GET /pessoas
-    // -------------------------------------------------------------------------
-
     @Test
-    @DisplayName("Deve retornar 200 OK e listar as pessoas")
+    @DisplayName("Deve retornar 200 OK e listar pessoas paginadas")
     void findAll_DeveRetornar200() throws Exception {
         Endereco endereco = new Endereco("Rua X", "123", null, "Bairro Y", "12345-000", "Cidade Z", "MG");
         Pessoa pessoa = new Pessoa(1L, "Maria", endereco, false);
 
-        when(pessoaUseCase.findAll()).thenReturn(List.of(pessoa));
+        PageResult<Pessoa> pageResult = new PageResult<>(
+            List.of(pessoa), 0, 10, 1L, 1
+        );
+        when(pessoaUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
 
-        mockMvc.perform(get("/pessoas"))
+        mockMvc.perform(get("/pessoas")
+                .param("page", "0")
+                .param("size", "10"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].nome").value("Maria"))
-            .andExpect(jsonPath("$[0].ativo").value(false));
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[0].nome").value("Maria"))
+            .andExpect(jsonPath("$.content[0].ativo").value(false))
+            .andExpect(jsonPath("$.page").value(0))
+            .andExpect(jsonPath("$.size").value(10))
+            .andExpect(jsonPath("$.totalElements").value(1));
     }
-
-    // -------------------------------------------------------------------------
-    // PUT /pessoas/{id}
-    // -------------------------------------------------------------------------
 
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar pessoa")
     void update_DeveRetornar200() throws Exception {
         PessoaUpdateDTO requestDTO = new PessoaUpdateDTO(
-            "Maria Atualizada", "Rua Nova", "100", "Apt 2", "Centro", 
+            "Maria Atualizada", "Rua Nova", "100", "Apt 2", "Centro",
             "11111-000", "Belo Horizonte", "MG", false
         );
 
@@ -159,10 +148,6 @@ class PessoaControllerTest {
             .andExpect(jsonPath("$.logradouro").value("Rua Nova"))
             .andExpect(jsonPath("$.ativo").value(false));
     }
-
-    // -------------------------------------------------------------------------
-    // DELETE /pessoas/{id}
-    // -------------------------------------------------------------------------
 
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar pessoa")

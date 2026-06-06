@@ -1,7 +1,6 @@
 package com.decodex.br.adapters.in.web;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,6 +19,8 @@ import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.application.mapper.PessoaDTOMapper;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.PessoaUseCase;
 
 import jakarta.validation.Valid;
@@ -27,31 +29,38 @@ import jakarta.validation.Valid;
 @RequestMapping("/pessoas")
 public class PessoaController {
 
-    private final PessoaUseCase pessoaUseCase;
+    private final PessoaUseCase useCase;
 
-    public PessoaController(PessoaUseCase pessoaUseCase) {
-        this.pessoaUseCase = pessoaUseCase;
+    public PessoaController(PessoaUseCase useCase) {
+        this.useCase = useCase;
     }
 
     @GetMapping
-    public ResponseEntity<List<PessoaResponseDTO>> findAll() {
-        List<PessoaResponseDTO> response = pessoaUseCase.findAll()
-            .stream()
-            .map(PessoaDTOMapper::toDTO)
-            .toList();
+    public PageResult<PessoaResponseDTO> findAll(
+    		 @RequestParam(defaultValue = "0") int page,
+             @RequestParam(defaultValue = "10") int size) {
 
-        return ResponseEntity.ok(response);
+         if (page < 0) {
+             throw new IllegalArgumentException("O número da página não pode ser negativo.");
+         }
+
+         if (size <= 0) {
+             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
+         }
+
+        return useCase.findAll(new PageRequest(page, size))
+                .map(PessoaDTOMapper::toDTO);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
-        Pessoa pessoa = pessoaUseCase.findById(id);
+        Pessoa pessoa = useCase.findById(id);
         return ResponseEntity.ok(PessoaDTOMapper.toDTO(pessoa));
     }
 
     @PostMapping
     public ResponseEntity<PessoaResponseDTO> create(@RequestBody @Valid PessoaCreateDTO dto) {
-        Pessoa pessoa = pessoaUseCase.create(PessoaDTOMapper.toDomain(dto));
+        Pessoa pessoa = useCase.create(PessoaDTOMapper.toDomain(dto));
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -68,14 +77,14 @@ public class PessoaController {
             @RequestBody @Valid PessoaUpdateDTO dto) {
 
         Pessoa novosDados = PessoaDTOMapper.toDomain(dto);
-        Pessoa atualizada = pessoaUseCase.update(id, novosDados);
+        Pessoa atualizada = useCase.update(id, novosDados);
 
         return ResponseEntity.ok(PessoaDTOMapper.toDTO(atualizada));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        pessoaUseCase.delete(id);
+        useCase.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

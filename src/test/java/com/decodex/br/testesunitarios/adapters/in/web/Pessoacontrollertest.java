@@ -28,6 +28,8 @@ import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.PessoaUseCase;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,14 +53,19 @@ class PessoaControllerUnitarioTest {
     }
 
     @Test
-    @DisplayName("Deve retornar lista de pessoas com status 200")
+    @DisplayName("Deve retornar lista paginada de pessoas com status 200")
     void findAll_deveRetornar200() {
-        when(pessoaUseCase.findAll()).thenReturn(List.of(pessoaFake()));
+        PageResult<Pessoa> pageResult = new PageResult<>(
+            List.of(pessoaFake()), 0, 10, 1L, 1
+        );
+        when(pessoaUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
 
-        ResponseEntity<List<PessoaResponseDTO>> response = controller.findAll();
+        PageResult<PessoaResponseDTO> response = controller.findAll(0, 10);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
+        assertEquals(1, response.content().size());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals("João", response.content().get(0).nome());
     }
 
     @Test
@@ -75,7 +82,9 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve criar pessoa e retornar status 201")
     void create_deveRetornar201() {
-        PessoaCreateDTO dto = new PessoaCreateDTO("João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true);
+        PessoaCreateDTO dto = new PessoaCreateDTO(
+            "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
+        );
         when(pessoaUseCase.create(any(Pessoa.class))).thenReturn(pessoaFake());
 
         ResponseEntity<PessoaResponseDTO> response = controller.create(dto);
@@ -87,7 +96,9 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve atualizar pessoa e retornar status 200")
     void update_deveRetornar200() {
-        PessoaUpdateDTO dto = new PessoaUpdateDTO("João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true);
+        PessoaUpdateDTO dto = new PessoaUpdateDTO(
+            "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
+        );
         when(pessoaUseCase.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaFake());
 
         ResponseEntity<PessoaResponseDTO> response = controller.update(1L, dto);
