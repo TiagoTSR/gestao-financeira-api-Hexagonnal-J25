@@ -1,9 +1,9 @@
 package com.decodex.br.domain.service;
 
-import java.util.List;
-
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.PessoaUseCase;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 
@@ -16,8 +16,8 @@ public class PessoaService implements PessoaUseCase {
     }
 
     @Override
-    public List<Pessoa> findAll() {
-        return repository.findAll();
+    public PageResult<Pessoa> findAll(PageRequest pageRequest) {
+        return repository.findAll(pageRequest);
     }
 
     @Override

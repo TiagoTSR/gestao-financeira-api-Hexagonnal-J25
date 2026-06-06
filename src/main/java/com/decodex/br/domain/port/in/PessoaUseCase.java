@@ -1,12 +1,12 @@
 package com.decodex.br.domain.port.in;
 
-import java.util.List;
-
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 public interface PessoaUseCase {
 	
-	List<Pessoa> findAll();
+	PageResult<Pessoa> findAll(PageRequest pageRequest);
 
     Pessoa findById(Long id);
 

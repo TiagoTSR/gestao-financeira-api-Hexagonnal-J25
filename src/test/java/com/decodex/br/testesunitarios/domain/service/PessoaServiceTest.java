@@ -23,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.domain.service.PessoaService;
 
@@ -38,6 +40,7 @@ class PessoaServiceTest {
 
     private Endereco endereco;
     private Pessoa pessoa;
+    private PageRequest pageRequest;
 
     @BeforeEach
     void setUp() {
@@ -45,17 +48,23 @@ class PessoaServiceTest {
             "Rua A", "123", null, "Centro", "12345-678", "São Paulo", "SP"
         );
         pessoa = new Pessoa(1L, "João Silva", endereco, true);
+        pageRequest = new PageRequest(0, 10);
     }
 
     @Test
-    @DisplayName("Deve listar todas as pessoas")
-    void findAll_ShouldReturnList() {
-        when(repository.findAll()).thenReturn(List.of(pessoa));
+    @DisplayName("Deve listar pessoas paginadas")
+    void findAll_ShouldReturnPageResult() {
+        PageResult<Pessoa> pageResult = new PageResult<>(
+            List.of(pessoa), 0, 10, 1L, 1
+        );
+        when(repository.findAll(pageRequest)).thenReturn(pageResult);
 
-        List<Pessoa> result = service.findAll();
+        PageResult<Pessoa> result = service.findAll(pageRequest);
 
-        assertThat(result).hasSize(1).contains(pessoa);
-        verify(repository, times(1)).findAll();
+        assertThat(result.content()).hasSize(1).contains(pessoa);
+        assertThat(result.page()).isZero();
+        assertThat(result.totalElements()).isEqualTo(1L);
+        verify(repository, times(1)).findAll(pageRequest);
     }
 
     @Test
@@ -97,7 +106,6 @@ class PessoaServiceTest {
     void update_ShouldUpdateFieldsAndSave() {
         Pessoa existing = new Pessoa(1L, "João Silva", endereco, true);
 
-        // ✅ endereco válido nos dados de atualização
         Endereco novoEndereco = new Endereco(
             "Rua B", "456", null, "Bairro Novo", "11111-111", "Rio", "RJ"
         );
@@ -111,14 +119,14 @@ class PessoaServiceTest {
 
         assertThat(result.getNome()).isEqualTo("João Silva Atualizado");
         assertThat(result.getAtivo()).isFalse();
-        assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua B"); // ✅ verifica endereco
+        assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua B");
         assertThat(result.getEndereco().getCidade()).isEqualTo("Rio");
 
         verify(repository, times(1)).findById(1L);
         verify(repository, times(1)).save(argThat(p ->
             p.getId().equals(1L) &&
             p.getNome().equals("João Silva Atualizado") &&
-            p.getEndereco().getLogradouro().equals("Rua B") && // ✅ verifica campo do endereco
+            p.getEndereco().getLogradouro().equals("Rua B") &&
             p.getAtivo().equals(false)
         ));
     }

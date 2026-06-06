@@ -1,9 +1,10 @@
 package com.decodex.br.domain.port.out;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 public interface PessoaRepositoryPort {
 	
@@ -11,7 +12,7 @@ public interface PessoaRepositoryPort {
 
     Optional<Pessoa> findById(Long id);
 
-    List<Pessoa> findAll();
+    PageResult<Pessoa> findAll(PageRequest pageRequest);
 
     void deleteById(Long id);
 
