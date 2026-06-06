@@ -30,6 +30,8 @@ import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,17 +50,20 @@ class CategoriaControllerUnitarioTest {
     }
 
     @Test
-    @DisplayName("Deve retornar lista de categorias com status 200")
+    @DisplayName("Deve retornar lista paginada de categorias com status 200")
     void findAll_deveRetornar200() {
-        // Usando doReturn para blindar o Mockito
-        doReturn(List.of(new Categoria(1L, "Lazer"))).when(categoriaUseCase).findAll();
+        PageResult<Categoria> pageResult = new PageResult<>(
+            List.of(new Categoria(1L, "Lazer")), 0, 10, 1L, 1
+        );
+        doReturn(pageResult).when(categoriaUseCase).findAll(any(PageRequest.class));
 
-        ResponseEntity<List<CategoriaResponseDTO>> response = controller.findAll();
+        PageResult<CategoriaResponseDTO> response = controller.findAll(0, 10);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
-        assertEquals("Lazer", response.getBody().get(0).nome());
+        assertNotNull(response);
+        assertEquals(1, response.content().size());
+        assertEquals(0, response.page());
+        assertEquals(10, response.size());
+        assertEquals("Lazer", response.content().get(0).nome());
     }
 
     @Test
