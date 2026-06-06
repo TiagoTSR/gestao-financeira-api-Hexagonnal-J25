@@ -1,53 +1,66 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
 import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 
 @Component
 public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
 
-    private final LancamentoRepository lancamentoRepository;
-    private final LancamentoMapper lancamentoMapper;
+    private final LancamentoRepository repository;
+    private final LancamentoMapper mapper;
     
     public LancamentoRepositoryAdapter(
-            LancamentoRepository lancamentoRepository,
-            LancamentoMapper lancamentoMapper) {
+            LancamentoRepository repository,
+            LancamentoMapper mapper) {
 
-        this.lancamentoRepository = lancamentoRepository;
-        this.lancamentoMapper = lancamentoMapper;
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public Lancamento save(Lancamento lancamento) {
-        return lancamentoMapper.toDomain(
-            lancamentoRepository.save(lancamentoMapper.toEntity(lancamento))
+        return mapper.toDomain(
+            repository.save(mapper.toEntity(lancamento))
         );
     }
 
     @Override
     public Optional<Lancamento> findById(Long id) {
-        return lancamentoRepository.findById(id)
-            .map(lancamentoMapper::toDomain);
+        return repository.findById(id)
+            .map(mapper::toDomain);
     }
 
     @Override
-    public List<Lancamento> findAll() {
-        return lancamentoRepository.findAll()
-            .stream()
-            .map(lancamentoMapper::toDomain)
-            .collect(Collectors.toList());
+    public PageResult<Lancamento> findAll(PageRequest request) {
+
+        Page<LancamentoEntity> page = repository.findAll(
+            org.springframework.data.domain.PageRequest.of(
+                request.page(),
+                request.size()
+            )
+        );
+
+        return new PageResult<>(
+            page.getContent().stream().map(mapper::toDomain).toList(),
+            page.getNumber(),
+            page.getSize(),
+            page.getTotalElements(),
+            page.getTotalPages()
+        );
     }
 
     @Override
     public void deleteById(Long id) {
-        lancamentoRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }
