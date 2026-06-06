@@ -3,12 +3,7 @@ package com.decodex.br.testesunitarios.domain.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,11 +18,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.decodex.br.domain.model.Categoria;
-import com.decodex.br.domain.model.Endereco;
-import com.decodex.br.domain.model.Lancamento;
-import com.decodex.br.domain.model.Pessoa;
-import com.decodex.br.domain.model.TipoLancamento;
+import com.decodex.br.domain.model.*;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.service.LancamentoService;
 
@@ -48,27 +41,27 @@ class LancamentoServiceTest {
     @BeforeEach
     void setUp() {
         categoria = new Categoria(1L, "Lazer");
-
-        Endereco endereco = new Endereco(
-            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
-        );
+        Endereco endereco = new Endereco("Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP");
         pessoa = new Pessoa(2L, "Ana", endereco, true);
-
-        lancamento = new Lancamento(
-            10L, "Cinema", LocalDate.of(2025, 6, 10), null,
-            new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa
-        );
+        lancamento = new Lancamento(10L, "Cinema", LocalDate.of(2025, 6, 10), null,
+                new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa);
     }
 
     @Test
-    @DisplayName("Deve listar todos os lançamentos")
-    void findAll_ShouldReturnList() {
-        when(repository.findAll()).thenReturn(List.of(lancamento));
+    @DisplayName("Deve listar lançamentos paginados")
+    void findAll_ShouldReturnPageResult() {
+        PageRequest pageRequest = new PageRequest(0, 10);
+        PageResult<Lancamento> pageResult = new PageResult<>(
+            List.of(lancamento), 0, 10, 1L, 1
+        );
+        when(repository.findAll(pageRequest)).thenReturn(pageResult);
 
-        List<Lancamento> result = service.findAll();
+        PageResult<Lancamento> result = service.findAll(pageRequest);
 
-        assertThat(result).hasSize(1).contains(lancamento);
-        verify(repository, times(1)).findAll();
+        assertThat(result.content()).hasSize(1).contains(lancamento);
+        assertThat(result.page()).isZero();
+        assertThat(result.totalElements()).isEqualTo(1L);
+        verify(repository, times(1)).findAll(pageRequest);
     }
 
     @Test
@@ -107,24 +100,19 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve atualizar lançamento existente")
     void update_ShouldUpdateFieldsAndSave() {
-        Endereco endereco = new Endereco(
-            "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
-        );
-        Pessoa pessoaLocal = new Pessoa(2L, "Ana", endereco, true); // ✅ endereco válido
-
         Lancamento existing = new Lancamento(
             10L, "Cinema", LocalDate.of(2025, 6, 10), null,
-            new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoaLocal
+            new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa
         );
         Lancamento updatedDetails = new Lancamento(
             null, "Cinema IMAX", LocalDate.of(2025, 6, 15),
             LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
-            TipoLancamento.DESPESA, categoria, pessoaLocal
+            TipoLancamento.DESPESA, categoria, pessoa
         );
         Lancamento expectedUpdated = new Lancamento(
             10L, "Cinema IMAX", LocalDate.of(2025, 6, 15),
             LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
-            TipoLancamento.DESPESA, categoria, pessoaLocal
+            TipoLancamento.DESPESA, categoria, pessoa
         );
 
         when(repository.findById(10L)).thenReturn(Optional.of(existing));
@@ -137,14 +125,12 @@ class LancamentoServiceTest {
         assertThat(result.getValor()).isEqualTo(new BigDecimal("75.00"));
         assertThat(result.getObservacao()).isEqualTo("Ingresso VIP");
 
-        verify(repository, times(1)).findById(10L);
-        verify(repository, times(1)).save(argThat(l ->
+        verify(repository).findById(10L);
+        verify(repository).save(argThat(l -> 
             l.getId().equals(10L) &&
             l.getDescricao().equals("Cinema IMAX") &&
             l.getValor().equals(new BigDecimal("75.00"))
         ));
-
-    // demais testes permanecem iguais
     }
 
     @Test

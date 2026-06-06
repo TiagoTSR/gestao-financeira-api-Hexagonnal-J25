@@ -1,12 +1,12 @@
 package com.decodex.br.domain.port.in;
 
-import java.util.List;
-
 import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 public interface LancamentoUseCase {
 	
-	List<Lancamento> findAll();
+	PageResult<Lancamento> findAll(PageRequest pageRequest);
 
     Lancamento findById(Long id);
 

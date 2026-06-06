@@ -1,9 +1,9 @@
 package com.decodex.br.domain.service;
 
-import java.util.List;
-
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 
@@ -16,8 +16,8 @@ public class LancamentoService implements LancamentoUseCase {
     }
 
     @Override
-    public List<Lancamento> findAll() {
-        return repository.findAll();
+    public PageResult<Lancamento> findAll(PageRequest pageRequest) {
+        return repository.findAll(pageRequest);
     }
 
     @Override
