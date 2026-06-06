@@ -1,11 +1,7 @@
 package com.decodex.br.testesunitarios.adapters.out.persistence.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.decodex.br.adapters.out.persistence.adapter.CategoriaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
 import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.pagination.PageRequest;
+import com.decodex.br.domain.pagination.PageResult;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários - CategoriaRepositoryAdapter")
@@ -42,8 +43,8 @@ class CategoriaRepositoryAdapterTest {
 
     @BeforeEach
     void setUp() {
-        domainCategoria  = new Categoria(1L, "Alimentação");
-        categoriaEntity  = new CategoriaEntity();
+        domainCategoria = new Categoria(1L, "Alimentação");
+        categoriaEntity = new CategoriaEntity();
         categoriaEntity.setId(1L);
         categoriaEntity.setNome("Alimentação");
     }
@@ -92,16 +93,25 @@ class CategoriaRepositoryAdapterTest {
     }
 
     @Test
-    @DisplayName("Deve listar todas as categorias")
-    void findAll_ShouldReturnAll() {
-        when(categoriaRepository.findAll()).thenReturn(List.of(categoriaEntity));
+    @DisplayName("Deve listar categorias com paginação")
+    void findAll_ShouldReturnPageResult() {
+        PageRequest pageRequest = new PageRequest(0, 10);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        Page<CategoriaEntity> page = new PageImpl<>(List.of(categoriaEntity), pageable, 1);
+
+        when(categoriaRepository.findAll(pageable)).thenReturn(page);
         when(categoriaMapper.toDomain(categoriaEntity)).thenReturn(domainCategoria);
 
-        List<Categoria> result = adapter.findAll();
+        PageResult<Categoria> result = adapter.findAll(pageRequest);
 
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getNome()).isEqualTo("Alimentação");
-        verify(categoriaRepository).findAll();
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().get(0).getNome()).isEqualTo("Alimentação");
+        assertThat(result.page()).isZero();
+        assertThat(result.size()).isEqualTo(10);
+        assertThat(result.totalElements()).isEqualTo(1L);
+        assertThat(result.totalPages()).isEqualTo(1);
+        verify(categoriaRepository).findAll(pageable);
+        verify(categoriaMapper).toDomain(categoriaEntity);
     }
 
     @Test
