@@ -18,6 +18,7 @@ import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.application.mapper.PessoaDTOMapper;
+import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -37,18 +38,19 @@ public class PessoaController {
 
     @GetMapping
     public PageResult<PessoaResponseDTO> findAll(
-    		 @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "10") int size) {
+            PessoaFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-         if (page < 0) {
-             throw new IllegalArgumentException("O número da página não pode ser negativo.");
-         }
+        if (page < 0) {
+            throw new IllegalArgumentException("O número da página não pode ser negativo.");
+        }
 
-         if (size <= 0) {
-             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
-         }
+        if (size <= 0) {
+            throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
+        }
 
-        return useCase.findAll(new PageRequest(page, size))
+        return useCase.findAll(filter, new PageRequest(page, size))
                 .map(PessoaDTOMapper::toDTO);
     }
 

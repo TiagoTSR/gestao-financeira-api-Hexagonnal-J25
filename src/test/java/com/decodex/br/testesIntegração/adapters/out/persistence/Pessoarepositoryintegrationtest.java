@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
+import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
 import com.decodex.br.testesIntegração.PostgresIntegrationBase;
 
@@ -29,9 +30,13 @@ class PessoaRepositoryIntegrationTest extends PostgresIntegrationBase {
 
     @Autowired
     private PessoaRepository repository;
+    
+    @Autowired
+    private LancamentoRepository lancamentoRepository;
 
     @BeforeEach
     void limpar() {
+    	lancamentoRepository.deleteAllInBatch();
         repository.deleteAll();
     }
 

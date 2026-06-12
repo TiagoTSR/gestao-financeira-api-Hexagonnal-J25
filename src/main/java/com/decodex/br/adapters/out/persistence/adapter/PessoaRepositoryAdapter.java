@@ -1,13 +1,18 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
+import com.decodex.br.adapters.out.persistence.specification.PessoaSpecification;
+import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -22,7 +27,6 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     public PessoaRepositoryAdapter(
             PessoaRepository repository,
             PessoaMapper mapper) {
-
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -41,21 +45,27 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     }
 
     @Override
-    public PageResult<Pessoa> findAll(PageRequest request) {
+    public PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest request) {
 
-        Page<PessoaEntity> page = repository.findAll(
-            org.springframework.data.domain.PageRequest.of(
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
                 request.size()
-            )
         );
 
+        Specification<PessoaEntity> spec = PessoaSpecification.fromFilter(filter);
+
+        Page<PessoaEntity> page = repository.findAll(spec, pageable);
+
+        List<Pessoa> domainContent = page.getContent().stream()
+                .map(mapper::toDomain)
+                .toList();
+
         return new PageResult<>(
-            page.getContent().stream().map(mapper::toDomain).toList(),
-            page.getNumber(),
-            page.getSize(),
-            page.getTotalElements(),
-            page.getTotalPages()
+                domainContent,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
         );
     }
 

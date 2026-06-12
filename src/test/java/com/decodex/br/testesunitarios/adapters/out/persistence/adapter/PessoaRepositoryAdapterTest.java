@@ -1,7 +1,13 @@
 package com.decodex.br.testesunitarios.adapters.out.persistence.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,12 +22,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.adapter.PessoaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
+import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -113,17 +121,19 @@ class PessoaRepositoryAdapterTest {
         verifyNoInteractions(pessoaMapper);
     }
 
-    @Test
-    @DisplayName("Deve listar pessoas com paginação")
+    @SuppressWarnings("unchecked")
+	@Test
+    @DisplayName("Deve listar pessoas com paginação e filtro")
     void findAll_ShouldReturnPageResult() {
+        PessoaFilter filter = new PessoaFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
         Page<PessoaEntity> page = new PageImpl<>(List.of(pessoaEntity), pageable, 1);
 
-        when(pessoaRepository.findAll(pageable)).thenReturn(page);
+        when(pessoaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
         when(pessoaMapper.toDomain(pessoaEntity)).thenReturn(domainPessoa);
 
-        PageResult<Pessoa> result = adapter.findAll(pageRequest);
+        PageResult<Pessoa> result = adapter.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.content().get(0).getNome()).isEqualTo("João Silva");
@@ -132,7 +142,8 @@ class PessoaRepositoryAdapterTest {
         assertThat(result.size()).isEqualTo(10);
         assertThat(result.totalElements()).isEqualTo(1L);
         assertThat(result.totalPages()).isEqualTo(1);
-        verify(pessoaRepository).findAll(pageable);
+        
+        verify(pessoaRepository).findAll(any(Specification.class), eq(pageable));
         verify(pessoaMapper).toDomain(pessoaEntity);
     }
 

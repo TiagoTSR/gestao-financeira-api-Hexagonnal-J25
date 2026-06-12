@@ -26,6 +26,7 @@ import com.decodex.br.adapters.in.web.PessoaController;
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
+import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -58,9 +59,11 @@ class PessoaControllerUnitarioTest {
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoaFake()), 0, 10, 1L, 1
         );
-        when(pessoaUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
+        when(pessoaUseCase.findAll(any(PessoaFilter.class), any(PageRequest.class)))
+            .thenReturn(pageResult);
 
-        PageResult<PessoaResponseDTO> response = controller.findAll(0, 10);
+        PessoaFilter filter = new PessoaFilter();
+        PageResult<PessoaResponseDTO> response = controller.findAll(filter, 0, 10);
 
         assertEquals(1, response.content().size());
         assertEquals(0, response.page());

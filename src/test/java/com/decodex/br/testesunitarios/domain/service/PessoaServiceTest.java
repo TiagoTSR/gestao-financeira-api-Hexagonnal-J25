@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -54,17 +56,18 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Deve listar pessoas paginadas")
     void findAll_ShouldReturnPageResult() {
+        PessoaFilter filter = new PessoaFilter();
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
-        when(repository.findAll(pageRequest)).thenReturn(pageResult);
+        when(repository.findAll(any(PessoaFilter.class), eq(pageRequest))).thenReturn(pageResult);
 
-        PageResult<Pessoa> result = service.findAll(pageRequest);
+        PageResult<Pessoa> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(pessoa);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(pageRequest);
+        verify(repository, times(1)).findAll(any(PessoaFilter.class), eq(pageRequest));
     }
 
     @Test
