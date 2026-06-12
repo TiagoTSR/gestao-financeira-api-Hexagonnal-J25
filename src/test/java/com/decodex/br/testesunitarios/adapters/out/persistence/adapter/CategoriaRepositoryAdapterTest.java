@@ -1,7 +1,13 @@
 package com.decodex.br.testesunitarios.adapters.out.persistence.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,11 +22,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.adapter.CategoriaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -92,17 +100,19 @@ class CategoriaRepositoryAdapterTest {
         verifyNoInteractions(categoriaMapper);
     }
 
-    @Test
-    @DisplayName("Deve listar categorias com paginação")
+    @SuppressWarnings("unchecked")
+	@Test
+    @DisplayName("Deve listar categorias com paginação e filtro")
     void findAll_ShouldReturnPageResult() {
+        CategoriaFilter filter = new CategoriaFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
         Page<CategoriaEntity> page = new PageImpl<>(List.of(categoriaEntity), pageable, 1);
 
-        when(categoriaRepository.findAll(pageable)).thenReturn(page);
+        when(categoriaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
         when(categoriaMapper.toDomain(categoriaEntity)).thenReturn(domainCategoria);
 
-        PageResult<Categoria> result = adapter.findAll(pageRequest);
+        PageResult<Categoria> result = adapter.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.content().get(0).getNome()).isEqualTo("Alimentação");
@@ -110,7 +120,8 @@ class CategoriaRepositoryAdapterTest {
         assertThat(result.size()).isEqualTo(10);
         assertThat(result.totalElements()).isEqualTo(1L);
         assertThat(result.totalPages()).isEqualTo(1);
-        verify(categoriaRepository).findAll(pageable);
+        
+        verify(categoriaRepository).findAll(any(Specification.class), eq(pageable));
         verify(categoriaMapper).toDomain(categoriaEntity);
     }
 

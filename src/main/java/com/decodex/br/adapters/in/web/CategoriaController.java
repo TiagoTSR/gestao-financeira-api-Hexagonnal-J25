@@ -18,6 +18,7 @@ import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.application.mapper.CategoriaDTOMapper;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -38,7 +39,8 @@ public class CategoriaController {
     @GetMapping
     public PageResult<CategoriaResponseDTO> findAll(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            CategoriaFilter filter) {
 
         if (page < 0) {
             throw new IllegalArgumentException("O número da página não pode ser negativo.");
@@ -48,7 +50,7 @@ public class CategoriaController {
             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
         }
 
-        return useCase.findAll(new PageRequest(page, size))
+        return useCase.findAll(filter,new PageRequest(page, size))
                 .map(CategoriaDTOMapper::toDTO);
     }
 

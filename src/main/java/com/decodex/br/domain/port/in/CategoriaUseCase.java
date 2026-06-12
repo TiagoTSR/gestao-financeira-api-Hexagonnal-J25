@@ -1,12 +1,13 @@
 package com.decodex.br.domain.port.in;
 
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
 public interface CategoriaUseCase {
 	
-	PageResult<Categoria> findAll(PageRequest pageRequest);
+	PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest pageRequest);
 
     Categoria findById(Long id);
 

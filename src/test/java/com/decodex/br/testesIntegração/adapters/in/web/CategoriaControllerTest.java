@@ -26,6 +26,7 @@ import com.decodex.br.adapters.in.web.CategoriaController;
 import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -108,7 +109,9 @@ class CategoriaControllerTest {
             List.of(new Categoria(1L, "Lazer"), new Categoria(2L, "Alimentação")),
             0, 10, 2L, 1
         );
-        when(categoriaUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
+
+        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+            .thenReturn(pageResult);
 
         mockMvc.perform(get("/categorias")
                 .param("page", "0")

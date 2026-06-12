@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
+import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
 import com.decodex.br.testesIntegração.PostgresIntegrationBase;
 
 import jakarta.validation.ConstraintViolationException;
@@ -28,9 +29,13 @@ class CategoriaRepositoryIntegrationTest extends PostgresIntegrationBase {
 
     @Autowired
     private CategoriaRepository repository;
+    
+    @Autowired
+    private LancamentoRepository lancamentoRepository;
 
     @BeforeEach
     void limpar() {
+    	lancamentoRepository.deleteAllInBatch();
         repository.deleteAll();
     }
 

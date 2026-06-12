@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -49,17 +51,18 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("Deve listar categorias paginadas")
     void findAll_ShouldReturnPageResult() {
+        CategoriaFilter filter = new CategoriaFilter();
         PageResult<Categoria> pageResult = new PageResult<>(
             List.of(categoria), 0, 10, 1L, 1
         );
-        when(repository.findAll(pageRequest)).thenReturn(pageResult);
+        when(repository.findAll(any(CategoriaFilter.class), eq(pageRequest))).thenReturn(pageResult);
 
-        PageResult<Categoria> result = service.findAll(pageRequest);
+        PageResult<Categoria> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(categoria);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(pageRequest);
+        verify(repository, times(1)).findAll(any(CategoriaFilter.class), eq(pageRequest));
     }
 
     @Test

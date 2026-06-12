@@ -1,6 +1,7 @@
 package com.decodex.br.testesunitarios.adapters.in.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,6 +30,7 @@ import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -55,9 +57,12 @@ class CategoriaControllerUnitarioTest {
         PageResult<Categoria> pageResult = new PageResult<>(
             List.of(new Categoria(1L, "Lazer")), 0, 10, 1L, 1
         );
-        doReturn(pageResult).when(categoriaUseCase).findAll(any(PageRequest.class));
 
-        PageResult<CategoriaResponseDTO> response = controller.findAll(0, 10);
+        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+            .thenReturn(pageResult);
+
+        CategoriaFilter filter = new CategoriaFilter();
+        PageResult<CategoriaResponseDTO> response = controller.findAll(0, 10, filter);
 
         assertNotNull(response);
         assertEquals(1, response.content().size());

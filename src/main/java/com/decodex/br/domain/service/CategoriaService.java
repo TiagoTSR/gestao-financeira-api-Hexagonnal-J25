@@ -1,6 +1,7 @@
 package com.decodex.br.domain.service;
 
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -16,8 +17,8 @@ public class CategoriaService implements CategoriaUseCase {
         this.repository = repository;
     }
 
-    public PageResult<Categoria> findAll(PageRequest pageRequest) {
-        return repository.findAll(pageRequest);
+    public PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest pageRequest) {
+        return repository.findAll(filter,pageRequest);
     }
 
     @Override

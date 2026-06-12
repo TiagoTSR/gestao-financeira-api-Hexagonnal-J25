@@ -1,13 +1,18 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
+import com.decodex.br.adapters.out.persistence.specification.CategoriaSpecification;
+import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -42,21 +47,27 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     }
 
     @Override
-    public PageResult<Categoria> findAll(PageRequest request) {
+    public PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest request) {
 
-        Page<CategoriaEntity> page = repository.findAll(
-            org.springframework.data.domain.PageRequest.of(
+    	Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
                 request.size()
-            )
         );
 
+        Specification<CategoriaEntity> spec = CategoriaSpecification.fromFilter(filter);
+
+        Page<CategoriaEntity> page = repository.findAll(spec, pageable);
+
+        List<Categoria> domainContent = page.getContent().stream()
+                .map(mapper::toDomain)
+                .toList();
+
         return new PageResult<>(
-            page.getContent().stream().map(mapper::toDomain).toList(),
-            page.getNumber(),
-            page.getSize(),
-            page.getTotalElements(),
-            page.getTotalPages()
+                domainContent,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
         );
     }
 
