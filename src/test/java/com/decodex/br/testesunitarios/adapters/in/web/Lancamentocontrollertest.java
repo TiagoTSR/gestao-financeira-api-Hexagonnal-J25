@@ -28,7 +28,12 @@ import com.decodex.br.adapters.in.web.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
-import com.decodex.br.domain.model.*;
+import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
+import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
@@ -69,9 +74,11 @@ class LancamentoControllerUnitarioTest {
         PageResult<Lancamento> pageResult = new PageResult<>(
             List.of(lancamentoFake()), 0, 10, 1L, 1
         );
-        when(lancamentoUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
+        when(lancamentoUseCase.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+            .thenReturn(pageResult);
 
-        PageResult<LancamentoResponseDTO> response = controller.findAll(0, 10);
+        LancamentoFilter filter = new LancamentoFilter();
+        PageResult<LancamentoResponseDTO> response = controller.findAll(0, 10, filter);
 
         assertEquals(1, response.content().size());
         assertEquals(0, response.page());

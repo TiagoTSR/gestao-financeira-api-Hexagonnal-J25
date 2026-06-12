@@ -18,6 +18,7 @@ import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
+import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
@@ -49,7 +50,8 @@ public class LancamentoController {
     @GetMapping
     public PageResult<LancamentoResponseDTO> findAll(
     		 @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "10") int size) {
+             @RequestParam(defaultValue = "10") int size,
+             LancamentoFilter filter) {
 
          if (page < 0) {
              throw new IllegalArgumentException("O número da página não pode ser negativo.");
@@ -59,7 +61,7 @@ public class LancamentoController {
              throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
          }
 
-        return lancamentoUseCase.findAll(new PageRequest(page, size))
+        return lancamentoUseCase.findAll(filter,new PageRequest(page, size))
                 .map(LancamentoDTOMapper::toDTO);
     }
 

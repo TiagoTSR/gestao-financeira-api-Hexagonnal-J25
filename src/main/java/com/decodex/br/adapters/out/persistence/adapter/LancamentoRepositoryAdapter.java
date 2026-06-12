@@ -1,13 +1,18 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
+import com.decodex.br.adapters.out.persistence.specification.LancamentoSpecification;
+import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -41,21 +46,27 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
-    public PageResult<Lancamento> findAll(PageRequest request) {
+    public PageResult<Lancamento> findAll(LancamentoFilter filter,PageRequest request) {
 
-        Page<LancamentoEntity> page = repository.findAll(
-            org.springframework.data.domain.PageRequest.of(
+    	Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
                 request.size()
-            )
         );
 
+        Specification<LancamentoEntity> spec = LancamentoSpecification.fromFilter(filter);
+
+        Page<LancamentoEntity> page = repository.findAll(spec, pageable);
+
+        List<Lancamento> domainContent = page.getContent().stream()
+                .map(mapper::toDomain)
+                .toList();
+
         return new PageResult<>(
-            page.getContent().stream().map(mapper::toDomain).toList(),
-            page.getNumber(),
-            page.getSize(),
-            page.getTotalElements(),
-            page.getTotalPages()
+                domainContent,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages()
         );
     }
 

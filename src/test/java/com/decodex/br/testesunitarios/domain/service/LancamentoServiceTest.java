@@ -3,7 +3,13 @@ package com.decodex.br.testesunitarios.domain.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +24,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.decodex.br.domain.model.*;
+import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
+import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
@@ -50,18 +61,19 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve listar lançamentos paginados")
     void findAll_ShouldReturnPageResult() {
+        LancamentoFilter filter = new LancamentoFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
         PageResult<Lancamento> pageResult = new PageResult<>(
             List.of(lancamento), 0, 10, 1L, 1
         );
-        when(repository.findAll(pageRequest)).thenReturn(pageResult);
+        when(repository.findAll(any(LancamentoFilter.class), eq(pageRequest))).thenReturn(pageResult);
 
-        PageResult<Lancamento> result = service.findAll(pageRequest);
+        PageResult<Lancamento> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(lancamento);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(pageRequest);
+        verify(repository, times(1)).findAll(any(LancamentoFilter.class), eq(pageRequest));
     }
 
     @Test

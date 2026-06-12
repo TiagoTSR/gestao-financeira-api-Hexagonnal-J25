@@ -1,7 +1,13 @@
 package com.decodex.br.testesunitarios.adapters.out.persistence.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,12 +24,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.adapter.LancamentoRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
-import com.decodex.br.domain.model.*;
+import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.domain.model.Categoria;
+import com.decodex.br.domain.model.Endereco;
+import com.decodex.br.domain.model.Lancamento;
+import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
@@ -102,17 +114,19 @@ class LancamentoRepositoryAdapterTest {
         verifyNoInteractions(lancamentoMapper);
     }
 
-    @Test
-    @DisplayName("Deve listar todos os lançamentos com paginação")
+    @SuppressWarnings("unchecked")
+	@Test
+    @DisplayName("Deve listar todos os lançamentos com paginação e filtro")
     void findAll_ShouldReturnPageResult() {
+        LancamentoFilter filter = new LancamentoFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
         Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
         Page<LancamentoEntity> page = new PageImpl<>(List.of(lancamentoEntity), pageable, 1);
 
-        when(lancamentoRepository.findAll(pageable)).thenReturn(page);
+        when(lancamentoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
         when(lancamentoMapper.toDomain(lancamentoEntity)).thenReturn(domainLancamento);
 
-        PageResult<Lancamento> result = adapter.findAll(pageRequest);
+        PageResult<Lancamento> result = adapter.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1);
         assertThat(result.content().get(0).getDescricao()).isEqualTo("Conta de luz");
@@ -120,7 +134,8 @@ class LancamentoRepositoryAdapterTest {
         assertThat(result.size()).isEqualTo(10);
         assertThat(result.totalElements()).isEqualTo(1L);
         assertThat(result.totalPages()).isEqualTo(1);
-        verify(lancamentoRepository).findAll(pageable);
+        
+        verify(lancamentoRepository).findAll(any(Specification.class), eq(pageable));
         verify(lancamentoMapper).toDomain(lancamentoEntity);
     }
 

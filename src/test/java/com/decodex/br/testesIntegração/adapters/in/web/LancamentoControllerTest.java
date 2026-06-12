@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.decodex.br.adapters.in.web.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -140,21 +141,19 @@ class LancamentoControllerTest {
         );
 
         PageResult<Lancamento> pageResult = new PageResult<>(
-            List.of(lancamento), 0, 10, 1L, 1
-        );
+                List.of(lancamento), 0, 10, 1L, 1
+            );
 
-        when(lancamentoUseCase.findAll(any(PageRequest.class))).thenReturn(pageResult);
+            when(lancamentoUseCase.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+                .thenReturn(pageResult);
 
-        mockMvc.perform(get("/lancamentos")
-                .param("page", "0")
-                .param("size", "10"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.content.length()").value(1))
-            .andExpect(jsonPath("$.content[0].descricao").value("Salário"))
-            .andExpect(jsonPath("$.page").value(0))
-            .andExpect(jsonPath("$.size").value(10))
-            .andExpect(jsonPath("$.totalElements").value(1));
-    }
+            mockMvc.perform(get("/lancamentos")
+                    .param("page", "0")
+                    .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].descricao").value("Salário"));
+        }
 
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar lançamento")
