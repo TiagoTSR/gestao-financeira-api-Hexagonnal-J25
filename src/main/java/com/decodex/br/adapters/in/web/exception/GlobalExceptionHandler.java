@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import com.decodex.br.domain.exeption.RelatorioPdfException;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -74,11 +75,10 @@ public class GlobalExceptionHandler {
                 status.value(),
                 error,
                 message,
-                request.getRequestURI()
-        );
+                request.getRequestURI());
         return ResponseEntity.status(status).body(errorResponse);
     }
-    
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex,
@@ -88,7 +88,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Bad Request",
                 "Valor inválido para o parâmetro '" + ex.getName() + "'.",
-                request
-        );
+                request);
+    }
+
+    @ExceptionHandler(RelatorioPdfException.class)
+    public ResponseEntity<ErrorResponse> handleRelatorioPdf(
+            RelatorioPdfException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erro ao gerar relatório",
+                ex.getMessage(),
+                request);
     }
 }
