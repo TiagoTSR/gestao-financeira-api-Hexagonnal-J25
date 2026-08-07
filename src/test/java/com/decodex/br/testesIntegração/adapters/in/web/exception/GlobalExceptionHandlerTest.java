@@ -21,7 +21,7 @@ import com.decodex.br.domain.port.in.CategoriaUseCase;
 import jakarta.persistence.EntityNotFoundException;
 
 @WebMvcTest(CategoriaController.class)
-@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
+@org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Web - GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
