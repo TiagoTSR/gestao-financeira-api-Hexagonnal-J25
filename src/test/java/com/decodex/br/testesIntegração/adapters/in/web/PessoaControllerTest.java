@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @WebMvcTest(controllers = PessoaController.class)
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Web - PessoaController")
 class PessoaControllerTest {
 
@@ -48,6 +49,12 @@ class PessoaControllerTest {
 
     @MockitoBean
     private PessoaUseCase pessoaUseCase;
+
+    @MockitoBean
+    private com.decodex.br.config.security.TokenService tokenService;
+
+    @MockitoBean
+    private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
     @Test
     @DisplayName("Deve retornar 201 Created ao criar pessoa válida")

@@ -21,6 +21,7 @@ import com.decodex.br.domain.port.in.CategoriaUseCase;
 import jakarta.persistence.EntityNotFoundException;
 
 @WebMvcTest(CategoriaController.class)
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Web - GlobalExceptionHandler")
 class GlobalExceptionHandlerTest {
 
@@ -29,6 +30,12 @@ class GlobalExceptionHandlerTest {
 
     @MockitoBean
     private CategoriaUseCase categoriaUseCase;
+
+    @MockitoBean
+    private com.decodex.br.config.security.TokenService tokenService;
+
+    @MockitoBean
+    private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
     @Test
     @DisplayName("Deve retornar 404 e ErrorResponse quando lançar ResourceNotFoundException")

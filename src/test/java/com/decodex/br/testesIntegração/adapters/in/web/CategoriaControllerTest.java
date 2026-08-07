@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @WebMvcTest(controllers = CategoriaController.class)
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Web - CategoriaController")
 class CategoriaControllerTest {
 
@@ -48,6 +49,12 @@ class CategoriaControllerTest {
 
     @MockitoBean
     private CategoriaUseCase categoriaUseCase;
+
+    @MockitoBean
+    private com.decodex.br.config.security.TokenService tokenService;
+
+    @MockitoBean
+    private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
     @Test
     @DisplayName("Deve retornar 201 Created e o Header Location ao criar categoria")

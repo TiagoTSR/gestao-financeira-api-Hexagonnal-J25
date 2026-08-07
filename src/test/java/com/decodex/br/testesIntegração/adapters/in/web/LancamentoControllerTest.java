@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @WebMvcTest(controllers = LancamentoController.class)
+@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
 @DisplayName("Web - LancamentoController")
 class LancamentoControllerTest {
 
@@ -61,6 +62,12 @@ class LancamentoControllerTest {
 
     @MockitoBean
     private PessoaUseCase pessoaUseCase;
+
+    @MockitoBean
+    private com.decodex.br.config.security.TokenService tokenService;
+
+    @MockitoBean
+    private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
     private Endereco enderecoFake() {
         return new Endereco("Rua das Flores", "10", null, "Centro", "01000-000", "São Paulo", "SP");
