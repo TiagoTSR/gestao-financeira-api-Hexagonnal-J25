@@ -7,4 +7,4 @@ CREATE TABLE usuario (
 
 -- Insere usuário admin com senha 123456 criptografada com BCrypt
 INSERT INTO usuario (username, password, email)
-VALUES ('admin', '$2a$10$8.2qPhGWyGAf.2oMzHN4y.G6tUq76wW1S70H.Kx1S6g1gG9XgGzGa', 'admin@decodex.com');
+VALUES ('admin', '$2a$10$EblZqNptyYvcLm/VwDCVAuBjzZOI7khzdyGPBr08PpIi0na624b8', 'admin@decodex.com');
