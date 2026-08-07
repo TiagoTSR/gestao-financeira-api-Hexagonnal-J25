@@ -1,5 +1,6 @@
 package com.decodex.br.config.security;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,7 +13,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 
     private final UsuarioRepositoryPort usuarioRepositoryPort;
 
-    public JpaUserDetailsService(UsuarioRepositoryPort usuarioRepositoryPort) {
+    public JpaUserDetailsService(@Lazy UsuarioRepositoryPort usuarioRepositoryPort) {
         this.usuarioRepositoryPort = usuarioRepositoryPort;
     }
 
