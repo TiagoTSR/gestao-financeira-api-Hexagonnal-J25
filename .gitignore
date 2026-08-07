@@ -9,6 +9,8 @@ replay_pid*
 # Logs
 *.log
 
+HISTORICO.md
+
 # Environment
 .env
 
