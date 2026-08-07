@@ -23,12 +23,13 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.adapters.in.web.documentation.CategoriaControllerDoc;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/categorias")
-public class CategoriaController {
+public class CategoriaController implements CategoriaControllerDoc {
 
     private final CategoriaUseCase useCase;
 

@@ -27,12 +27,13 @@ import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.adapters.in.web.documentation.LancamentoControllerDoc;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/lancamentos")
-public class LancamentoController {
+public class LancamentoController implements LancamentoControllerDoc {
 
     private final LancamentoUseCase lancamentoUseCase;
     private final CategoriaUseCase categoriaUseCase;

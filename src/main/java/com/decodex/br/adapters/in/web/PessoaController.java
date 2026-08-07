@@ -23,12 +23,13 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.adapters.in.web.documentation.PessoaControllerDoc;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/pessoas")
-public class PessoaController {
+public class PessoaController implements PessoaControllerDoc {
 
     private final PessoaUseCase useCase;
 

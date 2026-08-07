@@ -8,11 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import com.decodex.br.adapters.in.web.documentation.RelatorioControllerDoc;
 
 @RestController
 @RequestMapping("/api/relatorios")
 @CrossOrigin("http://localhost:4200")
-public class RelatorioController {
+public class RelatorioController implements RelatorioControllerDoc {
 
     private final GerarRelatorioEstatisticaUseCase gerarRelatorioUseCase;
 
