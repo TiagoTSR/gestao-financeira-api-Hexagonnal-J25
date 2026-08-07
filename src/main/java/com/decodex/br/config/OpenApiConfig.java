@@ -14,7 +14,7 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        final String securitySchemeName = "basicAuth";
+        final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
                         .title("Gestão Financeira API")
@@ -28,6 +28,7 @@ public class OpenApiConfig {
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)
                                 .type(SecurityScheme.Type.HTTP)
-                                .scheme("basic")));
+                                .scheme("bearer")
+                                .bearerFormat("JWT")));
     }
 }
