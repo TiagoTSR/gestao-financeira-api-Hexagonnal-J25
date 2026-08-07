@@ -1,47 +1,70 @@
 package com.decodex.br.domain.model;
 
 public class Usuario {
+
     private Long id;
     private String username;
-    private String password;
+    private Senha password;
     private String email;
 
     public Usuario(Long id, String username, String password, String email) {
         this.id = id;
-        this.username = username;
-        this.password = password;
-        this.email = email;
+        this.username = validarUsername(username);
+        this.password = new Senha(password);
+        this.email = validarEmail(email);
+    }
+
+    private String validarUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("O nome de usuário não pode ser vazio.");
+        }
+        return username;
+    }
+
+    private String validarEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("O e-mail não pode ser vazio.");
+        }
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("E-mail inválido.");
+        }
+        return email;
+    }
+
+    public void alterarSenha(String novoHash) {
+        this.password = new Senha(novoHash);
+    }
+
+    public void alterarEmail(String novoEmail) {
+        this.email = validarEmail(novoEmail);
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+        return password.getHash();
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return id != null && id.equals(usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
