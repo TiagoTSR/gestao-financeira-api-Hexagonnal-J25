@@ -61,6 +61,13 @@ public class GlobalExceptionHandler {
                 request);
     }
 
+    @ExceptionHandler(com.decodex.br.domain.exeption.RefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleRefreshToken(
+            com.decodex.br.domain.exeption.RefreshTokenException ex,
+            HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(
             Exception ex,

@@ -26,4 +26,25 @@ public interface AuthControllerDoc {
         @RequestBody @Valid LoginRequestDTO loginRequest,
         jakarta.servlet.http.HttpServletResponse response
     );
+
+    @Operation(summary = "Atualizar token de acesso (Refresh)", description = "Gera um novo Access Token JWT rotacionando o Refresh Token a partir do cookie HttpOnly.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Tokens atualizados e rotacionados com sucesso",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Refresh Token ausente ou inválido", content = @Content),
+        @ApiResponse(responseCode = "401", description = "Refresh Token expirado", content = @Content)
+    })
+    ResponseEntity<TokenResponseDTO> refresh(
+        jakarta.servlet.http.HttpServletRequest request,
+        jakarta.servlet.http.HttpServletResponse response
+    );
+
+    @Operation(summary = "Efetuar logout do usuário", description = "Invalida o refresh token no banco de dados e expira os cookies do navegador.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Logout realizado com sucesso", content = @Content)
+    })
+    ResponseEntity<Void> logout(
+        jakarta.servlet.http.HttpServletRequest request,
+        jakarta.servlet.http.HttpServletResponse response
+    );
 }
