@@ -35,11 +35,14 @@ class AuthControllerTest {
     @Mock
     private Authentication authentication;
 
+    @Mock
+    private jakarta.servlet.http.HttpServletResponse response;
+
     @InjectMocks
     private AuthController authController;
 
     @Test
-    @DisplayName("Deve autenticar com sucesso e retornar token JWT")
+    @DisplayName("Deve autenticar com sucesso e retornar token JWT e Cookie Set-Cookie")
     void deveAutenticarERetornarToken() {
         LoginRequestDTO request = new LoginRequestDTO("admin", "123456");
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
@@ -48,10 +51,15 @@ class AuthControllerTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("mocked-jwt-token");
 
-        ResponseEntity<TokenResponseDTO> response = authController.login(request);
+        ResponseEntity<TokenResponseDTO> responseEntity = authController.login(request, response);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().token()).isEqualTo("mocked-jwt-token");
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().token()).isEqualTo("mocked-jwt-token");
+
+        org.mockito.Mockito.verify(response).addHeader(
+            org.mockito.Mockito.eq(org.springframework.http.HttpHeaders.SET_COOKIE),
+            org.mockito.Mockito.argThat(header -> header.contains("token=mocked-jwt-token") && header.contains("HttpOnly") && header.contains("Secure"))
+        );
     }
 }
