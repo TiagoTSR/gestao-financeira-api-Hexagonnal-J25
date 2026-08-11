@@ -40,9 +40,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String recoverToken(HttpServletRequest request) {
         var authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
         }
-        return authHeader.substring(7);
+        
+        var cookie = org.springframework.web.util.WebUtils.getCookie(request, "token");
+        if (cookie != null) {
+            return cookie.getValue();
+        }
+        
+        return null;
     }
 }
