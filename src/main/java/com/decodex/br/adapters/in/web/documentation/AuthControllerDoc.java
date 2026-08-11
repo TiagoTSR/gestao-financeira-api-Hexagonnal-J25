@@ -22,5 +22,8 @@ public interface AuthControllerDoc {
         @ApiResponse(responseCode = "400", description = "Dados de login vazios ou inválidos", content = @Content),
         @ApiResponse(responseCode = "401", description = "Credenciais inválidas (usuário ou senha incorretos)", content = @Content)
     })
-    ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginRequest);
+    ResponseEntity<TokenResponseDTO> login(
+        @RequestBody @Valid LoginRequestDTO loginRequest,
+        jakarta.servlet.http.HttpServletResponse response
+    );
 }

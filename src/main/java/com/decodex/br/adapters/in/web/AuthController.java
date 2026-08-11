@@ -28,11 +28,24 @@ public class AuthController implements AuthControllerDoc {
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
+    public ResponseEntity<TokenResponseDTO> login(
+        @RequestBody @Valid LoginRequestDTO loginRequest,
+        jakarta.servlet.http.HttpServletResponse response
+    ) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         
         var token = tokenService.generateToken((UserDetails) auth.getPrincipal());
+        
+        var cookie = org.springframework.http.ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7200)
+                .sameSite("Lax")
+                .build();
+                
+        response.addHeader(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString());
         
         return ResponseEntity.ok(new TokenResponseDTO(token));
     }
