@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 import com.decodex.br.domain.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.RefreshTokenUseCase;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
@@ -15,8 +16,8 @@ import com.decodex.br.domain.service.PessoaService;
 
 @Configuration
 public class BeanConfig {
-	
-	@Bean
+
+    @Bean
     public CategoriaUseCase categoriaUseCase(CategoriaRepositoryPort categoriaRepositoryPort) {
         return new CategoriaService(categoriaRepositoryPort);
     }
@@ -25,10 +26,17 @@ public class BeanConfig {
     public PessoaUseCase pessoaUseCase(PessoaRepositoryPort pessoaRepositoryPort) {
         return new PessoaService(pessoaRepositoryPort);
     }
-    
+
     @Bean
     public LancamentoUseCase lancamentoUseCase(LancamentoRepositoryPort lancamentoRepositoryPort) {
         return new LancamentoService(lancamentoRepositoryPort);
+    }
+
+    @Bean
+    public RefreshTokenUseCase refreshTokenUseCase(
+            com.decodex.br.domain.port.out.RefreshTokenRepositoryPort refreshTokenRepositoryPort,
+            com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort) {
+        return new com.decodex.br.domain.service.RefreshTokenService(refreshTokenRepositoryPort, usuarioRepositoryPort);
     }
 
 }
