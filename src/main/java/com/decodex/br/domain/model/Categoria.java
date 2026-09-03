@@ -5,8 +5,13 @@ public class Categoria {
 	private Long id;
     private String nome;
 
-    public Categoria(String nome) {
+    public Categoria(Long id, String nome) {
+        this.id = id;
         this.nome = validarNomeCategoria(nome, "Nome");
+    }
+
+    public Categoria(String nome) {
+        this(null, nome);
     }
 
 	private String validarNomeCategoria(String valor, String campo) {
@@ -17,7 +22,7 @@ public class Categoria {
     }
 	
 	public void alterarNome(String novoNome) {
-	       this.nome = validarNomeCategoria(novoNome, novoNome);
+	       this.nome = validarNomeCategoria(novoNome, "Nome");
 	}
 	
 	public void atualizarCampos(Categoria novosDados) {
