@@ -69,6 +69,9 @@ class LancamentoControllerTest {
     @MockitoBean
     private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
+    @MockitoBean
+    private com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter;
+
     private Endereco enderecoFake() {
         return new Endereco("Rua das Flores", "10", null, "Centro", "01000-000", "São Paulo", "SP");
     }

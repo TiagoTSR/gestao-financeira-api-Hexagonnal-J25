@@ -56,6 +56,9 @@ class CategoriaControllerTest {
     @MockitoBean
     private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
+    @MockitoBean
+    private com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter;
+
     @Test
     @DisplayName("Deve retornar 201 Created e o Header Location ao criar categoria")
     void create_DeveRetornar201() throws Exception {

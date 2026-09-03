@@ -37,6 +37,9 @@ class GlobalExceptionHandlerTest {
     @MockitoBean
     private com.decodex.br.config.security.JpaUserDetailsService jpaUserDetailsService;
 
+    @MockitoBean
+    private com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter;
+
     @Test
     @DisplayName("Deve retornar 404 e ErrorResponse quando lançar ResourceNotFoundException")
     void handleResourceNotFound() throws Exception {
