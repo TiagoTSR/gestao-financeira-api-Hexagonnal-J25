@@ -14,6 +14,10 @@ public class Usuario {
         this.email = validarEmail(email);
     }
 
+    public Usuario(String username, String password, String email) {
+        this(null, username, password, email);
+    }
+
     private String validarUsername(String username) {
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("O nome de usuário não pode ser vazio.");

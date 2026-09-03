@@ -11,11 +11,14 @@ public class Pessoa {
 	private Boolean ativo;
 
 	public Pessoa(Long id, String nome, Endereco endereco, Boolean ativo) {
-		super();
 		this.id = id;
 		this.nome = validarNomePessoa(nome, "Nome");
 		this.endereco = validarEndereco(endereco);
 		this.ativo = validarAtivo(ativo);
+	}
+
+	public Pessoa(String nome, Endereco endereco, Boolean ativo) {
+		this(null, nome, endereco, ativo);
 	}
 
 	public Pessoa(Long id, String nome) {

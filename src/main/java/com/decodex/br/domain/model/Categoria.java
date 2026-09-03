@@ -3,31 +3,31 @@ package com.decodex.br.domain.model;
 public class Categoria {
 
 	private Long id;
-    private String nome;
+	private String nome;
 
-    public Categoria(Long id, String nome) {
-        this.id = id;
-        this.nome = validarNomeCategoria(nome, "Nome");
-    }
+	public Categoria(Long id, String nome) {
+		this.id = id;
+		this.nome = validarNomeCategoria(nome, "Nome");
+	}
 
-    public Categoria(String nome) {
-        this(null, nome);
-    }
+	public Categoria(String nome) {
+		this(null, nome);
+	}
 
 	private String validarNomeCategoria(String valor, String campo) {
-        if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException(campo + " não pode ser vazio");
-        }
-        return valor;
-    }
-	
-	public void alterarNome(String novoNome) {
-	       this.nome = validarNomeCategoria(novoNome, "Nome");
+		if (valor == null || valor.isBlank()) {
+			throw new IllegalArgumentException(campo + " não pode ser vazio");
+		}
+		return valor;
 	}
-	
+
+	public void alterarNome(String novoNome) {
+		this.nome = validarNomeCategoria(novoNome, "Nome");
+	}
+
 	public void atualizarCampos(Categoria novosDados) {
-      alterarNome(novosDados.nome);
-    }
+		alterarNome(novosDados.nome);
+	}
 
 	public Long getId() {
 		return id;
@@ -39,16 +39,18 @@ public class Categoria {
 
 	@Override
 	public boolean equals(Object o) {
-	    if (this == o) return true;
-	    if (o == null || getClass() != o.getClass()) return false;
-	    
-	    Categoria categoria = (Categoria) o;
-	    
-	    return id != null && id.equals(categoria.id);
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		Categoria categoria = (Categoria) o;
+
+		return id != null && id.equals(categoria.id);
 	}
 
 	@Override
 	public int hashCode() {
-	    return getClass().hashCode();
+		return getClass().hashCode();
 	}
 }
