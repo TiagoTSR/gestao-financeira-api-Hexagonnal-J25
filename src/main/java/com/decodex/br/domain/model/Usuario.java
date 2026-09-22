@@ -1,38 +1,24 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.validations.UsuarioValidation;
+
 public class Usuario {
 
     private Long id;
     private String username;
     private Senha password;
     private String email;
+    private final UsuarioValidation validation = new UsuarioValidation();
 
     public Usuario(Long id, String username, String password, String email) {
         this.id = id;
-        this.username = validarUsername(username);
+        this.username = validation.validarUsername(username);
         this.password = new Senha(password);
-        this.email = validarEmail(email);
+        this.email = validation.validarEmail(email);
     }
 
     public Usuario(String username, String password, String email) {
         this(null, username, password, email);
-    }
-
-    private String validarUsername(String username) {
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("O nome de usuário não pode ser vazio.");
-        }
-        return username;
-    }
-
-    private String validarEmail(String email) {
-        if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("O e-mail não pode ser vazio.");
-        }
-        if (!email.contains("@")) {
-            throw new IllegalArgumentException("E-mail inválido.");
-        }
-        return email;
     }
 
     public void alterarSenha(String novoHash) {
@@ -40,7 +26,7 @@ public class Usuario {
     }
 
     public void alterarEmail(String novoEmail) {
-        this.email = validarEmail(novoEmail);
+        this.email = validation.validarEmail(novoEmail);
     }
 
     public Long getId() {

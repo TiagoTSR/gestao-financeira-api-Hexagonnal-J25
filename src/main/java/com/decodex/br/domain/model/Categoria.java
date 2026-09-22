@@ -1,28 +1,24 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.validations.CategoriaValidation;
+
 public class Categoria {
 
 	private Long id;
 	private String nome;
+	private final CategoriaValidation validation = new CategoriaValidation();
 
 	public Categoria(Long id, String nome) {
 		this.id = id;
-		this.nome = validarNomeCategoria(nome, "Nome");
+		this.nome = validation.validarNome(nome, "Nome");
 	}
 
 	public Categoria(String nome) {
 		this(null, nome);
 	}
 
-	private String validarNomeCategoria(String valor, String campo) {
-		if (valor == null || valor.isBlank()) {
-			throw new IllegalArgumentException(campo + " não pode ser vazio");
-		}
-		return valor;
-	}
-
 	public void alterarNome(String novoNome) {
-		this.nome = validarNomeCategoria(novoNome, "Nome");
+		this.nome = validation.validarNome(novoNome, "Nome");
 	}
 
 	public void atualizarCampos(Categoria novosDados) {

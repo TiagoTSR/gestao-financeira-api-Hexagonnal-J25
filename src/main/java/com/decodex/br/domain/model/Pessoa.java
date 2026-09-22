@@ -1,5 +1,7 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.validations.PessoaValidation;
+
 public class Pessoa {
 
 	private Long id;
@@ -10,11 +12,13 @@ public class Pessoa {
 
 	private Boolean ativo;
 
+	private final PessoaValidation validation = new PessoaValidation();
+
 	public Pessoa(Long id, String nome, Endereco endereco, Boolean ativo) {
 		this.id = id;
-		this.nome = validarNomePessoa(nome, "Nome");
-		this.endereco = validarEndereco(endereco);
-		this.ativo = validarAtivo(ativo);
+		this.nome = validation.validarNome(nome, "Nome");
+		this.endereco = validation.validarEndereco(endereco);
+		this.ativo = validation.validarAtivo(ativo);
 	}
 
 	public Pessoa(String nome, Endereco endereco, Boolean ativo) {
@@ -22,46 +26,22 @@ public class Pessoa {
 	}
 
 	public Pessoa(Long id, String nome) {
-		if (id == null) {
-			throw new IllegalArgumentException("Id não pode ser nulo");
-		}
-		this.id = id;
-		this.nome = validarNomePessoa(nome, "Nome");
+		this.id = validation.validarId(id);
+		this.nome = validation.validarNome(nome, "Nome");
 		this.endereco = null;
 		this.ativo = null;
 	}
 
-	private String validarNomePessoa(String valor, String campo) {
-		if (valor == null || valor.isBlank()) {
-			throw new IllegalArgumentException(campo + " não pode ser vazio");
-		}
-		return valor;
-	}
-
-	private Endereco validarEndereco(Endereco endereco) {
-		if (endereco == null) {
-			throw new IllegalArgumentException("Endereço não pode ser nulo");
-		}
-		return endereco;
-	}
-
-	private Boolean validarAtivo(Boolean ativo) {
-		if (ativo == null) {
-			throw new IllegalArgumentException("Ativo não pode ser vazio (deve ser true ou false)");
-		}
-		return ativo;
-	}
-
 	public void alterarNome(String novoNome) {
-		this.nome = validarNomePessoa(novoNome, novoNome);
+		this.nome = validation.validarNome(novoNome, "Nome");
 	}
 
 	public void alterarEndereço(Endereco novoEndereço) {
-		this.endereco = validarEndereco(novoEndereço);
+		this.endereco = validation.validarEndereco(novoEndereço);
 	}
 
 	public void alterarAtivo(Boolean alteracaoAtivo) {
-		this.ativo = validarAtivo(alteracaoAtivo);
+		this.ativo = validation.validarAtivo(alteracaoAtivo);
 	}
 
 	public void atualizarCampos(Pessoa novosDados) {

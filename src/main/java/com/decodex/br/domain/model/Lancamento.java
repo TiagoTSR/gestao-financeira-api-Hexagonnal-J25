@@ -3,6 +3,8 @@ package com.decodex.br.domain.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.decodex.br.domain.validations.LancamentoValidation;
+
 public class Lancamento {
 
     private Long id;
@@ -23,17 +25,19 @@ public class Lancamento {
 
     private Pessoa pessoa;
 
+    private final LancamentoValidation validation = new LancamentoValidation();
+
     public Lancamento(Long id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
         this.id = id;
-        this.descricao = validarDescricao(descricao);
-        this.dataVencimento = validarDataVencimento(dataVencimento);
+        this.descricao = validation.validarDescricao(descricao);
+        this.dataVencimento = validation.validarDataVencimento(dataVencimento);
         this.dataPagamento = dataPagamento;
-        this.valor = validarValor(valor);
+        this.valor = validation.validarValor(valor);
         this.observacao = observacao;
-        this.tipo = validarTipo(tipo);
-        this.categoria = validarCategoria(categoria);
-        this.pessoa = validarPessoa(pessoa);
+        this.tipo = validation.validarTipo(tipo);
+        this.categoria = validation.validarCategoria(categoria);
+        this.pessoa = validation.validarPessoa(pessoa);
     }
 
     public Lancamento(String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
@@ -41,54 +45,12 @@ public class Lancamento {
         this(null, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa);
     }
 
-    private String validarDescricao(String descricao) {
-        if (descricao == null || descricao.isBlank()) {
-            throw new IllegalArgumentException("Descrição não pode ser nula ou vazia");
-        }
-        return descricao;
-    }
-
-    private LocalDate validarDataVencimento(LocalDate dataVencimento) {
-        if (dataVencimento == null) {
-            throw new IllegalArgumentException("Data de vencimento não pode ser nula");
-        }
-        return dataVencimento;
-    }
-
-    private BigDecimal validarValor(BigDecimal valor) {
-        if (valor == null) {
-            throw new IllegalArgumentException("Valor não pode ser nulo");
-        }
-        return valor;
-    }
-
-    private TipoLancamento validarTipo(TipoLancamento tipo) {
-        if (tipo == null) {
-            throw new IllegalArgumentException("Tipo não pode ser nulo");
-        }
-        return tipo;
-    }
-
-    private Categoria validarCategoria(Categoria categoria) {
-        if (categoria == null) {
-            throw new IllegalArgumentException("Categoria não pode ser nula");
-        }
-        return categoria;
-    }
-
-    private Pessoa validarPessoa(Pessoa pessoa) {
-        if (pessoa == null) {
-            throw new IllegalArgumentException("Pessoa não pode ser nula");
-        }
-        return pessoa;
-    }
-
     public void alterarDescricao(String novaDescricao) {
-        this.descricao = validarDescricao(novaDescricao);
+        this.descricao = validation.validarDescricao(novaDescricao);
     }
 
     public void alterarDataVencimento(LocalDate novaDataVencimento) {
-        this.dataVencimento = validarDataVencimento(novaDataVencimento);
+        this.dataVencimento = validation.validarDataVencimento(novaDataVencimento);
     }
 
     public void alterarDataPagamento(LocalDate novaDataPagamento) {
@@ -96,7 +58,7 @@ public class Lancamento {
     }
 
     public void alterarValor(BigDecimal novoValor) {
-        this.valor = validarValor(novoValor);
+        this.valor = validation.validarValor(novoValor);
     }
 
     public void alterarObservacao(String novaObservacao) {
@@ -104,15 +66,15 @@ public class Lancamento {
     }
 
     public void alterarTipo(TipoLancamento novoTipo) {
-        this.tipo = validarTipo(novoTipo);
+        this.tipo = validation.validarTipo(novoTipo);
     }
 
     public void alterarCategoria(Categoria novaCategoria) {
-        this.categoria = validarCategoria(novaCategoria);
+        this.categoria = validation.validarCategoria(novaCategoria);
     }
 
     public void alterarPessoa(Pessoa novaPessoa) {
-        this.pessoa = validarPessoa(novaPessoa);
+        this.pessoa = validation.validarPessoa(novaPessoa);
     }
 
     public void atualizarCampos(Lancamento novosDados) {
