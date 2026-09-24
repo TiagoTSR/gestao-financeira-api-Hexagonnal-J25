@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
 import com.decodex.br.application.dto.categoria.CategoriaDTO;
-import com.decodex.br.application.mapper.CategoriaDTOMapper;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 
@@ -20,20 +19,11 @@ class CategoriaDTOMapperTest {
         CategoriaDTO.Create createDTO = new CategoriaDTO.Create("Alimentação");
 
         // when
-        Categoria categoria = CategoriaDTOMapper.toDomain(createDTO);
+        Categoria categoria = createDTO.toDomain();
 
         // then
         assertThat(categoria.getId()).isNull();
         assertThat(categoria.getNome()).isEqualTo("Alimentação");
-    }
-
-    @Test
-    void toDomain_CreateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        // when
-        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaDTO.Create) null);
-
-        // then
-        assertThat(categoria).isNull();
     }
 
     // toDomain(Update)
@@ -44,20 +34,11 @@ class CategoriaDTOMapperTest {
         CategoriaDTO.Update updateDTO = new CategoriaDTO.Update("Novo Nome");
 
         // when
-        Categoria novaCategoria = CategoriaDTOMapper.toDomain(updateDTO);
+        Categoria novaCategoria = updateDTO.toDomain();
 
         // then
         assertThat(novaCategoria.getId()).isNull();
         assertThat(novaCategoria.getNome()).isEqualTo("Novo Nome");
-    }
-
-    @Test
-    void toDomain_UpdateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        // when
-        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaDTO.Update) null);
-
-        // then
-        assertThat(categoria).isNull();
     }
 
     @Test
@@ -67,7 +48,7 @@ class CategoriaDTOMapperTest {
         CategoriaDTO.Update updateDTO = new CategoriaDTO.Update("Novo Nome");
 
         // when
-        Categoria novosDados = CategoriaDTOMapper.toDomain(updateDTO);
+        Categoria novosDados = updateDTO.toDomain();
         existing.atualizarCampos(novosDados);
 
         // then
@@ -75,15 +56,15 @@ class CategoriaDTOMapperTest {
         assertThat(existing.getNome()).isEqualTo("Novo Nome");
     }
 
-    // toDTO
+    // from (Response)
 
     @Test
-    void toDTO_ShouldConvertCategoriaToResponseDTO() {
+    void from_ShouldConvertCategoriaToResponseDTO() {
         // given
         Categoria categoria = new Categoria(10L, "Transporte");
 
         // when
-        CategoriaDTO.Response responseDTO = CategoriaDTOMapper.toDTO(categoria);
+        CategoriaDTO.Response responseDTO = CategoriaDTO.Response.from(categoria);
 
         // then
         assertThat(responseDTO.id()).isEqualTo(10L);
@@ -91,9 +72,9 @@ class CategoriaDTOMapperTest {
     }
 
     @Test
-    void toDTO_ShouldReturnNull_WhenCategoriaIsNull() {
+    void from_ShouldReturnNull_WhenCategoriaIsNull() {
         // when
-        CategoriaDTO.Response responseDTO = CategoriaDTOMapper.toDTO(null);
+        CategoriaDTO.Response responseDTO = CategoriaDTO.Response.from(null);
 
         // then
         assertThat(responseDTO).isNull();

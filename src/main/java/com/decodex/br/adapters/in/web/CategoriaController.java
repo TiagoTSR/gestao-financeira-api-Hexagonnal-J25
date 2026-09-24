@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.decodex.br.application.dto.categoria.CategoriaDTO;
-import com.decodex.br.application.mapper.CategoriaDTOMapper;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -49,19 +48,19 @@ public class CategoriaController implements CategoriaControllerDoc {
             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
         }
 
-        return useCase.findAll(filter,new PageRequest(page, size))
-                .map(CategoriaDTOMapper::toDTO);
+        return useCase.findAll(filter, new PageRequest(page, size))
+                .map(CategoriaDTO.Response::from);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaDTO.Response> findById(@PathVariable Long id) {
         Categoria categoria = useCase.findById(id);
-        return ResponseEntity.ok(CategoriaDTOMapper.toDTO(categoria));
+        return ResponseEntity.ok(CategoriaDTO.Response.from(categoria));
     }
 
     @PostMapping
     public ResponseEntity<CategoriaDTO.Response> create(@RequestBody @Valid CategoriaDTO.Create dto) {
-        Categoria categoria = useCase.create(CategoriaDTOMapper.toDomain(dto));
+        Categoria categoria = useCase.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -69,7 +68,7 @@ public class CategoriaController implements CategoriaControllerDoc {
             .buildAndExpand(categoria.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(CategoriaDTOMapper.toDTO(categoria));
+        return ResponseEntity.created(location).body(CategoriaDTO.Response.from(categoria));
     }
 
     @PutMapping("/{id}")
@@ -77,10 +76,9 @@ public class CategoriaController implements CategoriaControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid CategoriaDTO.Update dto) {
 
-        Categoria novosDados = CategoriaDTOMapper.toDomain(dto);
-        Categoria atualizada = useCase.update(id, novosDados);
+        Categoria atualizada = useCase.update(id, dto.toDomain());
 
-        return ResponseEntity.ok(CategoriaDTOMapper.toDTO(atualizada));
+        return ResponseEntity.ok(CategoriaDTO.Response.from(atualizada));
     }
 
     @DeleteMapping("/{id}")

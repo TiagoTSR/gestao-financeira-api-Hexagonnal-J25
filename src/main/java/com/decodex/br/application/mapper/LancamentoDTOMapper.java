@@ -1,6 +1,8 @@
 package com.decodex.br.application.mapper;
 
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoDTO;
+import com.decodex.br.application.dto.pessoa.PessoaDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
@@ -43,11 +45,11 @@ public class LancamentoDTOMapper {
         if (lancamento == null) return null;
 
         var categoriaDTO = lancamento.getCategoria() != null
-                ? CategoriaDTOMapper.toDTO(lancamento.getCategoria())
+                ? CategoriaDTO.Response.from(lancamento.getCategoria())
                 : null;
 
         var pessoaDTO = lancamento.getPessoa() != null
-                ? PessoaResumoMapper.toDTO(lancamento.getPessoa())
+                ? PessoaDTO.Resumo.from(lancamento.getPessoa())
                 : null;
 
         return new LancamentoDTO.Response(

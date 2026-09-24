@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.decodex.br.application.dto.pessoa.PessoaDTO;
-import com.decodex.br.application.mapper.PessoaDTOMapper;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -50,18 +49,18 @@ public class PessoaController implements PessoaControllerDoc {
         }
 
         return useCase.findAll(filter, new PageRequest(page, size))
-                .map(PessoaDTOMapper::toDTO);
+                .map(PessoaDTO.Response::from);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PessoaDTO.Response> findById(@PathVariable Long id) {
         Pessoa pessoa = useCase.findById(id);
-        return ResponseEntity.ok(PessoaDTOMapper.toDTO(pessoa));
+        return ResponseEntity.ok(PessoaDTO.Response.from(pessoa));
     }
 
     @PostMapping
     public ResponseEntity<PessoaDTO.Response> create(@RequestBody @Valid PessoaDTO.Create dto) {
-        Pessoa pessoa = useCase.create(PessoaDTOMapper.toDomain(dto));
+        Pessoa pessoa = useCase.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -69,7 +68,7 @@ public class PessoaController implements PessoaControllerDoc {
             .buildAndExpand(pessoa.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(PessoaDTOMapper.toDTO(pessoa));
+        return ResponseEntity.created(location).body(PessoaDTO.Response.from(pessoa));
     }
 
     @PutMapping("/{id}")
@@ -77,10 +76,9 @@ public class PessoaController implements PessoaControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid PessoaDTO.Update dto) {
 
-        Pessoa novosDados = PessoaDTOMapper.toDomain(dto);
-        Pessoa atualizada = useCase.update(id, novosDados);
+        Pessoa atualizada = useCase.update(id, dto.toDomain());
 
-        return ResponseEntity.ok(PessoaDTOMapper.toDTO(atualizada));
+        return ResponseEntity.ok(PessoaDTO.Response.from(atualizada));
     }
 
     @DeleteMapping("/{id}")
