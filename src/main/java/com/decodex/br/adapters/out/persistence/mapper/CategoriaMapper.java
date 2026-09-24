@@ -1,25 +1,18 @@
 package com.decodex.br.adapters.out.persistence.mapper;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.domain.model.Categoria;
 
-@Component
-public class CategoriaMapper {
- public Categoria toDomain(CategoriaEntity entity) {
-     if (entity == null) return null;
-     return new Categoria(
-         entity.getId(),
-         entity.getNome()
-     );
- }
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface CategoriaMapper {
 
- public CategoriaEntity toEntity(Categoria categoria) {
-     if (categoria == null) return null;
-     CategoriaEntity entity = new CategoriaEntity();
-     entity.setId(categoria.getId());
-     entity.setNome(categoria.getNome());
-     return entity;
- }
+    CategoriaMapper INSTANCE = Mappers.getMapper(CategoriaMapper.class);
+
+    Categoria toDomain(CategoriaEntity entity);
+
+    CategoriaEntity toEntity(Categoria categoria);
 }

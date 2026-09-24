@@ -11,7 +11,7 @@ import com.decodex.br.domain.model.Usuario;
 @DisplayName("Testes unitários para UsuarioMapper")
 class UsuarioMapperTest {
 
-    private final UsuarioMapper mapper = new UsuarioMapper();
+    private final UsuarioMapper mapper = UsuarioMapper.INSTANCE;
 
     @Test
     @DisplayName("Deve converter UsuarioEntity para Usuario (Dominio) corretamente")

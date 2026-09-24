@@ -1,5 +1,6 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.PessoaValidation.validarAtivo;
 import static com.decodex.br.domain.validations.PessoaValidation.validarEndereco;
 import static com.decodex.br.domain.validations.PessoaValidation.validarId;
@@ -15,6 +16,7 @@ public class Pessoa {
 
 	private Boolean ativo;
 
+	@Default
 	public Pessoa(Long id, String nome, Endereco endereco, Boolean ativo) {
 		this.id = id;
 		this.nome = validarNome(nome, "Nome");

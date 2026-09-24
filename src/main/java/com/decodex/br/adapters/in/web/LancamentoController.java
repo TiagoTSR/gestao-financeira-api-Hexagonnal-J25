@@ -36,14 +36,17 @@ public class LancamentoController implements LancamentoControllerDoc {
     private final LancamentoUseCase lancamentoUseCase;
     private final CategoriaUseCase categoriaUseCase;
     private final PessoaUseCase pessoaUseCase;
+    private final LancamentoDTOMapper mapper;
 
     public LancamentoController(
             LancamentoUseCase lancamentoUseCase,
             CategoriaUseCase categoriaUseCase,
-            PessoaUseCase pessoaUseCase) {
+            PessoaUseCase pessoaUseCase,
+            LancamentoDTOMapper mapper) {
         this.lancamentoUseCase = lancamentoUseCase;
         this.categoriaUseCase = categoriaUseCase;
         this.pessoaUseCase = pessoaUseCase;
+        this.mapper = mapper;
     }
 
     @GetMapping
@@ -61,13 +64,13 @@ public class LancamentoController implements LancamentoControllerDoc {
          }
 
         return lancamentoUseCase.findAll(filter,new PageRequest(page, size))
-                .map(LancamentoDTOMapper::toDTO);
+                .map(mapper::toDTO);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoDTO.Response> findById(@PathVariable Long id) {
         Lancamento lancamento = lancamentoUseCase.findById(id);
-        return ResponseEntity.ok(LancamentoDTOMapper.toDTO(lancamento));
+        return ResponseEntity.ok(mapper.toDTO(lancamento));
     }
 
     @PostMapping
@@ -76,7 +79,7 @@ public class LancamentoController implements LancamentoControllerDoc {
         Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());
 
         Lancamento lancamento = lancamentoUseCase.create(
-            LancamentoDTOMapper.toDomain(dto, categoria, pessoa)
+            mapper.toDomain(dto, categoria, pessoa)
         );
 
         URI location = ServletUriComponentsBuilder
@@ -85,7 +88,7 @@ public class LancamentoController implements LancamentoControllerDoc {
             .buildAndExpand(lancamento.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(LancamentoDTOMapper.toDTO(lancamento));
+        return ResponseEntity.created(location).body(mapper.toDTO(lancamento));
     }
 
     @PutMapping("/{id}")
@@ -96,10 +99,10 @@ public class LancamentoController implements LancamentoControllerDoc {
         Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
         Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());
 
-        Lancamento novosDados = LancamentoDTOMapper.toDomain(dto, categoria, pessoa);
+        Lancamento novosDados = mapper.toDomain(dto, categoria, pessoa);
         Lancamento atualizado = lancamentoUseCase.update(id, novosDados);
 
-        return ResponseEntity.ok(LancamentoDTOMapper.toDTO(atualizado));
+        return ResponseEntity.ok(mapper.toDTO(atualizado));
     }
 
     @DeleteMapping("/{id}")

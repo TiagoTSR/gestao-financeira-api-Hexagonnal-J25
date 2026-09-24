@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity;
 import com.decodex.br.adapters.out.persistence.entity.UsuarioEntity;
 import com.decodex.br.adapters.out.persistence.mapper.RefreshTokenMapper;
+import com.decodex.br.adapters.out.persistence.mapper.RefreshTokenMapperImpl;
 import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapper;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.model.Usuario;
@@ -15,8 +16,7 @@ import com.decodex.br.domain.model.Usuario;
 @DisplayName("Testes unitários para RefreshTokenMapper")
 class RefreshTokenMapperTest {
 
-    private final UsuarioMapper usuarioMapper = new UsuarioMapper();
-    private final RefreshTokenMapper mapper = new RefreshTokenMapper(usuarioMapper);
+    private final RefreshTokenMapper mapper = new RefreshTokenMapperImpl(UsuarioMapper.INSTANCE);
 
     @Test
     @DisplayName("Deve converter RefreshTokenEntity para RefreshToken (Dominio) corretamente")

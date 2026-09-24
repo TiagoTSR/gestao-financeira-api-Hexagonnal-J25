@@ -14,7 +14,10 @@ import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
+import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
+import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapperImpl;
+import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
@@ -34,7 +37,7 @@ class LancamentoMapperTest {
 
     @BeforeEach
     void setUp() {
-        mapper = new LancamentoMapper();
+        mapper = new LancamentoMapperImpl(CategoriaMapper.INSTANCE, PessoaMapper.INSTANCE);
 
         categoriaEntity = new CategoriaEntity();
         categoriaEntity.setId(1L);

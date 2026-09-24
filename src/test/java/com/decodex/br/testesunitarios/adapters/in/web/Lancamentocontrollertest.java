@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoDTO;
+import com.decodex.br.application.mapper.LancamentoDTOMapper;
 import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
@@ -44,6 +46,7 @@ class LancamentoControllerUnitarioTest {
     @Mock private LancamentoUseCase lancamentoUseCase;
     @Mock private CategoriaUseCase categoriaUseCase;
     @Mock private PessoaUseCase pessoaUseCase;
+    @Spy private LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     @InjectMocks private LancamentoController controller;
 

@@ -1,5 +1,10 @@
 package com.decodex.br.application.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
+
 import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.application.dto.pessoa.PessoaDTO;
@@ -7,61 +12,52 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 
-public class LancamentoDTOMapper {
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface LancamentoDTOMapper {
 
-    public static Lancamento toDomain(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa) {
+    LancamentoDTOMapper INSTANCE = Mappers.getMapper(LancamentoDTOMapper.class);
+
+    default Lancamento toDomain(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
-
-        return new Lancamento(
-            null,
-            dto.descricao(),
-            dto.dataVencimento(),
-            dto.dataPagamento(),
-            dto.valor(),
-            dto.observacao(),
-            dto.tipo(),
-            categoria,
-            pessoa 
-        );
+        return toDomainInternal(dto, categoria, pessoa);
     }
 
-    public static Lancamento toDomain(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa) {
+    default Lancamento toDomain(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
-
-        return new Lancamento(
-            null,
-            dto.descricao(),
-            dto.dataVencimento(),
-            dto.dataPagamento(),
-            dto.valor(),
-            dto.observacao(),
-            dto.tipo(),
-            categoria,
-            pessoa 
-        );
+        return toDomainInternal(dto, categoria, pessoa);
     }
 
-    public static LancamentoDTO.Response toDTO(Lancamento lancamento) {
-        if (lancamento == null) return null;
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "descricao", source = "dto.descricao")
+    @Mapping(target = "dataVencimento", source = "dto.dataVencimento")
+    @Mapping(target = "dataPagamento", source = "dto.dataPagamento")
+    @Mapping(target = "valor", source = "dto.valor")
+    @Mapping(target = "observacao", source = "dto.observacao")
+    @Mapping(target = "tipo", source = "dto.tipo")
+    @Mapping(target = "categoria", source = "categoria")
+    @Mapping(target = "pessoa", source = "pessoa")
+    Lancamento toDomainInternal(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa);
 
-        var categoriaDTO = lancamento.getCategoria() != null
-                ? CategoriaDTO.Response.from(lancamento.getCategoria())
-                : null;
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "descricao", source = "dto.descricao")
+    @Mapping(target = "dataVencimento", source = "dto.dataVencimento")
+    @Mapping(target = "dataPagamento", source = "dto.dataPagamento")
+    @Mapping(target = "valor", source = "dto.valor")
+    @Mapping(target = "observacao", source = "dto.observacao")
+    @Mapping(target = "tipo", source = "dto.tipo")
+    @Mapping(target = "categoria", source = "categoria")
+    @Mapping(target = "pessoa", source = "pessoa")
+    Lancamento toDomainInternal(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa);
 
-        var pessoaDTO = lancamento.getPessoa() != null
-                ? PessoaDTO.Resumo.from(lancamento.getPessoa())
-                : null;
+    @Mapping(target = "categoria", source = "categoria")
+    @Mapping(target = "pessoa", source = "pessoa")
+    LancamentoDTO.Response toDTO(Lancamento lancamento);
 
-        return new LancamentoDTO.Response(
-            lancamento.getId(),
-            lancamento.getDescricao(),
-            lancamento.getDataVencimento(),
-            lancamento.getDataPagamento(),
-            lancamento.getValor(),
-            lancamento.getObservacao(),
-            lancamento.getTipo(),
-            categoriaDTO,
-            pessoaDTO
-        );
+    default CategoriaDTO.Response toCategoriaDTO(Categoria categoria) {
+        return CategoriaDTO.Response.from(categoria);
+    }
+
+    default PessoaDTO.Resumo toPessoaResumoDTO(Pessoa pessoa) {
+        return PessoaDTO.Resumo.from(pessoa);
     }
 }

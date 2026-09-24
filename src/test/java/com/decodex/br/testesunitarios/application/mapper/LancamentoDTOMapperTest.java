@@ -25,6 +25,7 @@ class LancamentoDTOMapperTest {
     );
     private final Categoria categoria = new Categoria(1L, "Categoria Teste");
     private final Pessoa pessoa = new Pessoa(1L, "Pessoa Teste", endereco, true);
+    private final LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     //  toDomain(Create)
 
@@ -40,7 +41,7 @@ class LancamentoDTOMapperTest {
             1L, 1L
         );
 
-        Lancamento lancamento = LancamentoDTOMapper.toDomain(dto, categoria, pessoa);
+        Lancamento lancamento = mapper.toDomain(dto, categoria, pessoa);
 
         assertThat(lancamento.getId()).isNull();
         assertThat(lancamento.getDescricao()).isEqualTo("Descrição Teste");
@@ -55,7 +56,7 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDomain_CreateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoDTO.Create) null, categoria, pessoa);
+        Lancamento lancamento = mapper.toDomain((LancamentoDTO.Create) null, categoria, pessoa);
 
         assertThat(lancamento).isNull();
     }
@@ -78,7 +79,7 @@ class LancamentoDTOMapperTest {
         Endereco novoEndereco = new Endereco("Rua Nova", "20", null, "Bairro Novo", "11111-111", "Rio", "RJ");
         Pessoa novaPessoa = new Pessoa(2L, "Nova Pessoa", novoEndereco, false);
 
-        Lancamento novosDados = LancamentoDTOMapper.toDomain(dto, novaCategoria, novaPessoa);
+        Lancamento novosDados = mapper.toDomain(dto, novaCategoria, novaPessoa);
 
         assertThat(novosDados.getId()).isNull();
         assertThat(novosDados.getDescricao()).isEqualTo("Nova Descrição");
@@ -88,7 +89,7 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoDTO.Update) null, categoria, pessoa);
+        Lancamento lancamento = mapper.toDomain((LancamentoDTO.Update) null, categoria, pessoa);
 
         assertThat(lancamento).isNull();
     }
@@ -116,7 +117,7 @@ class LancamentoDTOMapperTest {
             2L, 2L
         );
 
-        Lancamento novosDados = LancamentoDTOMapper.toDomain(dto, novaCategoria, novaPessoa);
+        Lancamento novosDados = mapper.toDomain(dto, novaCategoria, novaPessoa);
         existing.atualizarCampos(novosDados);
 
         assertThat(existing.getId()).isEqualTo(1L); // id preservado
@@ -143,7 +144,7 @@ class LancamentoDTOMapperTest {
             "Obs", TipoLancamento.DESPESA, cat, pes
         );
 
-        LancamentoDTO.Response responseDTO = LancamentoDTOMapper.toDTO(lancamento);
+        LancamentoDTO.Response responseDTO = mapper.toDTO(lancamento);
 
         assertThat(responseDTO.id()).isEqualTo(5L);
         assertThat(responseDTO.descricao()).isEqualTo("Descrição");
@@ -160,7 +161,7 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDTO_ShouldReturnNull_WhenLancamentoIsNull() {
-        LancamentoDTO.Response responseDTO = LancamentoDTOMapper.toDTO(null);
+        LancamentoDTO.Response responseDTO = mapper.toDTO(null);
 
         assertThat(responseDTO).isNull();
     }

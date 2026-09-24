@@ -10,6 +10,8 @@ import static com.decodex.br.domain.validations.LancamentoValidation.validarValo
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.decodex.br.domain.annotation.Default;
+
 public class Lancamento {
 
     private Long id;
@@ -30,6 +32,7 @@ public class Lancamento {
 
     private Pessoa pessoa;
 
+    @Default
     public Lancamento(Long id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
         this.id = id;

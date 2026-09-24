@@ -15,7 +15,7 @@ import com.decodex.br.domain.model.Pessoa;
 @DisplayName("Testes unitários para PessoaMapper")
 class PessoaMapperTest {
 
-    private final PessoaMapper mapper = new PessoaMapper();
+    private final PessoaMapper mapper = PessoaMapper.INSTANCE;
 
     private final Endereco endereco = new Endereco(
         "Rua X", "123", "Apto", "Centro", "12345-678", "São Paulo", "SP"

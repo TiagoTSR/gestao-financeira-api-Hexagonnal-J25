@@ -1,33 +1,18 @@
 package com.decodex.br.adapters.out.persistence.mapper;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
+
 import com.decodex.br.adapters.out.persistence.entity.UsuarioEntity;
 import com.decodex.br.domain.model.Usuario;
 
-@Component
-public class UsuarioMapper {
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface UsuarioMapper {
 
-    public Usuario toDomain(UsuarioEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new Usuario(
-            entity.getId(),
-            entity.getUsername(),
-            entity.getPassword(),
-            entity.getEmail()
-        );
-    }
+    UsuarioMapper INSTANCE = Mappers.getMapper(UsuarioMapper.class);
 
-    public UsuarioEntity toEntity(Usuario domain) {
-        if (domain == null) {
-            return null;
-        }
-        UsuarioEntity entity = new UsuarioEntity();
-        entity.setId(domain.getId());
-        entity.setUsername(domain.getUsername());
-        entity.setPassword(domain.getPassword());
-        entity.setEmail(domain.getEmail());
-        return entity;
-    }
+    Usuario toDomain(UsuarioEntity entity);
+
+    UsuarioEntity toEntity(Usuario domain);
 }

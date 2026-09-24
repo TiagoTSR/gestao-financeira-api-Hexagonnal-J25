@@ -1,39 +1,23 @@
 package com.decodex.br.adapters.out.persistence.mapper;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.factory.Mappers;
+
 import com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity;
 import com.decodex.br.domain.model.RefreshToken;
 
-@Component
-public class RefreshTokenMapper {
+@Mapper(
+    componentModel = MappingConstants.ComponentModel.SPRING,
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR,
+    uses = {UsuarioMapper.class}
+)
+public interface RefreshTokenMapper {
 
-    private final UsuarioMapper usuarioMapper;
+    RefreshTokenMapper INSTANCE = Mappers.getMapper(RefreshTokenMapper.class);
 
-    public RefreshTokenMapper(UsuarioMapper usuarioMapper) {
-        this.usuarioMapper = usuarioMapper;
-    }
+    RefreshToken toDomain(RefreshTokenEntity entity);
 
-    public RefreshToken toDomain(RefreshTokenEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-        return new RefreshToken(
-                entity.getId(),
-                entity.getToken(),
-                usuarioMapper.toDomain(entity.getUsuario()),
-                entity.getExpiryDate()
-        );
-    }
-
-    public RefreshTokenEntity toEntity(RefreshToken domain) {
-        if (domain == null) {
-            return null;
-        }
-        RefreshTokenEntity entity = new RefreshTokenEntity();
-        entity.setId(domain.getId());
-        entity.setToken(domain.getToken());
-        entity.setUsuario(usuarioMapper.toEntity(domain.getUsuario()));
-        entity.setExpiryDate(domain.getExpiryDate());
-        return entity;
-    }
+    RefreshTokenEntity toEntity(RefreshToken domain);
 }

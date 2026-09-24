@@ -1,5 +1,6 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.CategoriaValidation.validarNome;
 
 public class Categoria {
@@ -7,6 +8,7 @@ public class Categoria {
 	private Long id;
 	private String nome;
 
+	@Default
 	public Categoria(Long id, String nome) {
 		this.id = id;
 		this.nome = validarNome(nome, "Nome");

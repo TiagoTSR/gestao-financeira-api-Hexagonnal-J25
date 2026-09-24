@@ -12,7 +12,7 @@ import com.decodex.br.domain.model.Categoria;
 @DisplayName("Testes unitários para CategoriaMapper")
 class CategoriaMapperTest {
 
-    private final CategoriaMapper mapper = new CategoriaMapper();
+    private final CategoriaMapper mapper = CategoriaMapper.INSTANCE;
 
     @Test
     @DisplayName("Deve converter Entity para Domain corretamente")

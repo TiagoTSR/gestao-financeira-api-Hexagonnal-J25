@@ -1,5 +1,6 @@
 package com.decodex.br.domain.model;
 
+import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.UsuarioValidation.validarEmail;
 import static com.decodex.br.domain.validations.UsuarioValidation.validarUsername;
 
@@ -10,6 +11,7 @@ public class Usuario {
     private Senha password;
     private String email;
 
+    @Default
     public Usuario(Long id, String username, String password, String email) {
         this.id = id;
         this.username = validarUsername(username);
