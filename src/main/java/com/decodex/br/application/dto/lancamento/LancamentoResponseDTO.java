@@ -3,7 +3,7 @@ package com.decodex.br.application.dto.lancamento;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResumoResponse;
 import com.decodex.br.domain.model.TipoLancamento;
 
@@ -23,7 +23,7 @@ public record LancamentoResponseDTO(
 
 	    TipoLancamento tipo,
 
-	    CategoriaResponseDTO categoria,
+	    CategoriaDTO.Response categoria,
 
 	    PessoaResumoResponse  pessoa
 ) {}

@@ -1,13 +1,11 @@
 package com.decodex.br.application.mapper;
 
-import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
-import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
-import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.domain.model.Categoria;
 
 public class CategoriaDTOMapper {
 
-    public static Categoria toDomain(CategoriaCreateDTO dto) {
+    public static Categoria toDomain(CategoriaDTO.Create dto) {
         if (dto == null) return null;
 
         return new Categoria(
@@ -16,7 +14,7 @@ public class CategoriaDTOMapper {
         );
     }
 
-    public static Categoria toDomain(CategoriaUpdateDTO dto) {
+    public static Categoria toDomain(CategoriaDTO.Update dto) {
         if (dto == null) return null;
 
         return new Categoria(
@@ -25,10 +23,10 @@ public class CategoriaDTOMapper {
         );
     }
 
-    public static CategoriaResponseDTO toDTO(Categoria categoria) {
+    public static CategoriaDTO.Response toDTO(Categoria categoria) {
         if (categoria == null) return null;
 
-        return new CategoriaResponseDTO(
+        return new CategoriaDTO.Response(
             categoria.getId(),
             categoria.getNome()
         );

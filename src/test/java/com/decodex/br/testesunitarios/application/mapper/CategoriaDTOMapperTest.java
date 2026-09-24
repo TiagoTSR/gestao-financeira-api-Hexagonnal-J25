@@ -5,21 +5,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
-import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
-import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
-import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.application.mapper.CategoriaDTOMapper;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 
 class CategoriaDTOMapperTest {
 
-    // toDomain(CreateDTO)
+    // toDomain(Create)
 
     @Test
     void toDomain_CreateDTO_ShouldConvertCreateDTOToCategoria() {
         // given
-        CategoriaCreateDTO createDTO = new CategoriaCreateDTO("Alimentação");
+        CategoriaDTO.Create createDTO = new CategoriaDTO.Create("Alimentação");
 
         // when
         Categoria categoria = CategoriaDTOMapper.toDomain(createDTO);
@@ -32,18 +30,18 @@ class CategoriaDTOMapperTest {
     @Test
     void toDomain_CreateDTO_ShouldReturnNull_WhenDTOIsNull() {
         // when
-        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaCreateDTO) null);
+        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaDTO.Create) null);
 
         // then
         assertThat(categoria).isNull();
     }
 
-    // toDomain(UpdateDTO)
+    // toDomain(Update)
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnCategoriaComNovosDados() {
         // given
-        CategoriaUpdateDTO updateDTO = new CategoriaUpdateDTO("Novo Nome");
+        CategoriaDTO.Update updateDTO = new CategoriaDTO.Update("Novo Nome");
 
         // when
         Categoria novaCategoria = CategoriaDTOMapper.toDomain(updateDTO);
@@ -56,7 +54,7 @@ class CategoriaDTOMapperTest {
     @Test
     void toDomain_UpdateDTO_ShouldReturnNull_WhenDTOIsNull() {
         // when
-        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaUpdateDTO) null);
+        Categoria categoria = CategoriaDTOMapper.toDomain((CategoriaDTO.Update) null);
 
         // then
         assertThat(categoria).isNull();
@@ -66,7 +64,7 @@ class CategoriaDTOMapperTest {
     void update_ShouldAtualizarCategoria_QuandoToDomainEAtualizarCamposCombinados() {
         // given
         Categoria existing = new Categoria(1L, "Antigo Nome");
-        CategoriaUpdateDTO updateDTO = new CategoriaUpdateDTO("Novo Nome");
+        CategoriaDTO.Update updateDTO = new CategoriaDTO.Update("Novo Nome");
 
         // when
         Categoria novosDados = CategoriaDTOMapper.toDomain(updateDTO);
@@ -85,7 +83,7 @@ class CategoriaDTOMapperTest {
         Categoria categoria = new Categoria(10L, "Transporte");
 
         // when
-        CategoriaResponseDTO responseDTO = CategoriaDTOMapper.toDTO(categoria);
+        CategoriaDTO.Response responseDTO = CategoriaDTOMapper.toDTO(categoria);
 
         // then
         assertThat(responseDTO.id()).isEqualTo(10L);
@@ -95,7 +93,7 @@ class CategoriaDTOMapperTest {
     @Test
     void toDTO_ShouldReturnNull_WhenCategoriaIsNull() {
         // when
-        CategoriaResponseDTO responseDTO = CategoriaDTOMapper.toDTO(null);
+        CategoriaDTO.Response responseDTO = CategoriaDTOMapper.toDTO(null);
 
         // then
         assertThat(responseDTO).isNull();

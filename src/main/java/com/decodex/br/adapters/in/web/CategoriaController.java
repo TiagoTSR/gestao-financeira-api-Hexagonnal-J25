@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
-import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
-import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.application.mapper.CategoriaDTOMapper;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -38,7 +36,7 @@ public class CategoriaController implements CategoriaControllerDoc {
     }
 
     @GetMapping
-    public PageResult<CategoriaResponseDTO> findAll(
+    public PageResult<CategoriaDTO.Response> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             CategoriaFilter filter) {
@@ -56,13 +54,13 @@ public class CategoriaController implements CategoriaControllerDoc {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<CategoriaDTO.Response> findById(@PathVariable Long id) {
         Categoria categoria = useCase.findById(id);
         return ResponseEntity.ok(CategoriaDTOMapper.toDTO(categoria));
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaCreateDTO dto) {
+    public ResponseEntity<CategoriaDTO.Response> create(@RequestBody @Valid CategoriaDTO.Create dto) {
         Categoria categoria = useCase.create(CategoriaDTOMapper.toDomain(dto));
 
         URI location = ServletUriComponentsBuilder
@@ -75,9 +73,9 @@ public class CategoriaController implements CategoriaControllerDoc {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> update(
+    public ResponseEntity<CategoriaDTO.Response> update(
             @PathVariable Long id,
-            @RequestBody @Valid CategoriaUpdateDTO dto) {
+            @RequestBody @Valid CategoriaDTO.Update dto) {
 
         Categoria novosDados = CategoriaDTOMapper.toDomain(dto);
         Categoria atualizada = useCase.update(id, novosDados);

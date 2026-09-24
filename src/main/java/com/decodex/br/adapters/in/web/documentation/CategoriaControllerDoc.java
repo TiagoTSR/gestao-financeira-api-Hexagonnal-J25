@@ -1,9 +1,7 @@
 package com.decodex.br.adapters.in.web.documentation;
 
 import org.springframework.http.ResponseEntity;
-import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
-import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
-import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaDTO;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.pagination.PageResult;
 
@@ -21,7 +19,7 @@ public interface CategoriaControllerDoc {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Categorias listadas com sucesso")
     })
-    PageResult<CategoriaResponseDTO> findAll(
+    PageResult<CategoriaDTO.Response> findAll(
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size,
             @Parameter(description = "Filtro para busca de categorias") CategoriaFilter filter);
@@ -31,7 +29,7 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "200", description = "Categoria encontrada com sucesso"),
         @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content)
     })
-    ResponseEntity<CategoriaResponseDTO> findById(
+    ResponseEntity<CategoriaDTO.Response> findById(
             @Parameter(description = "ID da categoria a ser pesquisada", required = true) Long id);
 
     @Operation(summary = "Criar nova categoria", description = "Cria e retorna uma nova categoria baseada nos dados fornecidos.")
@@ -39,8 +37,8 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
-    ResponseEntity<CategoriaResponseDTO> create(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação da nova categoria", required = true) CategoriaCreateDTO dto);
+    ResponseEntity<CategoriaDTO.Response> create(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação da nova categoria", required = true) CategoriaDTO.Create dto);
 
     @Operation(summary = "Atualizar categoria", description = "Atualiza os dados de uma categoria existente através do seu ID.")
     @ApiResponses(value = {
@@ -48,9 +46,9 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
-    ResponseEntity<CategoriaResponseDTO> update(
+    ResponseEntity<CategoriaDTO.Response> update(
             @Parameter(description = "ID da categoria a ser atualizada", required = true) Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da categoria", required = true) CategoriaUpdateDTO dto);
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da categoria", required = true) CategoriaDTO.Update dto);
 
     @Operation(summary = "Excluir categoria", description = "Remove uma categoria do sistema permanentemente através do ID informado.")
     @ApiResponses(value = {
