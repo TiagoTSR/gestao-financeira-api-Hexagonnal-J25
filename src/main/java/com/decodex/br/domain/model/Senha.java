@@ -1,13 +1,12 @@
 package com.decodex.br.domain.model;
 
-import com.decodex.br.domain.validations.SenhaValidation;
+import static com.decodex.br.domain.validations.SenhaValidation.validarHash;
 
 public class Senha {
     private final String hash;
-    private final SenhaValidation validation = new SenhaValidation();
 
     public Senha(String hash) {
-        this.hash = validation.validarHash(hash);
+        this.hash = validarHash(hash);
     }
 
     public String getHash() {

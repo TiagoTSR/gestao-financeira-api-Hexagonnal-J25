@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -29,7 +30,7 @@ class LancamentoTest {
     private static final Endereco ENDERECO_PESSOA = new Endereco(
     	    "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
     	);
-    	private static final Pessoa PESSOA = new Pessoa(1L, "João Silva", ENDERECO_PESSOA, true);
+    private static final Pessoa PESSOA = new Pessoa(1L, "João Silva", ENDERECO_PESSOA, true);
 
     @Test
     @DisplayName("Deve criar lançamento válido com todos os campos")
@@ -53,7 +54,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoDescricaoNula() {
         assertThatThrownBy(() -> new Lancamento(ID, null, DATA_VENCIMENTO, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Descrição não pode ser nula ou vazia");
     }
 
@@ -62,7 +63,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoDescricaoVazia() {
         assertThatThrownBy(() -> new Lancamento(ID, "   ", DATA_VENCIMENTO, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Descrição não pode ser nula ou vazia");
     }
 
@@ -71,7 +72,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoDataVencimentoNula() {
         assertThatThrownBy(() -> new Lancamento(ID, DESCRICAO, null, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Data de vencimento não pode ser nula");
     }
     
@@ -80,7 +81,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoTipoNulo() {
         assertThatThrownBy(() -> new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, null, CATEGORIA, PESSOA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Tipo não pode ser nulo");
     }
 
@@ -89,7 +90,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoCategoriaNula() {
         assertThatThrownBy(() -> new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, TIPO, null, PESSOA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Categoria não pode ser nula");
     }
 
@@ -98,7 +99,7 @@ class LancamentoTest {
     void deveLancarExcecaoQuandoPessoaNula() {
         assertThatThrownBy(() -> new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO,
                 VALOR, OBSERVACAO, TIPO, CATEGORIA, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Pessoa não pode ser nula");
     }
 

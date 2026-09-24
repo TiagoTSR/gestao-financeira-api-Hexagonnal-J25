@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 
 @DisplayName("Testes unitários para Categoria")
@@ -24,7 +25,7 @@ class CategoriaTest {
     @DisplayName("Deve lançar exceção quando nome for nulo")
     void deveLancarExcecaoQuandoNomeNulo() {
         assertThatThrownBy(() -> new Categoria(1L, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Nome não pode ser vazio");
     }
 
@@ -32,7 +33,7 @@ class CategoriaTest {
     @DisplayName("Deve lançar exceção quando nome for vazio")
     void deveLancarExcecaoQuandoNomeVazio() {
         assertThatThrownBy(() -> new Categoria(1L, "   "))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("Nome não pode ser vazio");
     }
 

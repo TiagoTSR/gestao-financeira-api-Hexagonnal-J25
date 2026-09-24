@@ -8,6 +8,7 @@ import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.application.mapper.PessoaDTOMapper;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
@@ -111,7 +112,7 @@ class PessoaDTOMapperTest {
     @Test
     void pessoaConstructor_ShouldThrow_WhenEnderecoIsNull() {
         assertThatThrownBy(() -> new Pessoa(3L, "Sem Endereço", null, true))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Endereço não pode ser nulo");
     }
 }

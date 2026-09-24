@@ -1,10 +1,15 @@
 package com.decodex.br.domain.validations;
 
-public class EnderecoValidation {
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 
-    public String validarCampoNaoNulo(String valor, String campo) {
+public final class EnderecoValidation {
+
+    private EnderecoValidation() {
+    }
+
+    public static String validarCampoNaoNulo(String valor, String campo) {
         if (valor == null) {
-            throw new IllegalArgumentException(campo + " não pode ser nulo");
+            throw new RegraDeNegocioException(campo + " não pode ser nulo");
         }
         return valor;
     }

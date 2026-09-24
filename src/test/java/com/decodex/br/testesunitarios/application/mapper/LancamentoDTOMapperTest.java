@@ -12,6 +12,7 @@ import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -173,7 +174,7 @@ class LancamentoDTOMapperTest {
             null, "Descrição", LocalDate.now(), null,
             BigDecimal.ONE, null, TipoLancamento.DESPESA, null, pessoa
         ))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Categoria");
     }
 
@@ -183,7 +184,7 @@ class LancamentoDTOMapperTest {
             null, "Descrição", LocalDate.now(), null,
             BigDecimal.ONE, null, TipoLancamento.DESPESA, categoria, null
         ))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Pessoa");
     }
 }

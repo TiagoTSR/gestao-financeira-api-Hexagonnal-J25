@@ -1,6 +1,9 @@
 package com.decodex.br.domain.model;
 
-import com.decodex.br.domain.validations.PessoaValidation;
+import static com.decodex.br.domain.validations.PessoaValidation.validarAtivo;
+import static com.decodex.br.domain.validations.PessoaValidation.validarEndereco;
+import static com.decodex.br.domain.validations.PessoaValidation.validarId;
+import static com.decodex.br.domain.validations.PessoaValidation.validarNome;
 
 public class Pessoa {
 
@@ -12,13 +15,11 @@ public class Pessoa {
 
 	private Boolean ativo;
 
-	private final PessoaValidation validation = new PessoaValidation();
-
 	public Pessoa(Long id, String nome, Endereco endereco, Boolean ativo) {
 		this.id = id;
-		this.nome = validation.validarNome(nome, "Nome");
-		this.endereco = validation.validarEndereco(endereco);
-		this.ativo = validation.validarAtivo(ativo);
+		this.nome = validarNome(nome, "Nome");
+		this.endereco = validarEndereco(endereco);
+		this.ativo = validarAtivo(ativo);
 	}
 
 	public Pessoa(String nome, Endereco endereco, Boolean ativo) {
@@ -26,22 +27,22 @@ public class Pessoa {
 	}
 
 	public Pessoa(Long id, String nome) {
-		this.id = validation.validarId(id);
-		this.nome = validation.validarNome(nome, "Nome");
+		this.id = validarId(id);
+		this.nome = validarNome(nome, "Nome");
 		this.endereco = null;
 		this.ativo = null;
 	}
 
 	public void alterarNome(String novoNome) {
-		this.nome = validation.validarNome(novoNome, "Nome");
+		this.nome = validarNome(novoNome, "Nome");
 	}
 
 	public void alterarEndereço(Endereco novoEndereço) {
-		this.endereco = validation.validarEndereco(novoEndereço);
+		this.endereco = validarEndereco(novoEndereço);
 	}
 
 	public void alterarAtivo(Boolean alteracaoAtivo) {
-		this.ativo = validation.validarAtivo(alteracaoAtivo);
+		this.ativo = validarAtivo(alteracaoAtivo);
 	}
 
 	public void atualizarCampos(Pessoa novosDados) {
@@ -82,5 +83,4 @@ public class Pessoa {
 	public int hashCode() {
 		return getClass().hashCode();
 	}
-
 }

@@ -9,6 +9,7 @@ import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.application.mapper.CategoriaDTOMapper;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 
 class CategoriaDTOMapperTest {
@@ -103,11 +104,11 @@ class CategoriaDTOMapperTest {
     @Test
     void categoriaConstructor_ShouldThrow_WhenNomeIsNullOrBlank() {
         assertThatThrownBy(() -> new Categoria(null, null))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Nome");
 
         assertThatThrownBy(() -> new Categoria(null, "   "))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Nome");
     }
 }

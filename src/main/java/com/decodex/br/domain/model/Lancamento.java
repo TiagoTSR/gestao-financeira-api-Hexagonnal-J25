@@ -1,9 +1,14 @@
 package com.decodex.br.domain.model;
 
+import static com.decodex.br.domain.validations.LancamentoValidation.validarCategoria;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarDataVencimento;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarDescricao;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarPessoa;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarTipo;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarValor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-import com.decodex.br.domain.validations.LancamentoValidation;
 
 public class Lancamento {
 
@@ -25,19 +30,17 @@ public class Lancamento {
 
     private Pessoa pessoa;
 
-    private final LancamentoValidation validation = new LancamentoValidation();
-
     public Lancamento(Long id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
         this.id = id;
-        this.descricao = validation.validarDescricao(descricao);
-        this.dataVencimento = validation.validarDataVencimento(dataVencimento);
+        this.descricao = validarDescricao(descricao);
+        this.dataVencimento = validarDataVencimento(dataVencimento);
         this.dataPagamento = dataPagamento;
-        this.valor = validation.validarValor(valor);
+        this.valor = validarValor(valor);
         this.observacao = observacao;
-        this.tipo = validation.validarTipo(tipo);
-        this.categoria = validation.validarCategoria(categoria);
-        this.pessoa = validation.validarPessoa(pessoa);
+        this.tipo = validarTipo(tipo);
+        this.categoria = validarCategoria(categoria);
+        this.pessoa = validarPessoa(pessoa);
     }
 
     public Lancamento(String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
@@ -46,11 +49,11 @@ public class Lancamento {
     }
 
     public void alterarDescricao(String novaDescricao) {
-        this.descricao = validation.validarDescricao(novaDescricao);
+        this.descricao = validarDescricao(novaDescricao);
     }
 
     public void alterarDataVencimento(LocalDate novaDataVencimento) {
-        this.dataVencimento = validation.validarDataVencimento(novaDataVencimento);
+        this.dataVencimento = validarDataVencimento(novaDataVencimento);
     }
 
     public void alterarDataPagamento(LocalDate novaDataPagamento) {
@@ -58,7 +61,7 @@ public class Lancamento {
     }
 
     public void alterarValor(BigDecimal novoValor) {
-        this.valor = validation.validarValor(novoValor);
+        this.valor = validarValor(novoValor);
     }
 
     public void alterarObservacao(String novaObservacao) {
@@ -66,15 +69,15 @@ public class Lancamento {
     }
 
     public void alterarTipo(TipoLancamento novoTipo) {
-        this.tipo = validation.validarTipo(novoTipo);
+        this.tipo = validarTipo(novoTipo);
     }
 
     public void alterarCategoria(Categoria novaCategoria) {
-        this.categoria = validation.validarCategoria(novaCategoria);
+        this.categoria = validarCategoria(novaCategoria);
     }
 
     public void alterarPessoa(Pessoa novaPessoa) {
-        this.pessoa = validation.validarPessoa(novaPessoa);
+        this.pessoa = validarPessoa(novaPessoa);
     }
 
     public void atualizarCampos(Lancamento novosDados) {
@@ -140,5 +143,4 @@ public class Lancamento {
     public int hashCode() {
         return getClass().hashCode();
     }
-
 }

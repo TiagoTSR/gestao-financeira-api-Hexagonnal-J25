@@ -1,15 +1,20 @@
 package com.decodex.br.domain.validations;
 
-public class CategoriaValidation {
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 
-    public String validarNome(String valor, String campo) {
+public final class CategoriaValidation {
+
+    private CategoriaValidation() {
+    }
+
+    public static String validarNome(String valor, String campo) {
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException(campo + " não pode ser vazio");
+            throw new RegraDeNegocioException(campo + " não pode ser vazio");
         }
         return valor;
     }
 
-    public String validarNome(String valor) {
+    public static String validarNome(String valor) {
         return validarNome(valor, "Nome");
     }
 }

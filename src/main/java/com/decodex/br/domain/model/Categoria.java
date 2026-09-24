@@ -1,16 +1,15 @@
 package com.decodex.br.domain.model;
 
-import com.decodex.br.domain.validations.CategoriaValidation;
+import static com.decodex.br.domain.validations.CategoriaValidation.validarNome;
 
 public class Categoria {
 
 	private Long id;
 	private String nome;
-	private final CategoriaValidation validation = new CategoriaValidation();
 
 	public Categoria(Long id, String nome) {
 		this.id = id;
-		this.nome = validation.validarNome(nome, "Nome");
+		this.nome = validarNome(nome, "Nome");
 	}
 
 	public Categoria(String nome) {
@@ -18,7 +17,7 @@ public class Categoria {
 	}
 
 	public void alterarNome(String novoNome) {
-		this.nome = validation.validarNome(novoNome, "Nome");
+		this.nome = validarNome(novoNome, "Nome");
 	}
 
 	public void atualizarCampos(Categoria novosDados) {

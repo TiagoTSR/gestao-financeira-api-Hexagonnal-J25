@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 
 @DisplayName("Testes unitários para Endereco (Embeddable)")
@@ -37,7 +38,7 @@ class EnderecoTest {
     @DisplayName("Deve lançar exceção quando logradouro for nulo")
     void deveLancarExcecaoQuandoLogradouroNulo() {
         assertThatThrownBy(() -> new Endereco(null, NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, ESTADO))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("logradouro não pode ser nulo");
     }
 
@@ -45,7 +46,7 @@ class EnderecoTest {
     @DisplayName("Deve lançar exceção quando bairro for nulo")
     void deveLancarExcecaoQuandoBairroNulo() {
         assertThatThrownBy(() -> new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, null, CEP, CIDADE, ESTADO))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("bairro não pode ser nulo");
     }
 
@@ -53,7 +54,7 @@ class EnderecoTest {
     @DisplayName("Deve lançar exceção quando CEP for nulo")
     void deveLancarExcecaoQuandoCepNulo() {
         assertThatThrownBy(() -> new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, null, CIDADE, ESTADO))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("cep não pode ser nulo");
     }
 
@@ -61,7 +62,7 @@ class EnderecoTest {
     @DisplayName("Deve lançar exceção quando cidade for nula")
     void deveLancarExcecaoQuandoCidadeNula() {
         assertThatThrownBy(() -> new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CEP, null, ESTADO))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("cidade não pode ser nulo");
     }
 
@@ -69,7 +70,7 @@ class EnderecoTest {
     @DisplayName("Deve lançar exceção quando estado for nulo")
     void deveLancarExcecaoQuandoEstadoNulo() {
         assertThatThrownBy(() -> new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, null))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("estado não pode ser nulo");
     }
 

@@ -1,6 +1,6 @@
 package com.decodex.br.domain.model;
 
-import com.decodex.br.domain.validations.EnderecoValidation;
+import static com.decodex.br.domain.validations.EnderecoValidation.validarCampoNaoNulo;
 
 import jakarta.persistence.Embeddable;
 
@@ -21,20 +21,18 @@ public class Endereco {
 
     private String estado;
 
-    private final transient EnderecoValidation validation = new EnderecoValidation();
-
     protected Endereco() {
     }
 
     public Endereco(String logradouro, String numero, String complemento, 
                     String bairro, String cep, String cidade, String estado) {
-        this.logradouro = validation.validarCampoNaoNulo(logradouro, "logradouro");
+        this.logradouro = validarCampoNaoNulo(logradouro, "logradouro");
         this.numero = numero;
         this.complemento = complemento;
-        this.bairro = validation.validarCampoNaoNulo(bairro, "bairro");
-        this.cep = validation.validarCampoNaoNulo(cep, "cep");
-        this.cidade = validation.validarCampoNaoNulo(cidade, "cidade");
-        this.estado = validation.validarCampoNaoNulo(estado, "estado");
+        this.bairro = validarCampoNaoNulo(bairro, "bairro");
+        this.cep = validarCampoNaoNulo(cep, "cep");
+        this.cidade = validarCampoNaoNulo(cidade, "cidade");
+        this.estado = validarCampoNaoNulo(estado, "estado");
     }
 
 	public String getLogradouro() {

@@ -1,20 +1,25 @@
 package com.decodex.br.domain.validations;
 
-public class UsuarioValidation {
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 
-    public String validarUsername(String username) {
+public final class UsuarioValidation {
+
+    private UsuarioValidation() {
+    }
+
+    public static String validarUsername(String username) {
         if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("O nome de usuário não pode ser vazio.");
+            throw new RegraDeNegocioException("O nome de usuário não pode ser vazio.");
         }
         return username;
     }
 
-    public String validarEmail(String email) {
+    public static String validarEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("O e-mail não pode ser vazio.");
+            throw new RegraDeNegocioException("O e-mail não pode ser vazio.");
         }
         if (!email.contains("@")) {
-            throw new IllegalArgumentException("E-mail inválido.");
+            throw new RegraDeNegocioException("E-mail inválido.");
         }
         return email;
     }

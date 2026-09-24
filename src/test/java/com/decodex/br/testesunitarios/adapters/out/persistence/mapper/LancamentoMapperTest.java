@@ -15,6 +15,7 @@ import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -132,7 +133,7 @@ class LancamentoMapperTest {
         entity.setCategoria(null);
         entity.setPessoa(pessoaEntity);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () ->
             mapper.toDomain(entity)
         );
 
@@ -151,7 +152,7 @@ class LancamentoMapperTest {
         entity.setCategoria(categoriaEntity);
         entity.setPessoa(null);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () ->
             mapper.toDomain(entity)
         );
 

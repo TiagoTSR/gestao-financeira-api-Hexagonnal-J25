@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Usuario;
 
 @DisplayName("Testes unitários para Usuario")
@@ -25,7 +27,7 @@ class UsuarioTest {
     @DisplayName("Deve lançar exceção quando o username for inválido")
     void deveLancarExcecaoQuandoUsernameInvalido() {
         assertThatThrownBy(() -> new Usuario(1L, "  ", "hash123", "admin@decodex.com"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("O nome de usuário não pode ser vazio.");
     }
 
@@ -33,7 +35,7 @@ class UsuarioTest {
     @DisplayName("Deve lançar exceção quando o email for inválido")
     void deveLancarExcecaoQuandoEmailInvalido() {
         assertThatThrownBy(() -> new Usuario(1L, "admin", "hash123", "emailSemArroba"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessageContaining("E-mail inválido.");
     }
 

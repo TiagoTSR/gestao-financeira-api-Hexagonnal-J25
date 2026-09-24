@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
@@ -34,7 +35,7 @@ class PessoaTest {
     @DisplayName("Deve lançar exceção quando nome for nulo")
     void deveLancarExcecaoQuandoNomeNulo() {
         assertThatThrownBy(() -> new Pessoa(ID, null, ENDERECO, ATIVO))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Nome não pode ser vazio");
     }
 
@@ -42,7 +43,7 @@ class PessoaTest {
     @DisplayName("Deve lançar exceção quando nome for vazio")
     void deveLancarExcecaoQuandoNomeVazio() {
         assertThatThrownBy(() -> new Pessoa(ID, "  ", ENDERECO, ATIVO))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Nome não pode ser vazio");
     }
 
@@ -50,7 +51,7 @@ class PessoaTest {
     @DisplayName("Deve lançar exceção quando ativo for nulo")
     void deveLancarExcecaoQuandoAtivoNulo() {
         assertThatThrownBy(() -> new Pessoa(ID, NOME, ENDERECO, null))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Ativo não pode ser vazio (deve ser true ou false)");
     }
 
@@ -58,7 +59,7 @@ class PessoaTest {
     @DisplayName("Deve lançar exceção quando endereco for nulo")
     void deveLancarExcecaoQuandoEnderecoNulo() {
         assertThatThrownBy(() -> new Pessoa(ID, NOME, null, ATIVO))
-            .isInstanceOf(IllegalArgumentException.class)
+            .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Endereço não pode ser nulo");
     }
 

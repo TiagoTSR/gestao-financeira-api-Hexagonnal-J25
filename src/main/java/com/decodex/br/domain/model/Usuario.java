@@ -1,6 +1,7 @@
 package com.decodex.br.domain.model;
 
-import com.decodex.br.domain.validations.UsuarioValidation;
+import static com.decodex.br.domain.validations.UsuarioValidation.validarEmail;
+import static com.decodex.br.domain.validations.UsuarioValidation.validarUsername;
 
 public class Usuario {
 
@@ -8,13 +9,12 @@ public class Usuario {
     private String username;
     private Senha password;
     private String email;
-    private final UsuarioValidation validation = new UsuarioValidation();
 
     public Usuario(Long id, String username, String password, String email) {
         this.id = id;
-        this.username = validation.validarUsername(username);
+        this.username = validarUsername(username);
         this.password = new Senha(password);
-        this.email = validation.validarEmail(email);
+        this.email = validarEmail(email);
     }
 
     public Usuario(String username, String password, String email) {
@@ -26,7 +26,7 @@ public class Usuario {
     }
 
     public void alterarEmail(String novoEmail) {
-        this.email = validation.validarEmail(novoEmail);
+        this.email = validarEmail(novoEmail);
     }
 
     public Long getId() {

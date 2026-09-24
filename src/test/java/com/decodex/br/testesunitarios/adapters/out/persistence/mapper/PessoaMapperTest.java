@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
@@ -76,7 +77,7 @@ class PessoaMapperTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar Pessoa com endereço nulo")
     void pessoaComEnderecoNulo_DeveLancarExcecao() {
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(RegraDeNegocioException.class, () ->
             new Pessoa(2L, "José", null, false)
         );
     }
