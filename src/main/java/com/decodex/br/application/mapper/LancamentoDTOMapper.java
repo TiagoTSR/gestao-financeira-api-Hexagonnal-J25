@@ -1,15 +1,13 @@
 package com.decodex.br.application.mapper;
 
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 
 public class LancamentoDTOMapper {
 
-    public static Lancamento toDomain(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa) {
+    public static Lancamento toDomain(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
 
         return new Lancamento(
@@ -25,7 +23,7 @@ public class LancamentoDTOMapper {
         );
     }
 
-    public static Lancamento toDomain(LancamentoUpdateDTO dto, Categoria categoria, Pessoa pessoa) {
+    public static Lancamento toDomain(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
 
         return new Lancamento(
@@ -41,7 +39,7 @@ public class LancamentoDTOMapper {
         );
     }
 
-    public static LancamentoResponseDTO toDTO(Lancamento lancamento) {
+    public static LancamentoDTO.Response toDTO(Lancamento lancamento) {
         if (lancamento == null) return null;
 
         var categoriaDTO = lancamento.getCategoria() != null
@@ -52,7 +50,7 @@ public class LancamentoDTOMapper {
                 ? PessoaResumoMapper.toDTO(lancamento.getPessoa())
                 : null;
 
-        return new LancamentoResponseDTO(
+        return new LancamentoDTO.Response(
             lancamento.getId(),
             lancamento.getDescricao(),
             lancamento.getDataVencimento(),

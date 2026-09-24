@@ -1,9 +1,7 @@
 package com.decodex.br.adapters.in.web.documentation;
 
 import org.springframework.http.ResponseEntity;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.pagination.PageResult;
 
@@ -21,7 +19,7 @@ public interface LancamentoControllerDoc {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lançamentos listados com sucesso")
     })
-    PageResult<LancamentoResponseDTO> findAll(
+    PageResult<LancamentoDTO.Response> findAll(
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size,
             @Parameter(description = "Filtro para busca de lançamentos") LancamentoFilter filter);
@@ -31,7 +29,7 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "200", description = "Lançamento encontrado com sucesso"),
         @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
     })
-    ResponseEntity<LancamentoResponseDTO> findById(
+    ResponseEntity<LancamentoDTO.Response> findById(
             @Parameter(description = "ID do lançamento a ser pesquisado", required = true) Long id);
 
     @Operation(summary = "Criar novo lançamento", description = "Cria e retorna um novo lançamento financeiro baseado nos dados fornecidos.")
@@ -39,8 +37,8 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "201", description = "Lançamento criado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos (ex: Categoria ou Pessoa não encontradas)", content = @Content)
     })
-    ResponseEntity<LancamentoResponseDTO> create(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação do novo lançamento", required = true) LancamentoCreateDTO dto);
+    ResponseEntity<LancamentoDTO.Response> create(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação do novo lançamento", required = true) LancamentoDTO.Create dto);
 
     @Operation(summary = "Atualizar lançamento", description = "Atualiza os dados de um lançamento existente através do seu ID.")
     @ApiResponses(value = {
@@ -48,9 +46,9 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
-    ResponseEntity<LancamentoResponseDTO> update(
+    ResponseEntity<LancamentoDTO.Response> update(
             @Parameter(description = "ID do lançamento a ser atualizado", required = true) Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados do lançamento", required = true) LancamentoUpdateDTO dto);
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados do lançamento", required = true) LancamentoDTO.Update dto);
 
     @Operation(summary = "Excluir lançamento", description = "Remove um lançamento do sistema permanentemente através do ID informado.")
     @ApiResponses(value = {

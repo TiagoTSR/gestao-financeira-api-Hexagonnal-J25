@@ -9,9 +9,7 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 import com.decodex.br.application.dto.categoria.CategoriaDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
@@ -28,11 +26,11 @@ class LancamentoDTOMapperTest {
     private final Categoria categoria = new Categoria(1L, "Categoria Teste");
     private final Pessoa pessoa = new Pessoa(1L, "Pessoa Teste", endereco, true);
 
-    //  toDomain(CreateDTO)
+    //  toDomain(Create)
 
     @Test
     void toDomain_CreateDTO_ShouldConvertToLancamento() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoDTO.Create dto = new LancamentoDTO.Create(
             "Descrição Teste",
             LocalDate.of(2025, 1, 1),
             LocalDate.of(2025, 1, 2),
@@ -57,16 +55,16 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDomain_CreateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoCreateDTO) null, categoria, pessoa);
+        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoDTO.Create) null, categoria, pessoa);
 
         assertThat(lancamento).isNull();
     }
 
-    //  toDomain(UpdateDTO)
+    //  toDomain(Update)
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnLancamentoComNovosDados() {
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+        LancamentoDTO.Update dto = new LancamentoDTO.Update(
             "Nova Descrição",
             LocalDate.of(2026, 1, 1),
             LocalDate.of(2026, 1, 2),
@@ -90,7 +88,7 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoUpdateDTO) null, categoria, pessoa);
+        Lancamento lancamento = LancamentoDTOMapper.toDomain((LancamentoDTO.Update) null, categoria, pessoa);
 
         assertThat(lancamento).isNull();
     }
@@ -108,7 +106,7 @@ class LancamentoDTOMapperTest {
         Endereco novoEndereco = new Endereco("Rua Nova", "20", null, "Bairro Novo", "11111-111", "Rio", "RJ");
         Pessoa novaPessoa = new Pessoa(2L, "Nova Pessoa", novoEndereco, false);
 
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+        LancamentoDTO.Update dto = new LancamentoDTO.Update(
             "Nova Descrição",
             LocalDate.of(2026, 1, 1),
             LocalDate.of(2026, 1, 2),
@@ -145,7 +143,7 @@ class LancamentoDTOMapperTest {
             "Obs", TipoLancamento.DESPESA, cat, pes
         );
 
-        LancamentoResponseDTO responseDTO = LancamentoDTOMapper.toDTO(lancamento);
+        LancamentoDTO.Response responseDTO = LancamentoDTOMapper.toDTO(lancamento);
 
         assertThat(responseDTO.id()).isEqualTo(5L);
         assertThat(responseDTO.descricao()).isEqualTo("Descrição");
@@ -162,7 +160,7 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDTO_ShouldReturnNull_WhenLancamentoIsNull() {
-        LancamentoResponseDTO responseDTO = LancamentoDTOMapper.toDTO(null);
+        LancamentoDTO.Response responseDTO = LancamentoDTOMapper.toDTO(null);
 
         assertThat(responseDTO).isNull();
     }

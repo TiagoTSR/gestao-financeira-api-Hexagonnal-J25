@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
-import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
-import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
-import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaDTO;
 import com.decodex.br.application.mapper.PessoaDTOMapper;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
@@ -18,11 +16,11 @@ class PessoaDTOMapperTest {
         "Rua A", "123", null, "Centro", "01000-000", "São Paulo", "SP"
     );
 
-    // toDomain(CreateDTO)
+    // toDomain(Create)
 
     @Test
     void toDomain_CreateDTO_ShouldReturnPessoaComDadosCorretos() {
-        PessoaCreateDTO dto = new PessoaCreateDTO(
+        PessoaDTO.Create dto = new PessoaDTO.Create(
             "João Silva", "Rua A", "123", null, "Centro", "01000-000", "São Paulo", "SP", true
         );
 
@@ -37,16 +35,16 @@ class PessoaDTOMapperTest {
 
     @Test
     void toDomain_CreateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Pessoa pessoa = PessoaDTOMapper.toDomain((PessoaCreateDTO) null);
+        Pessoa pessoa = PessoaDTOMapper.toDomain((PessoaDTO.Create) null);
 
         assertThat(pessoa).isNull();
     }
 
-    // toDomain(UpdateDTO)
+    // toDomain(Update)
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnPessoaComNovosDados() {
-        PessoaUpdateDTO dto = new PessoaUpdateDTO(
+        PessoaDTO.Update dto = new PessoaDTO.Update(
             "Novo Nome", "Rua B", "456", null, "Bairro B", "20000-000", "Rio", "RJ", true
         );
 
@@ -61,7 +59,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnNull_WhenDTOIsNull() {
-        Pessoa pessoa = PessoaDTOMapper.toDomain((PessoaUpdateDTO) null);
+        Pessoa pessoa = PessoaDTOMapper.toDomain((PessoaDTO.Update) null);
 
         assertThat(pessoa).isNull();
     }
@@ -72,7 +70,7 @@ class PessoaDTOMapperTest {
     void update_ShouldAtualizarPessoa_QuandoToDomainEAtualizarCamposCombinados() {
         // Simula exatamente o que o PessoaService.update() faz
         Pessoa existing = new Pessoa(1L, "Nome Antigo", endereco, false);
-        PessoaUpdateDTO dto = new PessoaUpdateDTO(
+        PessoaDTO.Update dto = new PessoaDTO.Update(
             "Novo Nome", "Rua B", "456", null, "Bairro B", "20000-000", "Rio", "RJ", true
         );
 
@@ -92,7 +90,7 @@ class PessoaDTOMapperTest {
     void toDTO_ShouldConvertPessoaToResponseDTO() {
         Pessoa pessoa = new Pessoa(2L, "Maria Souza", endereco, false);
 
-        PessoaResponseDTO dto = PessoaDTOMapper.toDTO(pessoa);
+        PessoaDTO.Response dto = PessoaDTOMapper.toDTO(pessoa);
 
         assertThat(dto.id()).isEqualTo(2L);
         assertThat(dto.nome()).isEqualTo("Maria Souza");
@@ -104,7 +102,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void toDTO_ShouldReturnNull_WhenPessoaIsNull() {
-        PessoaResponseDTO dto = PessoaDTOMapper.toDTO(null);
+        PessoaDTO.Response dto = PessoaDTOMapper.toDTO(null);
 
         assertThat(dto).isNull();
     }

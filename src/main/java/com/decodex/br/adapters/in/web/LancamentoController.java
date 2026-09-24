@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
 import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -49,7 +47,7 @@ public class LancamentoController implements LancamentoControllerDoc {
     }
 
     @GetMapping
-    public PageResult<LancamentoResponseDTO> findAll(
+    public PageResult<LancamentoDTO.Response> findAll(
     		 @RequestParam(defaultValue = "0") int page,
              @RequestParam(defaultValue = "10") int size,
              LancamentoFilter filter) {
@@ -67,13 +65,13 @@ public class LancamentoController implements LancamentoControllerDoc {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<LancamentoDTO.Response> findById(@PathVariable Long id) {
         Lancamento lancamento = lancamentoUseCase.findById(id);
         return ResponseEntity.ok(LancamentoDTOMapper.toDTO(lancamento));
     }
 
     @PostMapping
-    public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoCreateDTO dto) {
+    public ResponseEntity<LancamentoDTO.Response> create(@RequestBody @Valid LancamentoDTO.Create dto) {
         Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
         Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());
 
@@ -91,9 +89,9 @@ public class LancamentoController implements LancamentoControllerDoc {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LancamentoResponseDTO> update(
+    public ResponseEntity<LancamentoDTO.Response> update(
             @PathVariable Long id,
-            @RequestBody @Valid LancamentoUpdateDTO dto) {
+            @RequestBody @Valid LancamentoDTO.Update dto) {
 
         Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
         Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());

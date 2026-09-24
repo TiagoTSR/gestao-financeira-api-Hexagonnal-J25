@@ -25,9 +25,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.LancamentoController;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
@@ -78,7 +76,7 @@ class LancamentoControllerUnitarioTest {
             .thenReturn(pageResult);
 
         LancamentoFilter filter = new LancamentoFilter();
-        PageResult<LancamentoResponseDTO> response = controller.findAll(0, 10, filter);
+        PageResult<LancamentoDTO.Response> response = controller.findAll(0, 10, filter);
 
         assertEquals(1, response.content().size());
         assertEquals(0, response.page());
@@ -91,7 +89,7 @@ class LancamentoControllerUnitarioTest {
     void findById_deveRetornar200() {
         when(lancamentoUseCase.findById(1L)).thenReturn(lancamentoFake());
 
-        ResponseEntity<LancamentoResponseDTO> response = controller.findById(1L);
+        ResponseEntity<LancamentoDTO.Response> response = controller.findById(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Salário", response.getBody().descricao());
@@ -100,14 +98,14 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve criar lançamento e retornar status 201")
     void create_deveRetornar201() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoDTO.Create dto = new LancamentoDTO.Create(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
         when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
         when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
         when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoFake());
 
-        ResponseEntity<LancamentoResponseDTO> response = controller.create(dto);
+        ResponseEntity<LancamentoDTO.Response> response = controller.create(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
@@ -116,14 +114,14 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve atualizar lançamento e retornar status 200")
     void update_deveRetornar200() {
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+        LancamentoDTO.Update dto = new LancamentoDTO.Update(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
         when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
         when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
         when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
 
-        ResponseEntity<LancamentoResponseDTO> response = controller.update(1L, dto);
+        ResponseEntity<LancamentoDTO.Response> response = controller.update(1L, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

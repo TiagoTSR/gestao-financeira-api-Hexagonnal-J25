@@ -23,8 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.decodex.br.adapters.in.web.PessoaController;
-import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
-import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaDTO;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
@@ -62,7 +61,7 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created ao criar pessoa válida")
     void create_DeveRetornar201() throws Exception {
-        PessoaCreateDTO requestDTO = new PessoaCreateDTO(
+        PessoaDTO.Create requestDTO = new PessoaDTO.Create(
             "João Silva", "Rua das Flores", "10", null, "Centro",
             "01000-000", "São Paulo", "SP", true
         );
@@ -87,7 +86,7 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao enviar pessoa com dados incompletos")
     void create_DeveRetornar400_QuandoDadosInvalidos() throws Exception {
-        PessoaCreateDTO requestDTO = new PessoaCreateDTO(
+        PessoaDTO.Create requestDTO = new PessoaDTO.Create(
             "", "Rua das Flores", "10", null, "Centro",
             "01000-000", "São Paulo", null, true
         );
@@ -136,7 +135,7 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar pessoa")
     void update_DeveRetornar200() throws Exception {
-        PessoaUpdateDTO requestDTO = new PessoaUpdateDTO(
+        PessoaDTO.Update requestDTO = new PessoaDTO.Update(
             "Maria Atualizada", "Rua Nova", "100", "Apt 2", "Centro",
             "11111-000", "Belo Horizonte", "MG", false
         );

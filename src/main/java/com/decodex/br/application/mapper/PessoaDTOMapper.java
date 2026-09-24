@@ -1,14 +1,12 @@
 package com.decodex.br.application.mapper;
 
-import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
-import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
-import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaDTO;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 
 public class PessoaDTOMapper {
 
-    public static Pessoa toDomain(PessoaCreateDTO dto) {
+    public static Pessoa toDomain(PessoaDTO.Create dto) {
         if (dto == null) return null;
 
         Endereco endereco = new Endereco(
@@ -28,7 +26,7 @@ public class PessoaDTOMapper {
         );
     }
 
-    public static Pessoa toDomain(PessoaUpdateDTO dto) {
+    public static Pessoa toDomain(PessoaDTO.Update dto) {
         if (dto == null) return null;
 
         Endereco endereco = new Endereco(
@@ -48,12 +46,12 @@ public class PessoaDTOMapper {
         );
     }
 
-    public static PessoaResponseDTO toDTO(Pessoa p) {
+    public static PessoaDTO.Response toDTO(Pessoa p) {
         if (p == null) return null;
 
         boolean temEndereco = p.getEndereco() != null;
 
-        return new PessoaResponseDTO(
+        return new PessoaDTO.Response(
             p.getId(),
             p.getNome(),
             temEndereco ? p.getEndereco().getLogradouro() : null,

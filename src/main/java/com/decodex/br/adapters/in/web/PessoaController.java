@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
-import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
-import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaDTO;
 import com.decodex.br.application.mapper.PessoaDTOMapper;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
@@ -38,7 +36,7 @@ public class PessoaController implements PessoaControllerDoc {
     }
 
     @GetMapping
-    public PageResult<PessoaResponseDTO> findAll(
+    public PageResult<PessoaDTO.Response> findAll(
             PessoaFilter filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -56,13 +54,13 @@ public class PessoaController implements PessoaControllerDoc {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PessoaDTO.Response> findById(@PathVariable Long id) {
         Pessoa pessoa = useCase.findById(id);
         return ResponseEntity.ok(PessoaDTOMapper.toDTO(pessoa));
     }
 
     @PostMapping
-    public ResponseEntity<PessoaResponseDTO> create(@RequestBody @Valid PessoaCreateDTO dto) {
+    public ResponseEntity<PessoaDTO.Response> create(@RequestBody @Valid PessoaDTO.Create dto) {
         Pessoa pessoa = useCase.create(PessoaDTOMapper.toDomain(dto));
 
         URI location = ServletUriComponentsBuilder
@@ -75,9 +73,9 @@ public class PessoaController implements PessoaControllerDoc {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PessoaResponseDTO> update(
+    public ResponseEntity<PessoaDTO.Response> update(
             @PathVariable Long id,
-            @RequestBody @Valid PessoaUpdateDTO dto) {
+            @RequestBody @Valid PessoaDTO.Update dto) {
 
         Pessoa novosDados = PessoaDTOMapper.toDomain(dto);
         Pessoa atualizada = useCase.update(id, novosDados);

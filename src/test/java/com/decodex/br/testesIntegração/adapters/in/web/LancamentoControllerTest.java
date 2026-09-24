@@ -25,8 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.decodex.br.adapters.in.web.LancamentoController;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoDTO;
 import com.decodex.br.domain.filter.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
@@ -87,7 +86,7 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created ao criar lançamento válido")
     void create_DeveRetornar201() throws Exception {
-        LancamentoCreateDTO requestDTO = new LancamentoCreateDTO(
+        LancamentoDTO.Create requestDTO = new LancamentoDTO.Create(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
             "Referente a maio", TipoLancamento.RECEITA, 1L, 1L
         );
@@ -116,7 +115,7 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao enviar lançamento sem descricao")
     void create_DeveRetornar400_QuandoDadosInvalidos() throws Exception {
-        LancamentoCreateDTO requestDTO = new LancamentoCreateDTO(
+        LancamentoDTO.Create requestDTO = new LancamentoDTO.Create(
             null, LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
             null, TipoLancamento.RECEITA, 1L, 1L
         );
@@ -168,7 +167,7 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar lançamento")
     void update_DeveRetornar200() throws Exception {
-        LancamentoUpdateDTO requestDTO = new LancamentoUpdateDTO(
+        LancamentoDTO.Update requestDTO = new LancamentoDTO.Update(
             "Aluguel", LocalDate.of(2025, 6, 5), LocalDate.of(2025, 6, 5), new BigDecimal("1200.00"),
             null, TipoLancamento.DESPESA, 2L, 2L
         );
