@@ -2,9 +2,11 @@ package com.decodex.br.adapters.out.persistence.adapter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +23,13 @@ import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 @Component
 public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
 
+    private static final Set<String> CAMPOS_ORDENAVEIS = Set.of("id", "nome");
+
     private final CategoriaRepository repository;
     private final CategoriaMapper mapper;
 
     public CategoriaRepositoryAdapter(
-            CategoriaRepository repository,CategoriaMapper mapper) {
+            CategoriaRepository repository, CategoriaMapper mapper) {
 
         this.repository = repository;
         this.mapper = mapper;
@@ -34,8 +38,8 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     @Override
     public Categoria save(Categoria categoria) {
         return mapper.toDomain(
-        		repository.save(
-                		mapper.toEntity(categoria)
+                repository.save(
+                        mapper.toEntity(categoria)
                 )
         );
     }
@@ -47,11 +51,12 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     }
 
     @Override
-    public PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest request) {
+    public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest request) {
 
-    	Pageable pageable = org.springframework.data.domain.PageRequest.of(
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
-                request.size()
+                request.size(),
+                resolverSort(request)
         );
 
         Specification<CategoriaEntity> spec = CategoriaSpecification.fromFilter(filter);
@@ -73,6 +78,18 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
 
     @Override
     public void deleteById(Long id) {
-    	repository.deleteById(id);
+        repository.deleteById(id);
+    }
+
+    private Sort resolverSort(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            return Sort.by(Sort.Direction.ASC, "nome");
+        }
+        String campo = pageRequest.getSortProperty().orElse(null);
+        if (campo == null || !CAMPOS_ORDENAVEIS.contains(campo)) {
+            return Sort.by(Sort.Direction.ASC, "nome");
+        }
+        Sort.Direction direcao = pageRequest.isDesc() ? Sort.Direction.DESC : Sort.Direction.ASC;
+        return Sort.by(direcao, campo);
     }
 }

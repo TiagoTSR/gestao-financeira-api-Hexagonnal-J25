@@ -106,7 +106,9 @@ class CategoriaRepositoryAdapterTest {
     void findAll_ShouldReturnPageResult() {
         CategoriaFilter filter = new CategoriaFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "nome")
+        );
         Page<CategoriaEntity> page = new PageImpl<>(List.of(categoriaEntity), pageable, 1);
 
         when(categoriaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
@@ -123,6 +125,26 @@ class CategoriaRepositoryAdapterTest {
         
         verify(categoriaRepository).findAll(any(Specification.class), eq(pageable));
         verify(categoriaMapper).toDomain(categoriaEntity);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisplayName("Deve resolver ordenação com resolverSort respeitando campos permitidos e direção descendente")
+    void findAll_ComOrdenacaoDescendente_DeveResolverSortCorretamente() {
+        CategoriaFilter filter = new CategoriaFilter();
+        PageRequest pageRequest = PageRequest.of(0, 10, "id", "desc");
+        Pageable pageableEsperado = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")
+        );
+        Page<CategoriaEntity> page = new PageImpl<>(List.of(categoriaEntity), pageableEsperado, 1);
+
+        when(categoriaRepository.findAll(any(Specification.class), eq(pageableEsperado))).thenReturn(page);
+        when(categoriaMapper.toDomain(categoriaEntity)).thenReturn(domainCategoria);
+
+        PageResult<Categoria> result = adapter.findAll(filter, pageRequest);
+
+        assertThat(result).isNotNull();
+        verify(categoriaRepository).findAll(any(Specification.class), eq(pageableEsperado));
     }
 
     @Test

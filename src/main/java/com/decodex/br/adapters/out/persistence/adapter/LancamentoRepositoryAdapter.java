@@ -2,9 +2,11 @@ package com.decodex.br.adapters.out.persistence.adapter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +23,13 @@ import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 @Component
 public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
 
+    private static final Set<String> CAMPOS_ORDENAVEIS = Set.of(
+            "id", "descricao", "dataVencimento", "dataPagamento", "valor", "tipo"
+    );
+
     private final LancamentoRepository repository;
     private final LancamentoMapper mapper;
-    
+
     public LancamentoRepositoryAdapter(
             LancamentoRepository repository,
             LancamentoMapper mapper) {
@@ -46,11 +52,12 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
-    public PageResult<Lancamento> findAll(LancamentoFilter filter,PageRequest request) {
+    public PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest request) {
 
-    	Pageable pageable = org.springframework.data.domain.PageRequest.of(
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
-                request.size()
+                request.size(),
+                resolverSort(request)
         );
 
         Specification<LancamentoEntity> spec = LancamentoSpecification.fromFilter(filter);
@@ -73,5 +80,17 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    private Sort resolverSort(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            return Sort.by(Sort.Direction.ASC, "dataVencimento");
+        }
+        String campo = pageRequest.getSortProperty().orElse(null);
+        if (campo == null || !CAMPOS_ORDENAVEIS.contains(campo)) {
+            return Sort.by(Sort.Direction.ASC, "dataVencimento");
+        }
+        Sort.Direction direcao = pageRequest.isDesc() ? Sort.Direction.DESC : Sort.Direction.ASC;
+        return Sort.by(direcao, campo);
     }
 }

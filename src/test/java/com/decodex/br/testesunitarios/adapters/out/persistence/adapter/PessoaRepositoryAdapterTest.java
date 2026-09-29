@@ -127,7 +127,9 @@ class PessoaRepositoryAdapterTest {
     void findAll_ShouldReturnPageResult() {
         PessoaFilter filter = new PessoaFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "nome")
+        );
         Page<PessoaEntity> page = new PageImpl<>(List.of(pessoaEntity), pageable, 1);
 
         when(pessoaRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
@@ -145,6 +147,25 @@ class PessoaRepositoryAdapterTest {
         
         verify(pessoaRepository).findAll(any(Specification.class), eq(pageable));
         verify(pessoaMapper).toDomain(pessoaEntity);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisplayName("Deve resolver ordenação com resolverSort respeitando campos permitidos e direção descendente")
+    void findAll_ComOrdenacaoDescendente_DeveResolverSortCorretamente() {
+        PessoaFilter filter = new PessoaFilter();
+        PageRequest pageRequest = PageRequest.of(0, 10, "ativo", "desc");
+        Pageable pageableEsperado = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "ativo")
+        );
+        Page<PessoaEntity> page = new PageImpl<>(List.of(pessoaEntity), pageableEsperado, 1);
+
+        when(pessoaRepository.findAll(any(Specification.class), eq(pageableEsperado))).thenReturn(page);
+        when(pessoaMapper.toDomain(pessoaEntity)).thenReturn(domainPessoa);
+
+        PageResult<Pessoa> result = adapter.findAll(filter, pageRequest);
+
+        assertThat(result).isNotNull();
     }
 
     @Test

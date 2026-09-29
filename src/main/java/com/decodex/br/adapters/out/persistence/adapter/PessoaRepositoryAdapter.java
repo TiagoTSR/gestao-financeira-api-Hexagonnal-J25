@@ -2,9 +2,11 @@ package com.decodex.br.adapters.out.persistence.adapter;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +23,11 @@ import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 @Component
 public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
 
+    private static final Set<String> CAMPOS_ORDENAVEIS = Set.of("id", "nome", "ativo");
+
     private final PessoaRepository repository;
     private final PessoaMapper mapper;
-    
+
     public PessoaRepositoryAdapter(
             PessoaRepository repository,
             PessoaMapper mapper) {
@@ -49,7 +53,8 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
-                request.size()
+                request.size(),
+                resolverSort(request)
         );
 
         Specification<PessoaEntity> spec = PessoaSpecification.fromFilter(filter);
@@ -72,5 +77,17 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     @Override
     public void deleteById(Long id) {
         repository.deleteById(id);
+    }
+
+    private Sort resolverSort(PageRequest pageRequest) {
+        if (pageRequest == null) {
+            return Sort.by(Sort.Direction.ASC, "nome");
+        }
+        String campo = pageRequest.getSortProperty().orElse(null);
+        if (campo == null || !CAMPOS_ORDENAVEIS.contains(campo)) {
+            return Sort.by(Sort.Direction.ASC, "nome");
+        }
+        Sort.Direction direcao = pageRequest.isDesc() ? Sort.Direction.DESC : Sort.Direction.ASC;
+        return Sort.by(direcao, campo);
     }
 }

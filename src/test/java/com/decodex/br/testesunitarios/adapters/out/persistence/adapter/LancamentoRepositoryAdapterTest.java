@@ -120,7 +120,9 @@ class LancamentoRepositoryAdapterTest {
     void findAll_ShouldReturnPageResult() {
         LancamentoFilter filter = new LancamentoFilter();
         PageRequest pageRequest = new PageRequest(0, 10);
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "dataVencimento")
+        );
         Page<LancamentoEntity> page = new PageImpl<>(List.of(lancamentoEntity), pageable, 1);
 
         when(lancamentoRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
@@ -137,6 +139,26 @@ class LancamentoRepositoryAdapterTest {
         
         verify(lancamentoRepository).findAll(any(Specification.class), eq(pageable));
         verify(lancamentoMapper).toDomain(lancamentoEntity);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    @DisplayName("Deve resolver ordenação com resolverSort respeitando campos permitidos e direção descendente")
+    void findAll_ComOrdenacaoDescendente_DeveResolverSortCorretamente() {
+        LancamentoFilter filter = new LancamentoFilter();
+        PageRequest pageRequest = PageRequest.of(0, 10, "valor", "desc");
+        Pageable pageableEsperado = org.springframework.data.domain.PageRequest.of(
+                0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "valor")
+        );
+        Page<LancamentoEntity> page = new PageImpl<>(List.of(lancamentoEntity), pageableEsperado, 1);
+
+        when(lancamentoRepository.findAll(any(Specification.class), eq(pageableEsperado))).thenReturn(page);
+        when(lancamentoMapper.toDomain(lancamentoEntity)).thenReturn(domainLancamento);
+
+        PageResult<Lancamento> result = adapter.findAll(filter, pageRequest);
+
+        assertThat(result).isNotNull();
+        verify(lancamentoRepository).findAll(any(Specification.class), eq(pageableEsperado));
     }
 
     @Test
