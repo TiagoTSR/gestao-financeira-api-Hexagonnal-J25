@@ -1,6 +1,7 @@
 package com.decodex.br.adapters.in.web.documentation;
 
 import org.springframework.http.ResponseEntity;
+
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
@@ -17,14 +18,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Pessoas", description = "Endpoints para gerenciamento de pessoas (clientes, fornecedores, etc.)")
 public interface PessoaControllerDoc {
 
-    @Operation(summary = "Listar pessoas com paginação e filtro", description = "Retorna uma página de pessoas cadastradas, com suporte a filtros de nome.")
+    @Operation(summary = "Listar pessoas com paginação e filtro", description = "Retorna uma página de pessoas cadastradas, com suporte a filtros e ordenação.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Pessoas listadas com sucesso")
     })
-    PageResult<PessoaResponseDTO> findAll(
+    ResponseEntity<PageResult<PessoaResponseDTO>> findAll(
             @Parameter(description = "Filtro para busca de pessoas") PessoaFilter filter,
             @Parameter(description = "Número da página (inicia em 0)") int page,
-            @Parameter(description = "Quantidade de elementos por página") int size);
+            @Parameter(description = "Quantidade de elementos por página") int size,
+            @Parameter(description = "Campo para ordenação (ex: id, nome, ativo)") String sort,
+            @Parameter(description = "Direção da ordenação (asc/desc)") String direction);
 
     @Operation(summary = "Buscar pessoa por ID", description = "Retorna uma pessoa específica através de seu identificador.")
     @ApiResponses(value = {

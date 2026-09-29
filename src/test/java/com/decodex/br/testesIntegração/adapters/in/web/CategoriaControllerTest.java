@@ -136,6 +136,27 @@ class CategoriaControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 200 OK na rota /categorias/paginada com ordenacao")
+    void findAll_RotaPaginadaComSort_DeveRetornar200() throws Exception {
+        PageResult<Categoria> pageResult = new PageResult<>(
+            List.of(new Categoria(1L, "Lazer")),
+            0, 10, 1L, 1
+        );
+
+        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+            .thenReturn(pageResult);
+
+        mockMvc.perform(get("/categorias/paginada")
+                .param("page", "0")
+                .param("size", "10")
+                .param("sort", "nome")
+                .param("direction", "desc"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(1))
+            .andExpect(jsonPath("$.content[0].nome").value("Lazer"));
+    }
+
+    @Test
     @DisplayName("Deve retornar 200 OK ao atualizar categoria")
     void update_DeveRetornar200() throws Exception {
         CategoriaUpdateDTO requestDTO = new CategoriaUpdateDTO("Saúde");

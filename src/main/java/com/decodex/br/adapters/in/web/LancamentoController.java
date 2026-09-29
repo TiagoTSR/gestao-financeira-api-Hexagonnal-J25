@@ -51,30 +51,36 @@ public class LancamentoController implements LancamentoControllerDoc {
         this.mapper = mapper;
     }
 
-    @GetMapping
-    public PageResult<LancamentoResponseDTO> findAll(
-    		 @RequestParam(defaultValue = "0") int page,
-             @RequestParam(defaultValue = "10") int size,
-             LancamentoFilter filter) {
+    @Override
+    @GetMapping(value = {"", "/paginada"})
+    public ResponseEntity<PageResult<LancamentoResponseDTO>> findAll(
+            LancamentoFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String direction) {
 
-         if (page < 0) {
-             throw new IllegalArgumentException("O número da página não pode ser negativo.");
-         }
-
-         if (size <= 0) {
-             throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
-         }
-
-        return lancamentoUseCase.findAll(filter,new PageRequest(page, size))
-                .map(mapper::toDTO);
+        PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
+        return ResponseEntity.ok(lancamentoUseCase.findAll(filter, pageRequest)
+                .map(mapper::toDTO));
     }
 
+    // Sobrecarga de conveniência para uso programático e testes unitários
+    public ResponseEntity<PageResult<LancamentoResponseDTO>> findAll(
+            int page,
+            int size,
+            LancamentoFilter filter) {
+        return findAll(filter, page, size, null, null);
+    }
+
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable Long id) {
         Lancamento lancamento = lancamentoUseCase.findById(id);
         return ResponseEntity.ok(mapper.toDTO(lancamento));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoCreateDTO dto) {
         Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
@@ -93,6 +99,7 @@ public class LancamentoController implements LancamentoControllerDoc {
         return ResponseEntity.created(location).body(mapper.toDTO(lancamento));
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<LancamentoResponseDTO> update(
             @PathVariable Long id,
@@ -107,6 +114,7 @@ public class LancamentoController implements LancamentoControllerDoc {
         return ResponseEntity.ok(mapper.toDTO(atualizado));
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         lancamentoUseCase.delete(id);

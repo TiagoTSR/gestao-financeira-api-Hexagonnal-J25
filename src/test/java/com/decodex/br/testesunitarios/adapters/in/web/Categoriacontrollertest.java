@@ -62,13 +62,15 @@ class CategoriaControllerUnitarioTest {
             .thenReturn(pageResult);
 
         CategoriaFilter filter = new CategoriaFilter();
-        PageResult<CategoriaResponseDTO> response = controller.findAll(0, 10, filter);
+        ResponseEntity<PageResult<CategoriaResponseDTO>> response = controller.findAll(0, 10, filter);
 
         assertNotNull(response);
-        assertEquals(1, response.content().size());
-        assertEquals(0, response.page());
-        assertEquals(10, response.size());
-        assertEquals("Lazer", response.content().get(0).nome());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().content().size());
+        assertEquals(0, response.getBody().page());
+        assertEquals(10, response.getBody().size());
+        assertEquals("Lazer", response.getBody().content().get(0).nome());
     }
 
     @Test

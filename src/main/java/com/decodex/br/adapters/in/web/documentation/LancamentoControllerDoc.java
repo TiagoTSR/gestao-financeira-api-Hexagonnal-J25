@@ -1,6 +1,7 @@
 package com.decodex.br.adapters.in.web.documentation;
 
 import org.springframework.http.ResponseEntity;
+
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
@@ -17,14 +18,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Lançamentos", description = "Endpoints para gerenciamento de lançamentos financeiros (receitas e despesas)")
 public interface LancamentoControllerDoc {
 
-    @Operation(summary = "Listar lançamentos com paginação e filtro", description = "Retorna uma página de lançamentos de acordo com os filtros de descrição, datas, pessoa e categoria.")
+    @Operation(summary = "Listar lançamentos com paginação e filtro", description = "Retorna uma página de lançamentos de acordo com os filtros e ordenação informados.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lançamentos listados com sucesso")
     })
-    PageResult<LancamentoResponseDTO> findAll(
+    ResponseEntity<PageResult<LancamentoResponseDTO>> findAll(
+            @Parameter(description = "Filtro para busca de lançamentos") LancamentoFilter filter,
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size,
-            @Parameter(description = "Filtro para busca de lançamentos") LancamentoFilter filter);
+            @Parameter(description = "Campo para ordenação (ex: id, dataVencimento, valor)") String sort,
+            @Parameter(description = "Direção da ordenação (asc/desc)") String direction);
 
     @Operation(summary = "Buscar lançamento por ID", description = "Retorna um lançamento específico através de seu identificador.")
     @ApiResponses(value = {
@@ -37,10 +40,10 @@ public interface LancamentoControllerDoc {
     @Operation(summary = "Criar novo lançamento", description = "Cria e retorna um novo lançamento financeiro baseado nos dados fornecidos.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Lançamento criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos (ex: Categoria ou Pessoa não encontradas)", content = @Content)
+        @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
     ResponseEntity<LancamentoResponseDTO> create(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação do novo lançamento", required = true) LancamentoCreateDTO dto);
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação do lançamento", required = true) LancamentoCreateDTO dto);
 
     @Operation(summary = "Atualizar lançamento", description = "Atualiza os dados de um lançamento existente através do seu ID.")
     @ApiResponses(value = {

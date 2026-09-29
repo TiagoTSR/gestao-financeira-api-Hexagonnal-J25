@@ -63,12 +63,15 @@ class PessoaControllerUnitarioTest {
             .thenReturn(pageResult);
 
         PessoaFilter filter = new PessoaFilter();
-        PageResult<PessoaResponseDTO> response = controller.findAll(filter, 0, 10);
+        ResponseEntity<PageResult<PessoaResponseDTO>> response = controller.findAll(filter, 0, 10);
 
-        assertEquals(1, response.content().size());
-        assertEquals(0, response.page());
-        assertEquals(10, response.size());
-        assertEquals("João", response.content().get(0).nome());
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().content().size());
+        assertEquals(0, response.getBody().page());
+        assertEquals(10, response.getBody().size());
+        assertEquals("João", response.getBody().content().get(0).nome());
     }
 
     @Test

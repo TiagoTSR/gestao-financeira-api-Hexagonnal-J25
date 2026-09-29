@@ -81,12 +81,15 @@ class LancamentoControllerUnitarioTest {
             .thenReturn(pageResult);
 
         LancamentoFilter filter = new LancamentoFilter();
-        PageResult<LancamentoResponseDTO> response = controller.findAll(0, 10, filter);
+        ResponseEntity<PageResult<LancamentoResponseDTO>> response = controller.findAll(0, 10, filter);
 
-        assertEquals(1, response.content().size());
-        assertEquals(0, response.page());
-        assertEquals(10, response.size());
-        assertEquals("Salário", response.content().get(0).descricao());
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().content().size());
+        assertEquals(0, response.getBody().page());
+        assertEquals(10, response.getBody().size());
+        assertEquals("Salário", response.getBody().content().get(0).descricao());
     }
 
     @Test

@@ -17,14 +17,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Categorias", description = "Endpoints para gerenciamento de categorias de lançamentos")
 public interface CategoriaControllerDoc {
 
-    @Operation(summary = "Listar categorias com paginação e filtro", description = "Retorna uma página de categorias cadastradas, com suporte a filtros de nome.")
+    @Operation(summary = "Listar categorias com paginação e filtro", description = "Retorna uma página de categorias cadastradas, com suporte a filtros e ordenação.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Categorias listadas com sucesso")
     })
-    PageResult<CategoriaResponseDTO> findAll(
+    ResponseEntity<PageResult<CategoriaResponseDTO>> findAll(
+            @Parameter(description = "Filtro para busca de categorias") CategoriaFilter filter,
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size,
-            @Parameter(description = "Filtro para busca de categorias") CategoriaFilter filter);
+            @Parameter(description = "Campo para ordenação (ex: id, nome)") String sort,
+            @Parameter(description = "Direção da ordenação (asc/desc)") String direction);
 
     @Operation(summary = "Buscar categoria por ID", description = "Retorna uma categoria específica através de seu identificador.")
     @ApiResponses(value = {

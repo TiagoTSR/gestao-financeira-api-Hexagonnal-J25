@@ -36,30 +36,36 @@ public class PessoaController implements PessoaControllerDoc {
         this.useCase = useCase;
     }
 
-    @GetMapping
-    public PageResult<PessoaResponseDTO> findAll(
+    @Override
+    @GetMapping(value = {"", "/paginada"})
+    public ResponseEntity<PageResult<PessoaResponseDTO>> findAll(
             PessoaFilter filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String direction) {
 
-        if (page < 0) {
-            throw new IllegalArgumentException("O número da página não pode ser negativo.");
-        }
-
-        if (size <= 0) {
-            throw new IllegalArgumentException("O tamanho da página deve ser maior que zero.");
-        }
-
-        return useCase.findAll(filter, new PageRequest(page, size))
-                .map(PessoaResponseDTO::from);
+        PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
+        return ResponseEntity.ok(useCase.findAll(filter, pageRequest)
+                .map(PessoaResponseDTO::from));
     }
 
+    // Sobrecarga de conveniência para testes e chamadas programáticas
+    public ResponseEntity<PageResult<PessoaResponseDTO>> findAll(
+            PessoaFilter filter,
+            int page,
+            int size) {
+        return findAll(filter, page, size, null, null);
+    }
+
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
         Pessoa pessoa = useCase.findById(id);
         return ResponseEntity.ok(PessoaResponseDTO.from(pessoa));
     }
 
+    @Override
     @PostMapping
     public ResponseEntity<PessoaResponseDTO> create(@RequestBody @Valid PessoaCreateDTO dto) {
         Pessoa pessoa = useCase.create(dto.toDomain());
@@ -73,6 +79,7 @@ public class PessoaController implements PessoaControllerDoc {
         return ResponseEntity.created(location).body(PessoaResponseDTO.from(pessoa));
     }
 
+    @Override
     @PutMapping("/{id}")
     public ResponseEntity<PessoaResponseDTO> update(
             @PathVariable Long id,
@@ -83,6 +90,7 @@ public class PessoaController implements PessoaControllerDoc {
         return ResponseEntity.ok(PessoaResponseDTO.from(atualizada));
     }
 
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         useCase.delete(id);
