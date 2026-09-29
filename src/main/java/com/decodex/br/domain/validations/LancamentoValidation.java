@@ -3,7 +3,7 @@ package com.decodex.br.domain.validations;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;

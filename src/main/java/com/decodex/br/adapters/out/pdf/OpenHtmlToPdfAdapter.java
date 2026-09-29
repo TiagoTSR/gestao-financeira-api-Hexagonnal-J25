@@ -1,6 +1,6 @@
 package com.decodex.br.adapters.out.pdf;
 
-import com.decodex.br.domain.exeption.RelatorioPdfException;
+import com.decodex.br.domain.exception.RelatorioPdfException;
 import com.decodex.br.domain.model.LancamentoEstatisticaPessoa;
 import com.decodex.br.domain.port.out.RelatorioPdfPort;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;

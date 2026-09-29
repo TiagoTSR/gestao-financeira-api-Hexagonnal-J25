@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 
 class CategoriaDTOMapperTest {

@@ -82,7 +82,7 @@ class UsuarioRepositoryAdapterTest {
                 .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_usuario_email"));
 
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainInput))
-                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .isInstanceOf(com.decodex.br.domain.exception.RegraDeNegocioException.class)
                 .hasMessageContaining("Já existe um usuário cadastrado com o e-mail: duplicado@email.com");
     }
 
@@ -97,7 +97,7 @@ class UsuarioRepositoryAdapterTest {
                 .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_usuario_username"));
 
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainInput))
-                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .isInstanceOf(com.decodex.br.domain.exception.RegraDeNegocioException.class)
                 .hasMessageContaining("Já existe um usuário cadastrado com o username: admin");
     }
 }

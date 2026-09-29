@@ -17,7 +17,7 @@ import com.decodex.br.adapters.in.web.documentation.AuthControllerDoc;
 import com.decodex.br.application.dto.auth.LoginRequestDTO;
 import com.decodex.br.application.dto.auth.TokenResponseDTO;
 import com.decodex.br.config.security.TokenService;
-import com.decodex.br.domain.exeption.RefreshTokenException;
+import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.port.in.RefreshTokenUseCase;
 import jakarta.servlet.http.HttpServletRequest;

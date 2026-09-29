@@ -10,13 +10,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
 import com.decodex.br.adapters.out.persistence.specification.CategoriaSpecification;
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -38,6 +39,7 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Categoria save(Categoria categoria) {
         try {
             return mapper.toDomain(
@@ -51,12 +53,14 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Categoria> findById(Long id) {
         return repository.findById(id)
                 .map(mapper::toDomain);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest request) {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
@@ -83,6 +87,7 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
     }

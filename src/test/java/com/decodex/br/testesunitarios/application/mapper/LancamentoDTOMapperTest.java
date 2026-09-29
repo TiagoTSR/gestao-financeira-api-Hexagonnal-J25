@@ -12,7 +12,7 @@ import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;

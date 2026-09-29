@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
-import com.decodex.br.domain.exeption.RelatorioPdfException;
-import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RelatorioPdfException;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -86,9 +86,9 @@ public class GlobalExceptionHandler {
                 request);
     }
 
-    @ExceptionHandler(com.decodex.br.domain.exeption.RefreshTokenException.class)
+    @ExceptionHandler(com.decodex.br.domain.exception.RefreshTokenException.class)
     public ResponseEntity<ErrorResponse> handleRefreshToken(
-            com.decodex.br.domain.exeption.RefreshTokenException ex,
+            com.decodex.br.domain.exception.RefreshTokenException ex,
             HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request);
     }

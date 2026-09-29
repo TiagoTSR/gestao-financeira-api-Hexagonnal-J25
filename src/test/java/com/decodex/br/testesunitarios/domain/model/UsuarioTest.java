@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Usuario;
 
 @DisplayName("Testes unitários para Usuario")

@@ -4,10 +4,11 @@ import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapper;
 import com.decodex.br.adapters.out.persistence.repository.UsuarioRepository;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Usuario;
 import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
 
@@ -23,12 +24,14 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Usuario> findByUsername(String username) {
         return repository.findByUsername(username)
                 .map(mapper::toDomain);
     }
 
     @Override
+    @Transactional
     public Usuario save(Usuario usuario) {
         try {
             var entity = mapper.toEntity(usuario);

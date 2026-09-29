@@ -18,7 +18,7 @@ import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapperImpl;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;

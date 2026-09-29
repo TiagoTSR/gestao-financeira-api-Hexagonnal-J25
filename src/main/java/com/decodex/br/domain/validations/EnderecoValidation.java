@@ -1,6 +1,6 @@
 package com.decodex.br.domain.validations;
 
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 
 public final class EnderecoValidation {
 

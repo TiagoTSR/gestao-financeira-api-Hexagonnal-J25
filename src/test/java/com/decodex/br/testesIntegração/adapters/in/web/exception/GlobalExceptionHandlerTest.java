@@ -15,7 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.decodex.br.adapters.in.web.CategoriaController;
-import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.port.in.CategoriaUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -59,7 +59,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("Deve retornar 400 e ErrorResponse quando lançar RegraDeNegocioException")
     void handleRegraDeNegocio() throws Exception {
         when(categoriaUseCase.findById(10L))
-            .thenThrow(new com.decodex.br.domain.exeption.RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: Lazer"));
+            .thenThrow(new com.decodex.br.domain.exception.RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: Lazer"));
 
         mockMvc.perform(get("/categorias/10"))
             .andExpect(status().isBadRequest())

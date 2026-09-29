@@ -83,7 +83,7 @@ class CategoriaRepositoryAdapterTest {
                 .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_categoria_nome"));
 
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainCategoria))
-                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .isInstanceOf(com.decodex.br.domain.exception.RegraDeNegocioException.class)
                 .hasMessageContaining("Já existe uma categoria cadastrada com o nome: Alimentação");
 
         verify(categoriaRepository).saveAndFlush(categoriaEntity);

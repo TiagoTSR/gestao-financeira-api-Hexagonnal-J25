@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
@@ -39,6 +40,7 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Lancamento save(Lancamento lancamento) {
         return mapper.toDomain(
             repository.save(mapper.toEntity(lancamento))
@@ -46,12 +48,14 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Lancamento> findById(Long id) {
         return repository.findById(id)
             .map(mapper::toDomain);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest request) {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
@@ -78,6 +82,7 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
     }

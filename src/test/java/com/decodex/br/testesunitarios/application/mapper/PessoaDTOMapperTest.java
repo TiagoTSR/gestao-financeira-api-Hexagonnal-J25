@@ -8,7 +8,7 @@ import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResumoDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
-import com.decodex.br.domain.exeption.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 

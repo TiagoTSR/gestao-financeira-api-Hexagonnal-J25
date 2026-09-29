@@ -158,7 +158,7 @@ class CategoriaRepositoryAdapterIT extends PostgresIntegrationBase {
         Categoria categoriaDuplicada = new Categoria(null, "Alimentação");
 
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(categoriaDuplicada))
-                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .isInstanceOf(com.decodex.br.domain.exception.RegraDeNegocioException.class)
                 .hasMessageContaining("Já existe uma categoria cadastrada com o nome: Alimentação");
     }
 }

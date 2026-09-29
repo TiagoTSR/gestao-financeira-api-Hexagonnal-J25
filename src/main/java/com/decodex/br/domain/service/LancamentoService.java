@@ -1,6 +1,6 @@
 package com.decodex.br.domain.service;
 
-import com.decodex.br.domain.exeption.ResourceNotFoundException;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
@@ -36,6 +37,7 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     }
 
     @Override
+    @Transactional
     public Pessoa save(Pessoa pessoa) {
         return mapper.toDomain(
             repository.save(mapper.toEntity(pessoa))
@@ -43,12 +45,14 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Pessoa> findById(Long id) {
         return repository.findById(id)
             .map(mapper::toDomain);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest request) {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
@@ -75,6 +79,7 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         repository.deleteById(id);
     }

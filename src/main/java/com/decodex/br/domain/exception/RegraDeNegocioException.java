@@ -1,4 +1,4 @@
-package com.decodex.br.domain.exeption;
+package com.decodex.br.domain.exception;
 
 public class RegraDeNegocioException extends RuntimeException {
 
