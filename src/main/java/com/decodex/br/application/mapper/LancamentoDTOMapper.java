@@ -5,9 +5,11 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.factory.Mappers;
 
-import com.decodex.br.application.dto.categoria.CategoriaDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoDTO;
-import com.decodex.br.application.dto.pessoa.PessoaDTO;
+import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResumoDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
@@ -17,12 +19,12 @@ public interface LancamentoDTOMapper {
 
     LancamentoDTOMapper INSTANCE = Mappers.getMapper(LancamentoDTOMapper.class);
 
-    default Lancamento toDomain(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa) {
+    default Lancamento toDomain(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
         return toDomainInternal(dto, categoria, pessoa);
     }
 
-    default Lancamento toDomain(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa) {
+    default Lancamento toDomain(LancamentoUpdateDTO dto, Categoria categoria, Pessoa pessoa) {
         if (dto == null) return null;
         return toDomainInternal(dto, categoria, pessoa);
     }
@@ -36,7 +38,7 @@ public interface LancamentoDTOMapper {
     @Mapping(target = "tipo", source = "dto.tipo")
     @Mapping(target = "categoria", source = "categoria")
     @Mapping(target = "pessoa", source = "pessoa")
-    Lancamento toDomainInternal(LancamentoDTO.Create dto, Categoria categoria, Pessoa pessoa);
+    Lancamento toDomainInternal(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "descricao", source = "dto.descricao")
@@ -47,17 +49,17 @@ public interface LancamentoDTOMapper {
     @Mapping(target = "tipo", source = "dto.tipo")
     @Mapping(target = "categoria", source = "categoria")
     @Mapping(target = "pessoa", source = "pessoa")
-    Lancamento toDomainInternal(LancamentoDTO.Update dto, Categoria categoria, Pessoa pessoa);
+    Lancamento toDomainInternal(LancamentoUpdateDTO dto, Categoria categoria, Pessoa pessoa);
 
     @Mapping(target = "categoria", source = "categoria")
     @Mapping(target = "pessoa", source = "pessoa")
-    LancamentoDTO.Response toDTO(Lancamento lancamento);
+    LancamentoResponseDTO toDTO(Lancamento lancamento);
 
-    default CategoriaDTO.Response toCategoriaDTO(Categoria categoria) {
-        return CategoriaDTO.Response.from(categoria);
+    default CategoriaResponseDTO toCategoriaDTO(Categoria categoria) {
+        return CategoriaResponseDTO.from(categoria);
     }
 
-    default PessoaDTO.Resumo toPessoaResumoDTO(Pessoa pessoa) {
-        return PessoaDTO.Resumo.from(pessoa);
+    default PessoaResumoDTO toPessoaResumoDTO(Pessoa pessoa) {
+        return PessoaResumoDTO.from(pessoa);
     }
 }

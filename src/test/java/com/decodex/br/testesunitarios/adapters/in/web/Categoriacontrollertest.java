@@ -26,7 +26,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.CategoriaController;
-import com.decodex.br.application.dto.categoria.CategoriaDTO;
+import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
+import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -60,7 +62,7 @@ class CategoriaControllerUnitarioTest {
             .thenReturn(pageResult);
 
         CategoriaFilter filter = new CategoriaFilter();
-        PageResult<CategoriaDTO.Response> response = controller.findAll(0, 10, filter);
+        PageResult<CategoriaResponseDTO> response = controller.findAll(0, 10, filter);
 
         assertNotNull(response);
         assertEquals(1, response.content().size());
@@ -74,7 +76,7 @@ class CategoriaControllerUnitarioTest {
     void findById_deveRetornar200() {
         doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).findById(1L);
 
-        ResponseEntity<CategoriaDTO.Response> response = controller.findById(1L);
+        ResponseEntity<CategoriaResponseDTO> response = controller.findById(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1L, response.getBody().id());
@@ -91,10 +93,10 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve criar categoria e retornar status 201")
     void create_deveRetornar201() {
-        CategoriaDTO.Create dto = new CategoriaDTO.Create("Lazer");
+        CategoriaCreateDTO dto = new CategoriaCreateDTO("Lazer");
         doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).create(any(Categoria.class));
 
-        ResponseEntity<CategoriaDTO.Response> response = controller.create(dto);
+        ResponseEntity<CategoriaResponseDTO> response = controller.create(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
@@ -104,10 +106,10 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve atualizar categoria e retornar status 200")
     void update_deveRetornar200() {
-        CategoriaDTO.Update dto = new CategoriaDTO.Update("Atualizado");
+        CategoriaUpdateDTO dto = new CategoriaUpdateDTO("Atualizado");
         doReturn(new Categoria(1L, "Atualizado")).when(categoriaUseCase).update(eq(1L), any(Categoria.class));
 
-        ResponseEntity<CategoriaDTO.Response> response = controller.update(1L, dto);
+        ResponseEntity<CategoriaResponseDTO> response = controller.update(1L, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Atualizado", response.getBody().nome());

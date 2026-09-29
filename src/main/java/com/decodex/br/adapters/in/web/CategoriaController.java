@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.decodex.br.application.dto.categoria.CategoriaDTO;
+import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
+import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -35,7 +37,7 @@ public class CategoriaController implements CategoriaControllerDoc {
     }
 
     @GetMapping
-    public PageResult<CategoriaDTO.Response> findAll(
+    public PageResult<CategoriaResponseDTO> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             CategoriaFilter filter) {
@@ -49,17 +51,17 @@ public class CategoriaController implements CategoriaControllerDoc {
         }
 
         return useCase.findAll(filter, new PageRequest(page, size))
-                .map(CategoriaDTO.Response::from);
+                .map(CategoriaResponseDTO::from);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaDTO.Response> findById(@PathVariable Long id) {
+    public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
         Categoria categoria = useCase.findById(id);
-        return ResponseEntity.ok(CategoriaDTO.Response.from(categoria));
+        return ResponseEntity.ok(CategoriaResponseDTO.from(categoria));
     }
 
     @PostMapping
-    public ResponseEntity<CategoriaDTO.Response> create(@RequestBody @Valid CategoriaDTO.Create dto) {
+    public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaCreateDTO dto) {
         Categoria categoria = useCase.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
@@ -68,17 +70,17 @@ public class CategoriaController implements CategoriaControllerDoc {
             .buildAndExpand(categoria.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(CategoriaDTO.Response.from(categoria));
+        return ResponseEntity.created(location).body(CategoriaResponseDTO.from(categoria));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoriaDTO.Response> update(
+    public ResponseEntity<CategoriaResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody @Valid CategoriaDTO.Update dto) {
+            @RequestBody @Valid CategoriaUpdateDTO dto) {
 
         Categoria atualizada = useCase.update(id, dto.toDomain());
 
-        return ResponseEntity.ok(CategoriaDTO.Response.from(atualizada));
+        return ResponseEntity.ok(CategoriaResponseDTO.from(atualizada));
     }
 
     @DeleteMapping("/{id}")

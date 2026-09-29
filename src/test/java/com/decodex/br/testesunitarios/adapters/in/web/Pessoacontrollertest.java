@@ -23,7 +23,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.decodex.br.adapters.in.web.PessoaController;
-import com.decodex.br.application.dto.pessoa.PessoaDTO;
+import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
+import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
@@ -61,7 +63,7 @@ class PessoaControllerUnitarioTest {
             .thenReturn(pageResult);
 
         PessoaFilter filter = new PessoaFilter();
-        PageResult<PessoaDTO.Response> response = controller.findAll(filter, 0, 10);
+        PageResult<PessoaResponseDTO> response = controller.findAll(filter, 0, 10);
 
         assertEquals(1, response.content().size());
         assertEquals(0, response.page());
@@ -74,7 +76,7 @@ class PessoaControllerUnitarioTest {
     void findById_deveRetornar200() {
         when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
 
-        ResponseEntity<PessoaDTO.Response> response = controller.findById(1L);
+        ResponseEntity<PessoaResponseDTO> response = controller.findById(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("João", response.getBody().nome());
@@ -83,12 +85,12 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve criar pessoa e retornar status 201")
     void create_deveRetornar201() {
-        PessoaDTO.Create dto = new PessoaDTO.Create(
+        PessoaCreateDTO dto = new PessoaCreateDTO(
             "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
         );
         when(pessoaUseCase.create(any(Pessoa.class))).thenReturn(pessoaFake());
 
-        ResponseEntity<PessoaDTO.Response> response = controller.create(dto);
+        ResponseEntity<PessoaResponseDTO> response = controller.create(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
@@ -97,12 +99,12 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve atualizar pessoa e retornar status 200")
     void update_deveRetornar200() {
-        PessoaDTO.Update dto = new PessoaDTO.Update(
+        PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
         );
         when(pessoaUseCase.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaFake());
 
-        ResponseEntity<PessoaDTO.Response> response = controller.update(1L, dto);
+        ResponseEntity<PessoaResponseDTO> response = controller.update(1L, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

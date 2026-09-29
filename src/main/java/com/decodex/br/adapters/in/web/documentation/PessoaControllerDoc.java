@@ -1,7 +1,9 @@
 package com.decodex.br.adapters.in.web.documentation;
 
 import org.springframework.http.ResponseEntity;
-import com.decodex.br.application.dto.pessoa.PessoaDTO;
+import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
+import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.pagination.PageResult;
 
@@ -19,7 +21,7 @@ public interface PessoaControllerDoc {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Pessoas listadas com sucesso")
     })
-    PageResult<PessoaDTO.Response> findAll(
+    PageResult<PessoaResponseDTO> findAll(
             @Parameter(description = "Filtro para busca de pessoas") PessoaFilter filter,
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size);
@@ -29,7 +31,7 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "200", description = "Pessoa encontrada com sucesso"),
         @ApiResponse(responseCode = "404", description = "Pessoa não encontrada", content = @Content)
     })
-    ResponseEntity<PessoaDTO.Response> findById(
+    ResponseEntity<PessoaResponseDTO> findById(
             @Parameter(description = "ID da pessoa a ser pesquisada", required = true) Long id);
 
     @Operation(summary = "Criar nova pessoa", description = "Cria e retorna uma nova pessoa baseada nos dados fornecidos.")
@@ -37,8 +39,8 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "201", description = "Pessoa criada com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
-    ResponseEntity<PessoaDTO.Response> create(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação da nova pessoa", required = true) PessoaDTO.Create dto);
+    ResponseEntity<PessoaResponseDTO> create(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados para criação da nova pessoa", required = true) PessoaCreateDTO dto);
 
     @Operation(summary = "Atualizar pessoa", description = "Atualiza os dados de uma pessoa existente através do seu ID.")
     @ApiResponses(value = {
@@ -46,9 +48,9 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Pessoa não encontrada", content = @Content),
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
-    ResponseEntity<PessoaDTO.Response> update(
+    ResponseEntity<PessoaResponseDTO> update(
             @Parameter(description = "ID da pessoa a ser atualizada", required = true) Long id,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da pessoa", required = true) PessoaDTO.Update dto);
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da pessoa", required = true) PessoaUpdateDTO dto);
 
     @Operation(summary = "Excluir pessoa", description = "Remove uma pessoa do sistema permanentemente através do ID informado.")
     @ApiResponses(value = {

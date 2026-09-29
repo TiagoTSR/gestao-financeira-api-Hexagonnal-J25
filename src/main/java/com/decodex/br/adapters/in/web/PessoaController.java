@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.decodex.br.application.dto.pessoa.PessoaDTO;
+import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
+import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.filter.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -35,7 +37,7 @@ public class PessoaController implements PessoaControllerDoc {
     }
 
     @GetMapping
-    public PageResult<PessoaDTO.Response> findAll(
+    public PageResult<PessoaResponseDTO> findAll(
             PessoaFilter filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -49,17 +51,17 @@ public class PessoaController implements PessoaControllerDoc {
         }
 
         return useCase.findAll(filter, new PageRequest(page, size))
-                .map(PessoaDTO.Response::from);
+                .map(PessoaResponseDTO::from);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PessoaDTO.Response> findById(@PathVariable Long id) {
+    public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
         Pessoa pessoa = useCase.findById(id);
-        return ResponseEntity.ok(PessoaDTO.Response.from(pessoa));
+        return ResponseEntity.ok(PessoaResponseDTO.from(pessoa));
     }
 
     @PostMapping
-    public ResponseEntity<PessoaDTO.Response> create(@RequestBody @Valid PessoaDTO.Create dto) {
+    public ResponseEntity<PessoaResponseDTO> create(@RequestBody @Valid PessoaCreateDTO dto) {
         Pessoa pessoa = useCase.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
@@ -68,17 +70,17 @@ public class PessoaController implements PessoaControllerDoc {
             .buildAndExpand(pessoa.getId())
             .toUri();
 
-        return ResponseEntity.created(location).body(PessoaDTO.Response.from(pessoa));
+        return ResponseEntity.created(location).body(PessoaResponseDTO.from(pessoa));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PessoaDTO.Response> update(
+    public ResponseEntity<PessoaResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody @Valid PessoaDTO.Update dto) {
+            @RequestBody @Valid PessoaUpdateDTO dto) {
 
         Pessoa atualizada = useCase.update(id, dto.toDomain());
 
-        return ResponseEntity.ok(PessoaDTO.Response.from(atualizada));
+        return ResponseEntity.ok(PessoaResponseDTO.from(atualizada));
     }
 
     @DeleteMapping("/{id}")

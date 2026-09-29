@@ -23,7 +23,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.decodex.br.adapters.in.web.CategoriaController;
-import com.decodex.br.application.dto.categoria.CategoriaDTO;
+import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
+import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 import com.decodex.br.domain.filter.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -61,7 +62,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created e o Header Location ao criar categoria")
     void create_DeveRetornar201() throws Exception {
-        CategoriaDTO.Create requestDTO = new CategoriaDTO.Create("Lazer");
+        CategoriaCreateDTO requestDTO = new CategoriaCreateDTO("Lazer");
         Categoria categoriaCriada = new Categoria(1L, "Lazer");
 
         when(categoriaUseCase.create(any(Categoria.class))).thenReturn(categoriaCriada);
@@ -78,7 +79,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao tentar criar categoria com nome em branco")
     void create_DeveRetornar400_QuandoNomeInvalido() throws Exception {
-        CategoriaDTO.Create requestDTO = new CategoriaDTO.Create("");
+        CategoriaCreateDTO requestDTO = new CategoriaCreateDTO("");
 
         mockMvc.perform(post("/categorias")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -137,7 +138,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar categoria")
     void update_DeveRetornar200() throws Exception {
-        CategoriaDTO.Update requestDTO = new CategoriaDTO.Update("Saúde");
+        CategoriaUpdateDTO requestDTO = new CategoriaUpdateDTO("Saúde");
         Categoria categoriaAtualizada = new Categoria(1L, "Saúde");
 
         when(categoriaUseCase.update(eq(1L), any(Categoria.class))).thenReturn(categoriaAtualizada);

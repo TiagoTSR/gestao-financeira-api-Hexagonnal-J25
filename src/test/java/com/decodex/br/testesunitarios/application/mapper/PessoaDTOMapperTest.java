@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 
-import com.decodex.br.application.dto.pessoa.PessoaDTO;
+import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
+import com.decodex.br.application.dto.pessoa.PessoaResumoDTO;
+import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
@@ -19,7 +22,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void toDomain_CreateDTO_ShouldReturnPessoaComDadosCorretos() {
-        PessoaDTO.Create dto = new PessoaDTO.Create(
+        PessoaCreateDTO dto = new PessoaCreateDTO(
             "João Silva", "Rua A", "123", null, "Centro", "01000-000", "São Paulo", "SP", true
         );
 
@@ -36,7 +39,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnPessoaComNovosDados() {
-        PessoaDTO.Update dto = new PessoaDTO.Update(
+        PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "Novo Nome", "Rua B", "456", null, "Bairro B", "20000-000", "Rio", "RJ", true
         );
 
@@ -55,7 +58,7 @@ class PessoaDTOMapperTest {
     void update_ShouldAtualizarPessoa_QuandoToDomainEAtualizarCamposCombinados() {
         // Simula exatamente o que o PessoaService.update() faz
         Pessoa existing = new Pessoa(1L, "Nome Antigo", endereco, false);
-        PessoaDTO.Update dto = new PessoaDTO.Update(
+        PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "Novo Nome", "Rua B", "456", null, "Bairro B", "20000-000", "Rio", "RJ", true
         );
 
@@ -75,7 +78,7 @@ class PessoaDTOMapperTest {
     void from_ShouldConvertPessoaToResponseDTO() {
         Pessoa pessoa = new Pessoa(2L, "Maria Souza", endereco, false);
 
-        PessoaDTO.Response dto = PessoaDTO.Response.from(pessoa);
+        PessoaResponseDTO dto = PessoaResponseDTO.from(pessoa);
 
         assertThat(dto.id()).isEqualTo(2L);
         assertThat(dto.nome()).isEqualTo("Maria Souza");
@@ -87,7 +90,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void from_Response_ShouldReturnNull_WhenPessoaIsNull() {
-        PessoaDTO.Response dto = PessoaDTO.Response.from(null);
+        PessoaResponseDTO dto = PessoaResponseDTO.from(null);
 
         assertThat(dto).isNull();
     }
@@ -98,7 +101,7 @@ class PessoaDTOMapperTest {
     void from_ShouldConvertPessoaToResumoDTO() {
         Pessoa pessoa = new Pessoa(2L, "Maria Souza", endereco, false);
 
-        PessoaDTO.Resumo dto = PessoaDTO.Resumo.from(pessoa);
+        PessoaResumoDTO dto = PessoaResumoDTO.from(pessoa);
 
         assertThat(dto.id()).isEqualTo(2L);
         assertThat(dto.nome()).isEqualTo("Maria Souza");
@@ -106,7 +109,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void from_Resumo_ShouldReturnNull_WhenPessoaIsNull() {
-        PessoaDTO.Resumo dto = PessoaDTO.Resumo.from(null);
+        PessoaResumoDTO dto = PessoaResumoDTO.from(null);
 
         assertThat(dto).isNull();
     }
