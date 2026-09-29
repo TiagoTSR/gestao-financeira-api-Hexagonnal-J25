@@ -30,7 +30,7 @@ import com.decodex.br.adapters.out.persistence.adapter.LancamentoRepositoryAdapt
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
-import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;

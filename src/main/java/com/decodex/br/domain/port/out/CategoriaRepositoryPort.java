@@ -2,7 +2,7 @@ package com.decodex.br.domain.port.out;
 
 import java.util.Optional;
 
-import com.decodex.br.domain.filter.CategoriaFilter;
+import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;

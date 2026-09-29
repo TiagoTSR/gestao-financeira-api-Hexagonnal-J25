@@ -1,6 +1,6 @@
 package com.decodex.br.domain.port.in;
 
-import com.decodex.br.domain.filter.PessoaFilter;
+import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;

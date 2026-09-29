@@ -26,7 +26,7 @@ import com.decodex.br.adapters.in.web.PessoaController;
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
-import com.decodex.br.domain.filter.PessoaFilter;
+import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;

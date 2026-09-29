@@ -17,7 +17,7 @@ import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
 import com.decodex.br.adapters.out.persistence.repository.PessoaRepository;
-import com.decodex.br.domain.filter.PessoaFilter;
+import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;

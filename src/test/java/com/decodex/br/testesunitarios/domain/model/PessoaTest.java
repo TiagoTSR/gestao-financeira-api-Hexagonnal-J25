@@ -86,4 +86,63 @@ class PessoaTest {
         assertThat(pessoa1).isNotEqualTo(null);
         assertThat(pessoa1).isNotEqualTo(new Object());
     }
+
+    @Test
+    @DisplayName("Deve atualizar pessoa atomicamente com sucesso")
+    void deveAtualizarPessoaAtomicamente() {
+        Pessoa pessoa = new Pessoa(ID, NOME, ENDERECO, ATIVO);
+        Endereco novoEndereco = new Endereco("Rua Nova", "99", null, "Bairro", "00000-000", "Curitiba", "PR");
+
+        pessoa.atualizar("Carlos", novoEndereco, false);
+
+        assertThat(pessoa.getNome()).isEqualTo("Carlos");
+        assertThat(pessoa.getEndereco()).isEqualTo(novoEndereco);
+        assertThat(pessoa.getAtivo()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve manter estado original quando atualizar falhar em algum campo posterior (atomicidade)")
+    void deveManterEstadoOriginalQuandoValidacaoFalhar() {
+        Pessoa pessoa = new Pessoa(ID, NOME, ENDERECO, ATIVO);
+
+        // Tentativa de atualizar com nome válido mas endereço nulo (deve falhar e não alterar o nome)
+        assertThatThrownBy(() -> pessoa.atualizar("Nome Novo", null, false))
+            .isInstanceOf(RegraDeNegocioException.class);
+
+        assertThat(pessoa.getNome()).isEqualTo(NOME);
+        assertThat(pessoa.getEndereco()).isEqualTo(ENDERECO);
+        assertThat(pessoa.getAtivo()).isEqualTo(ATIVO);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar campos via atualizarCampos e ignorar nulo")
+    void deveAtualizarCamposEIgnorarNulo() {
+        Pessoa pessoa = new Pessoa(ID, NOME, ENDERECO, ATIVO);
+        Endereco novoEndereco = new Endereco("Rua Nova", "99", null, "Bairro", "00000-000", "Curitiba", "PR");
+        Pessoa novosDados = new Pessoa("Carlos", novoEndereco, false);
+
+        pessoa.atualizarCampos(novosDados);
+
+        assertThat(pessoa.getNome()).isEqualTo("Carlos");
+        assertThat(pessoa.getEndereco()).isEqualTo(novoEndereco);
+        assertThat(pessoa.getAtivo()).isFalse();
+
+        pessoa.atualizarCampos(null);
+        assertThat(pessoa.getNome()).isEqualTo("Carlos");
+    }
+
+    @Test
+    @DisplayName("Deve permitir alterações pontuais via alterarNome, alterarEndereco e alterarAtivo")
+    void devePermitirAlteracoesPontuais() {
+        Pessoa pessoa = new Pessoa(ID, NOME, ENDERECO, ATIVO);
+        Endereco novoEndereco = new Endereco("Rua Nova", "99", null, "Bairro", "00000-000", "Curitiba", "PR");
+
+        pessoa.alterarNome("Ana");
+        pessoa.alterarEndereco(novoEndereco);
+        pessoa.alterarAtivo(false);
+
+        assertThat(pessoa.getNome()).isEqualTo("Ana");
+        assertThat(pessoa.getEndereco()).isEqualTo(novoEndereco);
+        assertThat(pessoa.getAtivo()).isFalse();
+    }
 }

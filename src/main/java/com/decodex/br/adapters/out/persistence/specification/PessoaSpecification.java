@@ -3,7 +3,7 @@ package com.decodex.br.adapters.out.persistence.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
-import com.decodex.br.domain.filter.PessoaFilter;
+import com.decodex.br.application.dto.pessoa.PessoaFilter;
 
 import jakarta.persistence.criteria.Path;
 

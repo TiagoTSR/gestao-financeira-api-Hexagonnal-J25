@@ -83,15 +83,39 @@ public class Lancamento {
         this.pessoa = validarPessoa(novaPessoa);
     }
 
+    public void atualizar(String novaDescricao, LocalDate novaDataVencimento, LocalDate novaDataPagamento,
+                          BigDecimal novoValor, String novaObservacao, TipoLancamento novoTipo,
+                          Categoria novaCategoria, Pessoa novaPessoa) {
+        String descricaoValidada = validarDescricao(novaDescricao);
+        LocalDate vencimentoValidado = validarDataVencimento(novaDataVencimento);
+        BigDecimal valorValidado = validarValor(novoValor);
+        TipoLancamento tipoValidado = validarTipo(novoTipo);
+        Categoria categoriaValidada = validarCategoria(novaCategoria);
+        Pessoa pessoaValidada = validarPessoa(novaPessoa);
+
+        this.descricao = descricaoValidada;
+        this.dataVencimento = vencimentoValidado;
+        this.dataPagamento = novaDataPagamento;
+        this.valor = valorValidado;
+        this.observacao = novaObservacao;
+        this.tipo = tipoValidado;
+        this.categoria = categoriaValidada;
+        this.pessoa = pessoaValidada;
+    }
+
     public void atualizarCampos(Lancamento novosDados) {
-        alterarDescricao(novosDados.descricao);
-        alterarDataVencimento(novosDados.dataVencimento);
-        alterarDataPagamento(novosDados.dataPagamento);
-        alterarValor(novosDados.valor);
-        alterarObservacao(novosDados.observacao);
-        alterarTipo(novosDados.tipo);
-        alterarCategoria(novosDados.categoria);
-        alterarPessoa(novosDados.pessoa);
+        if (novosDados != null) {
+            atualizar(
+                novosDados.descricao,
+                novosDados.dataVencimento,
+                novosDados.dataPagamento,
+                novosDados.valor,
+                novosDados.observacao,
+                novosDados.tipo,
+                novosDados.categoria,
+                novosDados.pessoa
+            );
+        }
     }
 
     public Long getId() {

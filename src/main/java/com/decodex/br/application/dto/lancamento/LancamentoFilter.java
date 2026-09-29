@@ -1,4 +1,4 @@
-package com.decodex.br.domain.filter;
+package com.decodex.br.application.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

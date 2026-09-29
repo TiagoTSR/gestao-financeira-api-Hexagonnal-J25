@@ -22,8 +22,15 @@ public class Categoria {
 		this.nome = validarNome(novoNome, "Nome");
 	}
 
+	public void atualizar(String novoNome) {
+		String nomeValidado = validarNome(novoNome, "Nome");
+		this.nome = nomeValidado;
+	}
+
 	public void atualizarCampos(Categoria novosDados) {
-		alterarNome(novosDados.nome);
+		if (novosDados != null) {
+			atualizar(novosDados.nome);
+		}
 	}
 
 	public Long getId() {

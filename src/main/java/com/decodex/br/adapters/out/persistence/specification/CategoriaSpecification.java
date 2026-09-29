@@ -3,7 +3,7 @@ package com.decodex.br.adapters.out.persistence.specification;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
-import com.decodex.br.domain.filter.CategoriaFilter;
+import com.decodex.br.application.dto.categoria.CategoriaFilter;
 
 public final class CategoriaSpecification {
 

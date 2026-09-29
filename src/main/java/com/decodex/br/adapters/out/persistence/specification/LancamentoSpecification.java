@@ -5,7 +5,7 @@ import org.springframework.data.jpa.domain.Specification;
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
-import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;

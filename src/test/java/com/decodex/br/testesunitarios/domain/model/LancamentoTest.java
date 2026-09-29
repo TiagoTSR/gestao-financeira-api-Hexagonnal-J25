@@ -134,4 +134,82 @@ class LancamentoTest {
         assertThat(lancamento1).isNotEqualTo(null);
         assertThat(lancamento1).isNotEqualTo(new Object());
     }
+
+    @Test
+    @DisplayName("Deve atualizar lançamento atomicamente com sucesso")
+    void deveAtualizarLancamentoAtomicamente() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+        Categoria novaCategoria = new Categoria(2L, "Transporte");
+        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        LocalDate novoVencimento = LocalDate.of(2025, 8, 1);
+        LocalDate novoPagamento = LocalDate.of(2025, 8, 2);
+        BigDecimal novoValor = new BigDecimal("350.00");
+
+        lancamento.atualizar("Nova Descrição", novoVencimento, novoPagamento, novoValor, "Nova Obs", TipoLancamento.RECEITA, novaCategoria, novaPessoa);
+
+        assertThat(lancamento.getDescricao()).isEqualTo("Nova Descrição");
+        assertThat(lancamento.getDataVencimento()).isEqualTo(novoVencimento);
+        assertThat(lancamento.getDataPagamento()).isEqualTo(novoPagamento);
+        assertThat(lancamento.getValor()).isEqualByComparingTo(novoValor);
+        assertThat(lancamento.getObservacao()).isEqualTo("Nova Obs");
+        assertThat(lancamento.getTipo()).isEqualTo(TipoLancamento.RECEITA);
+        assertThat(lancamento.getCategoria()).isEqualTo(novaCategoria);
+        assertThat(lancamento.getPessoa()).isEqualTo(novaPessoa);
+    }
+
+    @Test
+    @DisplayName("Deve manter estado original quando atualizar falhar em algum campo posterior (atomicidade)")
+    void deveManterEstadoOriginalQuandoValidacaoFalhar() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+
+        // Descrição válida, mas valor nulo deve falhar e não modificar nada
+        assertThatThrownBy(() -> lancamento.atualizar("Tentativa", DATA_VENCIMENTO, null, null, null, TIPO, CATEGORIA, PESSOA))
+            .isInstanceOf(RegraDeNegocioException.class);
+
+        assertThat(lancamento.getDescricao()).isEqualTo(DESCRICAO);
+        assertThat(lancamento.getValor()).isEqualTo(VALOR);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar campos via atualizarCampos e ignorar nulo")
+    void deveAtualizarCamposEIgnorarNulo() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+        Categoria novaCategoria = new Categoria(2L, "Transporte");
+        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        Lancamento novosDados = new Lancamento("Nova Descrição", DATA_VENCIMENTO, null, new BigDecimal("200.00"), null, TipoLancamento.RECEITA, novaCategoria, novaPessoa);
+
+        lancamento.atualizarCampos(novosDados);
+        assertThat(lancamento.getDescricao()).isEqualTo("Nova Descrição");
+
+        lancamento.atualizarCampos(null);
+        assertThat(lancamento.getDescricao()).isEqualTo("Nova Descrição");
+    }
+
+    @Test
+    @DisplayName("Deve permitir alterações pontuais via métodos alterar")
+    void devePermitirAlteracoesPontuais() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
+        Categoria novaCategoria = new Categoria(2L, "Transporte");
+        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        LocalDate novoVencimento = LocalDate.of(2025, 9, 1);
+        LocalDate novoPagamento = LocalDate.of(2025, 9, 2);
+
+        lancamento.alterarDescricao("Novo Texto");
+        lancamento.alterarDataVencimento(novoVencimento);
+        lancamento.alterarDataPagamento(novoPagamento);
+        lancamento.alterarValor(new BigDecimal("999.00"));
+        lancamento.alterarObservacao("Nota");
+        lancamento.alterarTipo(TipoLancamento.RECEITA);
+        lancamento.alterarCategoria(novaCategoria);
+        lancamento.alterarPessoa(novaPessoa);
+
+        assertThat(lancamento.getDescricao()).isEqualTo("Novo Texto");
+        assertThat(lancamento.getDataVencimento()).isEqualTo(novoVencimento);
+        assertThat(lancamento.getDataPagamento()).isEqualTo(novoPagamento);
+        assertThat(lancamento.getValor()).isEqualByComparingTo("999.00");
+        assertThat(lancamento.getObservacao()).isEqualTo("Nota");
+        assertThat(lancamento.getTipo()).isEqualTo(TipoLancamento.RECEITA);
+        assertThat(lancamento.getCategoria()).isEqualTo(novaCategoria);
+        assertThat(lancamento.getPessoa()).isEqualTo(novaPessoa);
+    }
 }

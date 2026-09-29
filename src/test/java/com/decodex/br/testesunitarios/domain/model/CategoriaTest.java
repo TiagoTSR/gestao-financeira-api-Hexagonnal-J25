@@ -62,4 +62,36 @@ class CategoriaTest {
         // Testa cobertura do: if (getClass() != o.getClass())
         assertThat(cat1).isNotEqualTo(new Object()); 
     }
+
+    @Test
+    @DisplayName("Deve alterar nome com sucesso")
+    void deveAlterarNome() {
+        Categoria cat = new Categoria(1L, "Lazer");
+        cat.alterarNome("Cinema");
+        assertThat(cat.getNome()).isEqualTo("Cinema");
+    }
+
+    @Test
+    @DisplayName("Deve atualizar nome com sucesso via atualizar")
+    void deveAtualizar() {
+        Categoria cat = new Categoria(1L, "Lazer");
+        cat.atualizar("Viagens");
+        assertThat(cat.getNome()).isEqualTo("Viagens");
+    }
+
+    @Test
+    @DisplayName("Deve atualizar campos via atualizarCampos")
+    void deveAtualizarCampos() {
+        Categoria cat = new Categoria(1L, "Lazer");
+        cat.atualizarCampos(new Categoria(null, "Educação"));
+        assertThat(cat.getNome()).isEqualTo("Educação");
+    }
+
+    @Test
+    @DisplayName("Não deve atualizar campos quando novosDados for nulo")
+    void naoDeveAtualizarCamposQuandoNulo() {
+        Categoria cat = new Categoria(1L, "Lazer");
+        cat.atualizarCampos(null);
+        assertThat(cat.getNome()).isEqualTo("Lazer");
+    }
 }

@@ -39,18 +39,28 @@ public class Pessoa {
 		this.nome = validarNome(novoNome, "Nome");
 	}
 
-	public void alterarEndereço(Endereco novoEndereço) {
-		this.endereco = validarEndereco(novoEndereço);
+	public void alterarEndereco(Endereco novoEndereco) {
+		this.endereco = validarEndereco(novoEndereco);
 	}
 
 	public void alterarAtivo(Boolean alteracaoAtivo) {
 		this.ativo = validarAtivo(alteracaoAtivo);
 	}
 
+	public void atualizar(String novoNome, Endereco novoEndereco, Boolean novoAtivo) {
+		String nomeValidado = validarNome(novoNome, "Nome");
+		Endereco enderecoValidado = validarEndereco(novoEndereco);
+		Boolean ativoValidado = validarAtivo(novoAtivo);
+
+		this.nome = nomeValidado;
+		this.endereco = enderecoValidado;
+		this.ativo = ativoValidado;
+	}
+
 	public void atualizarCampos(Pessoa novosDados) {
-		alterarNome(novosDados.nome);
-		alterarEndereço(novosDados.endereco);
-		alterarAtivo(novosDados.ativo);
+		if (novosDados != null) {
+			atualizar(novosDados.nome, novosDados.endereco, novosDados.ativo);
+		}
 	}
 
 	public Long getId() {

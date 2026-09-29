@@ -1,6 +1,6 @@
 package com.decodex.br.domain.port.in;
 
-import com.decodex.br.domain.filter.LancamentoFilter;
+import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
