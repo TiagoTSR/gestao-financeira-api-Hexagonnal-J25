@@ -12,7 +12,6 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import com.decodex.br.adapters.out.persistence.adapter.UsuarioRepositoryAdapter;
-import com.decodex.br.adapters.out.persistence.entity.UsuarioEntity;
 import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapper;
 import com.decodex.br.adapters.out.persistence.repository.UsuarioRepository;
 import com.decodex.br.domain.model.Usuario;

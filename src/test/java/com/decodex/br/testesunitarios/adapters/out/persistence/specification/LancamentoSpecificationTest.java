@@ -2,7 +2,6 @@ package com.decodex.br.testesunitarios.adapters.out.persistence.specification;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
-import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.specification.LancamentoSpecification;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import jakarta.persistence.criteria.CriteriaBuilder;

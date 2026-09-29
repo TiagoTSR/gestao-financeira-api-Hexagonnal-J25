@@ -1,7 +1,6 @@
 package com.decodex.br.adapters.out.persistence;
 
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
-import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.domain.model.LancamentoEstatisticaPessoa;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;

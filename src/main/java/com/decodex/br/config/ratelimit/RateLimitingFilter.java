@@ -2,9 +2,12 @@ package com.decodex.br.config.ratelimit;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
 import io.github.bucket4j.ConsumptionProbe;
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,8 +72,10 @@ public class RateLimitingFilter implements Filter {
     }
 
     private Bucket createNewBucket(String ip) {
-        Refill refill = Refill.greedy(capacity, Duration.ofMinutes(durationInMinutes));
-        Bandwidth limit = Bandwidth.classic(capacity, refill);
+        Bandwidth limit = Bandwidth.builder()
+                .capacity(capacity)
+                .refillGreedy(capacity, Duration.ofMinutes(durationInMinutes))
+                .build();
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
