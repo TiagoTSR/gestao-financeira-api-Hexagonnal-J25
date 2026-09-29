@@ -1,64 +1,83 @@
 package com.decodex.br.adapters.out.persistence.specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.application.dto.pessoa.PessoaFilter;
 
 import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
 
 public final class PessoaSpecification {
 
     private PessoaSpecification() {
     }
 
-    @SuppressWarnings("unused")
-	public static Specification<PessoaEntity> fromFilter(PessoaFilter filter) {
+    public static Specification<PessoaEntity> comFiltro(PessoaFilter filter) {
+        return fromFilter(filter);
+    }
+
+    public static Specification<PessoaEntity> fromFilter(PessoaFilter filter) {
         return (root, query, cb) -> {
-            var predicates = cb.conjunction();
+            if (filter == null) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getNome() != null && !filter.getNome().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(root.get("nome")),
-                    "%" + filter.getNome().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getNome().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getAtivo() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("ativo"), filter.getAtivo()));
+                predicates.add(cb.equal(root.get("ativo"), filter.getAtivo()));
             }
 
             Path<Object> enderecoPath = root.get("endereco");
 
             if (filter.getCidade() != null && !filter.getCidade().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(enderecoPath.get("cidade")),
-                    "%" + filter.getCidade().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getCidade().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getEstado() != null && !filter.getEstado().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(enderecoPath.get("estado")),
-                    "%" + filter.getEstado().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getEstado().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getBairro() != null && !filter.getBairro().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(enderecoPath.get("bairro")),
-                    "%" + filter.getBairro().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getBairro().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getCep() != null && !filter.getCep().isBlank()) {
-                predicates = cb.and(predicates, cb.equal(
+                predicates.add(cb.equal(
                     enderecoPath.get("cep"),
                     filter.getCep()
                 ));
             }
 
-            return predicates;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static String escaparLike(String valor) {
+        return SpecificationHelper.escaparLike(valor);
     }
 }

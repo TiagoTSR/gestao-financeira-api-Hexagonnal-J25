@@ -100,4 +100,55 @@ class CategoriaRepositoryAdapterIT extends PostgresIntegrationBase {
         assertThat(resultado.content()).hasSize(1);
         assertThat(resultado.content().get(0).getId()).isEqualTo(idExistente);
     }
-}
+
+    @Test
+    @DisplayName("Deve escapar caractere especial '%' no filtro LIKE e não tratar como wildcard")
+    void findAll_ComFiltroContendoPorcentagem_DeveEscaparCorretamente() {
+        CategoriaEntity catComPercentual = new CategoriaEntity();
+        catComPercentual.setNome("Desconto 10% Especial");
+        CategoriaEntity catSemPercentual = new CategoriaEntity();
+        catSemPercentual.setNome("Desconto 100 Especial");
+        repository.save(catComPercentual);
+        repository.save(catSemPercentual);
+
+        CategoriaFilter filtro = new CategoriaFilter();
+        filtro.setNome("10%");
+        PageRequest pageRequest = new PageRequest(0, 10);
+
+        PageResult<Categoria> resultado = adapter.findAll(filtro, pageRequest);
+
+        assertThat(resultado.content()).hasSize(1);
+        assertThat(resultado.content().get(0).getNome()).isEqualTo("Desconto 10% Especial");
+    }
+
+    @Test
+    @DisplayName("Deve escapar caractere especial '_' no filtro LIKE e não tratar como caractere coringa")
+    void findAll_ComFiltroContendoUnderscore_DeveEscaparCorretamente() {
+        CategoriaEntity catComUnderscore = new CategoriaEntity();
+        catComUnderscore.setNome("Conta_Corrente");
+        CategoriaEntity catSemUnderscore = new CategoriaEntity();
+        catSemUnderscore.setNome("Conta X Corrente");
+        repository.save(catComUnderscore);
+        repository.save(catSemUnderscore);
+
+        CategoriaFilter filtro = new CategoriaFilter();
+        filtro.setNome("Conta_");
+        PageRequest pageRequest = new PageRequest(0, 10);
+
+        PageResult<Categoria> resultado = adapter.findAll(filtro, pageRequest);
+
+        assertThat(resultado.content()).hasSize(1);
+        assertThat(resultado.content().get(0).getNome()).isEqualTo("Conta_Corrente");
+    }
+
+    @Test
+    @DisplayName("Deve retornar todos os registros quando o filtro for null")
+    void findAll_ComFiltroNull_DeveRetornarTodos() {
+        PageRequest pageRequest = new PageRequest(0, 10);
+
+        PageResult<Categoria> resultado = adapter.findAll(null, pageRequest);
+
+        assertThat(resultado.content()).hasSize(3);
+        assertThat(resultado.totalElements()).isEqualTo(3L);
+    }
+}

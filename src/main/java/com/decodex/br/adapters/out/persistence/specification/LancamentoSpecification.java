@@ -1,5 +1,8 @@
 package com.decodex.br.adapters.out.persistence.specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
@@ -9,64 +12,80 @@ import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 
 public final class LancamentoSpecification {
 
     private LancamentoSpecification() {
     }
 
-    @SuppressWarnings("unused")
-	public static Specification<LancamentoEntity> fromFilter(LancamentoFilter filter) {
+    public static Specification<LancamentoEntity> comFiltro(LancamentoFilter filter) {
+        return fromFilter(filter);
+    }
+
+    public static Specification<LancamentoEntity> fromFilter(LancamentoFilter filter) {
         return (root, query, cb) -> {
-            var predicates = cb.conjunction();
+            if (filter == null) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getDescricao() != null && !filter.getDescricao().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(root.get("descricao")),
-                    "%" + filter.getDescricao().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getDescricao().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getDataVencimento() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("dataVencimento"), filter.getDataVencimento()));
+                predicates.add(cb.equal(root.get("dataVencimento"), filter.getDataVencimento()));
             }
 
             if (filter.getDataPagamento() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("dataPagamento"), filter.getDataPagamento()));
+                predicates.add(cb.equal(root.get("dataPagamento"), filter.getDataPagamento()));
             }
 
             if (filter.getValor() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("valor"), filter.getValor()));
+                predicates.add(cb.equal(root.get("valor"), filter.getValor()));
             }
 
             if (filter.getObservacao() != null && !filter.getObservacao().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(root.get("observacao")),
-                    "%" + filter.getObservacao().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getObservacao().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getTipo() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("tipo"), filter.getTipo()));
+                predicates.add(cb.equal(root.get("tipo"), filter.getTipo()));
             }
 
             if (filter.getNomeCategoria() != null && !filter.getNomeCategoria().isBlank()) {
                 Join<LancamentoEntity, CategoriaEntity> categoriaJoin = root.join("categoria", JoinType.INNER);
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(categoriaJoin.get("nome")),
-                    "%" + filter.getNomeCategoria().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getNomeCategoria().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
             if (filter.getNomePessoa() != null && !filter.getNomePessoa().isBlank()) {
                 Join<LancamentoEntity, PessoaEntity> pessoaJoin = root.join("pessoa", JoinType.INNER);
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(pessoaJoin.get("nome")),
-                    "%" + filter.getNomePessoa().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getNomePessoa().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
-            return predicates;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static String escaparLike(String valor) {
+        return SpecificationHelper.escaparLike(valor);
     }
 }

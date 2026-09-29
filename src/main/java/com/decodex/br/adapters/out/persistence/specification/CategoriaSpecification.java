@@ -1,32 +1,49 @@
 package com.decodex.br.adapters.out.persistence.specification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
+
+import jakarta.persistence.criteria.Predicate;
 
 public final class CategoriaSpecification {
 
     private CategoriaSpecification() {
     }
 
-    @SuppressWarnings("unused")
-	public static Specification<CategoriaEntity> fromFilter(CategoriaFilter filter) {
+    public static Specification<CategoriaEntity> comFiltro(CategoriaFilter filter) {
+        return fromFilter(filter);
+    }
+
+    public static Specification<CategoriaEntity> fromFilter(CategoriaFilter filter) {
         return (root, query, cb) -> {
-            var predicates = cb.conjunction();
+            if (filter == null) {
+                return cb.conjunction();
+            }
+
+            List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getId() != null) {
-                predicates = cb.and(predicates, cb.equal(root.get("id"), filter.getId()));
+                predicates.add(cb.equal(root.get("id"), filter.getId()));
             }
 
             if (filter.getNome() != null && !filter.getNome().isBlank()) {
-                predicates = cb.and(predicates, cb.like(
+                predicates.add(cb.like(
                     cb.lower(root.get("nome")),
-                    "%" + filter.getNome().toLowerCase() + "%"
+                    "%" + escaparLike(filter.getNome().trim().toLowerCase()) + "%",
+                    '\\'
                 ));
             }
 
-            return predicates;
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    public static String escaparLike(String valor) {
+        return SpecificationHelper.escaparLike(valor);
     }
 }
