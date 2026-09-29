@@ -1,0 +1,6 @@
+{
+    "spring-boot.ls.problem.boot2.JAVA_AUTOWIRED_CONSTRUCTOR": "IGNORE",
+    "spring-boot.ls.problem.boot3.JAVA_AUTOWIRED_CONSTRUCTOR": "IGNORE",
+    "spring-boot.ls.problem.boot4.JAVA_AUTOWIRED_CONSTRUCTOR": "IGNORE",
+    "spring-boot.ls.problem.JAVA_AUTOWIRED_CONSTRUCTOR": "IGNORE"
+}
