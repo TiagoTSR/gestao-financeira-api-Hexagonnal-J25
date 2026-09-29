@@ -17,6 +17,7 @@ import com.decodex.br.domain.exeption.RelatorioPdfException;
 import com.decodex.br.domain.exeption.ResourceNotFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -27,6 +28,22 @@ public class GlobalExceptionHandler {
             RegraDeNegocioException ex,
             HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            HttpServletRequest request) {
+        String mensagem = "Operação não permitida: violação de integridade de dados.";
+        String causa = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
+        if (causa.contains("uk_categoria_nome") || causa.contains("categoria_nome_key")) {
+            mensagem = "Já existe uma categoria cadastrada com este nome.";
+        } else if (causa.contains("uk_usuario_email") || causa.contains("usuario_email_key")) {
+            mensagem = "Já existe um usuário cadastrado com este e-mail.";
+        } else if (causa.contains("uk_usuario_username") || causa.contains("usuario_username_key")) {
+            mensagem = "Já existe um usuário cadastrado com este nome de usuário.";
+        }
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", mensagem, request);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)

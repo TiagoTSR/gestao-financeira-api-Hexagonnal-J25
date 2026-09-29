@@ -6,11 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
-@Table(name = "categoria")
+@Table(name = "categoria", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_categoria_nome", columnNames = "nome")
+})
 public class CategoriaEntity {
 	
 	@Id
@@ -19,7 +22,7 @@ public class CategoriaEntity {
 	
 	@NotBlank
     @Size(min = 3, max = 50)
-    @Column(length = 50)
+    @Column(length = 50, nullable = false)
     private String nome;
     
 	public Long getId() {

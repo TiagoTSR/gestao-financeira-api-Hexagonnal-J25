@@ -1,9 +1,13 @@
 package com.decodex.br.adapters.out.persistence.adapter;
 
 import java.util.Optional;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
+
 import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapper;
 import com.decodex.br.adapters.out.persistence.repository.UsuarioRepository;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Usuario;
 import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
 
@@ -26,8 +30,16 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
 
     @Override
     public Usuario save(Usuario usuario) {
-        var entity = mapper.toEntity(usuario);
-        var savedEntity = repository.save(entity);
-        return mapper.toDomain(savedEntity);
+        try {
+            var entity = mapper.toEntity(usuario);
+            var savedEntity = repository.saveAndFlush(entity);
+            return mapper.toDomain(savedEntity);
+        } catch (DataIntegrityViolationException ex) {
+            String cause = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
+            if (cause.toLowerCase().contains("email")) {
+                throw new RegraDeNegocioException("Já existe um usuário cadastrado com o e-mail: " + usuario.getEmail(), ex);
+            }
+            throw new RegraDeNegocioException("Já existe um usuário cadastrado com o username: " + usuario.getUsername(), ex);
+        }
     }
 }

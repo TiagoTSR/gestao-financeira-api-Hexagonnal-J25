@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,6 +16,7 @@ import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
 import com.decodex.br.adapters.out.persistence.specification.CategoriaSpecification;
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
+import com.decodex.br.domain.exeption.RegraDeNegocioException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
@@ -37,11 +39,15 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
 
     @Override
     public Categoria save(Categoria categoria) {
-        return mapper.toDomain(
-                repository.save(
-                        mapper.toEntity(categoria)
-                )
-        );
+        try {
+            return mapper.toDomain(
+                    repository.saveAndFlush(
+                            mapper.toEntity(categoria)
+                    )
+            );
+        } catch (DataIntegrityViolationException ex) {
+            throw new RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: " + categoria.getNome(), ex);
+        }
     }
 
     @Override

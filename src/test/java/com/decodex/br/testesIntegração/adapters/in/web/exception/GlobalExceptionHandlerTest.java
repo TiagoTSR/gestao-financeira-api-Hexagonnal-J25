@@ -56,6 +56,34 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 400 e ErrorResponse quando lançar RegraDeNegocioException")
+    void handleRegraDeNegocio() throws Exception {
+        when(categoriaUseCase.findById(10L))
+            .thenThrow(new com.decodex.br.domain.exeption.RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: Lazer"));
+
+        mockMvc.perform(get("/categorias/10"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("Já existe uma categoria cadastrada com o nome: Lazer"))
+            .andExpect(jsonPath("$.path").value("/categorias/10"));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 400 e mensagem amigável quando lançar DataIntegrityViolationException")
+    void handleDataIntegrityViolation() throws Exception {
+        when(categoriaUseCase.findById(11L))
+            .thenThrow(new org.springframework.dao.DataIntegrityViolationException("Unique constraint: uk_categoria_nome violated"));
+
+        mockMvc.perform(get("/categorias/11"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("Já existe uma categoria cadastrada com este nome."))
+            .andExpect(jsonPath("$.path").value("/categorias/11"));
+    }
+
+    @Test
     @DisplayName("Deve retornar 404 sem corpo quando lançar JPA EntityNotFoundException")
     void handleEntityNotFound() throws Exception {
         when(categoriaUseCase.findById(2L))

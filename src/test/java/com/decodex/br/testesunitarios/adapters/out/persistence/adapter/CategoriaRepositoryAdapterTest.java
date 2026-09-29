@@ -61,7 +61,7 @@ class CategoriaRepositoryAdapterTest {
     @DisplayName("Deve salvar e retornar domínio")
     void save_ShouldPersistAndReturnDomain() {
         when(categoriaMapper.toEntity(domainCategoria)).thenReturn(categoriaEntity);
-        when(categoriaRepository.save(categoriaEntity)).thenReturn(categoriaEntity);
+        when(categoriaRepository.saveAndFlush(categoriaEntity)).thenReturn(categoriaEntity);
         when(categoriaMapper.toDomain(categoriaEntity)).thenReturn(domainCategoria);
 
         Categoria result = adapter.save(domainCategoria);
@@ -71,8 +71,22 @@ class CategoriaRepositoryAdapterTest {
         assertThat(result.getNome()).isEqualTo("Alimentação");
 
         verify(categoriaMapper).toEntity(domainCategoria);
-        verify(categoriaRepository).save(categoriaEntity);
+        verify(categoriaRepository).saveAndFlush(categoriaEntity);
         verify(categoriaMapper).toDomain(categoriaEntity);
+    }
+
+    @Test
+    @DisplayName("Deve traduzir DataIntegrityViolationException para RegraDeNegocioException ao tentar salvar categoria duplicada")
+    void save_QuandoDataIntegrityViolation_DeveLancarRegraDeNegocioException() {
+        when(categoriaMapper.toEntity(domainCategoria)).thenReturn(categoriaEntity);
+        when(categoriaRepository.saveAndFlush(categoriaEntity))
+                .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_categoria_nome"));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainCategoria))
+                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .hasMessageContaining("Já existe uma categoria cadastrada com o nome: Alimentação");
+
+        verify(categoriaRepository).saveAndFlush(categoriaEntity);
     }
 
     @Test

@@ -58,7 +58,7 @@ class UsuarioRepositoryAdapterTest {
         Usuario domainOutput = new Usuario(10L, "novo", "hash", "novo@email.com");
 
         when(mapper.toEntity(domainInput)).thenReturn(entityInput);
-        when(repository.save(entityInput)).thenReturn(entitySaved);
+        when(repository.saveAndFlush(entityInput)).thenReturn(entitySaved);
         when(mapper.toDomain(entitySaved)).thenReturn(domainOutput);
 
         Usuario result = adapter.save(domainInput);
@@ -67,7 +67,37 @@ class UsuarioRepositoryAdapterTest {
         assertThat(result.getId()).isEqualTo(10L);
         assertThat(result.getUsername()).isEqualTo("novo");
         verify(mapper).toEntity(domainInput);
-        verify(repository).save(entityInput);
+        verify(repository).saveAndFlush(entityInput);
         verify(mapper).toDomain(entitySaved);
+    }
+
+    @Test
+    @DisplayName("Deve traduzir DataIntegrityViolationException para RegraDeNegocioException de email duplicado")
+    void save_QuandoEmailDuplicado_DeveLancarRegraDeNegocioException() {
+        Usuario domainInput = new Usuario(null, "usuario", "hash", "duplicado@email.com");
+        UsuarioEntity entityInput = new UsuarioEntity();
+
+        when(mapper.toEntity(domainInput)).thenReturn(entityInput);
+        when(repository.saveAndFlush(entityInput))
+                .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_usuario_email"));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainInput))
+                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .hasMessageContaining("Já existe um usuário cadastrado com o e-mail: duplicado@email.com");
+    }
+
+    @Test
+    @DisplayName("Deve traduzir DataIntegrityViolationException para RegraDeNegocioException de username duplicado")
+    void save_QuandoUsernameDuplicado_DeveLancarRegraDeNegocioException() {
+        Usuario domainInput = new Usuario(null, "admin", "hash", "outro@email.com");
+        UsuarioEntity entityInput = new UsuarioEntity();
+
+        when(mapper.toEntity(domainInput)).thenReturn(entityInput);
+        when(repository.saveAndFlush(entityInput))
+                .thenThrow(new org.springframework.dao.DataIntegrityViolationException("uk_usuario_username"));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> adapter.save(domainInput))
+                .isInstanceOf(com.decodex.br.domain.exeption.RegraDeNegocioException.class)
+                .hasMessageContaining("Já existe um usuário cadastrado com o username: admin");
     }
 }
