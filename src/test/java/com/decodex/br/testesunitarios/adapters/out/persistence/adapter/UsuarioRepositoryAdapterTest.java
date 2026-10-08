@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,7 @@ class UsuarioRepositoryAdapterTest {
     void findByUsername_DeveRetornarUsuario() {
         UsuarioEntity entity = new UsuarioEntity();
         entity.setUsername("admin");
-        Usuario domain = new Usuario(1L, "admin", "hash", "admin@email.com");
+        Usuario domain = new Usuario(UUID.randomUUID(), "admin", "hash", "admin@email.com");
 
         when(repository.findByUsername("admin")).thenReturn(Optional.of(entity));
         when(mapper.toDomain(entity)).thenReturn(domain);
@@ -50,11 +51,12 @@ class UsuarioRepositoryAdapterTest {
     @Test
     @DisplayName("Deve salvar Usuario com sucesso e retornar o domínio correspondente")
     void save_DeveSalvarUsuario() {
+        UUID savedId = UUID.randomUUID();
         Usuario domainInput = new Usuario(null, "novo", "hash", "novo@email.com");
         UsuarioEntity entityInput = new UsuarioEntity();
         UsuarioEntity entitySaved = new UsuarioEntity();
-        entitySaved.setId(10L);
-        Usuario domainOutput = new Usuario(10L, "novo", "hash", "novo@email.com");
+        entitySaved.setId(savedId);
+        Usuario domainOutput = new Usuario(savedId, "novo", "hash", "novo@email.com");
 
         when(mapper.toEntity(domainInput)).thenReturn(entityInput);
         when(repository.saveAndFlush(entityInput)).thenReturn(entitySaved);
@@ -63,7 +65,7 @@ class UsuarioRepositoryAdapterTest {
         Usuario result = adapter.save(domainInput);
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(10L);
+        assertThat(result.getId()).isEqualTo(savedId);
         assertThat(result.getUsername()).isEqualTo("novo");
         verify(mapper).toEntity(domainInput);
         verify(repository).saveAndFlush(entityInput);

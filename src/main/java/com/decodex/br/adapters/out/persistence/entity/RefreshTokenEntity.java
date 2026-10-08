@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "refresh_token", uniqueConstraints = {
@@ -19,8 +20,8 @@ import java.time.Instant;
 public class RefreshTokenEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false)
     private String token;
@@ -32,11 +33,11 @@ public class RefreshTokenEntity {
     @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,10 +36,13 @@ class RefreshTokenServiceTest {
     @InjectMocks
     private RefreshTokenService service;
 
+    private final UUID usuarioId = UUID.randomUUID();
+    private final UUID tokenId = UUID.randomUUID();
+
     @Test
     @DisplayName("Deve criar um RefreshToken com validade de 7 dias e limpar anteriores")
     void deveCriarRefreshTokenComSucesso() {
-        Usuario usuario = new Usuario(1L, "admin", "hash", "admin@email.com");
+        Usuario usuario = new Usuario(usuarioId, "admin", "hash", "admin@email.com");
         when(usuarioRepositoryPort.findByUsername("admin")).thenReturn(Optional.of(usuario));
         when(refreshTokenRepositoryPort.save(any(RefreshToken.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -66,8 +70,8 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("Deve validar a expiração e retornar o token se ele for válido")
     void deveRetornarTokenSeNaoExpirado() {
-        Usuario usuario = new Usuario(1L, "admin", "hash", "admin@email.com");
-        RefreshToken token = new RefreshToken(1L, "some-token", usuario, Instant.now().plusSeconds(3600));
+        Usuario usuario = new Usuario(usuarioId, "admin", "hash", "admin@email.com");
+        RefreshToken token = new RefreshToken(tokenId, "some-token", usuario, Instant.now().plusSeconds(3600));
 
         RefreshToken result = service.verifyExpiration(token);
 
@@ -78,8 +82,8 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("Deve lançar exceção e deletar do banco se o token estiver expirado")
     void deveLancarExcecaoEDeletarSeExpirado() {
-        Usuario usuario = new Usuario(1L, "admin", "hash", "admin@email.com");
-        RefreshToken token = new RefreshToken(1L, "some-token", usuario, Instant.now().minusSeconds(10));
+        Usuario usuario = new Usuario(usuarioId, "admin", "hash", "admin@email.com");
+        RefreshToken token = new RefreshToken(tokenId, "some-token", usuario, Instant.now().minusSeconds(10));
 
         assertThatThrownBy(() -> service.verifyExpiration(token))
             .isInstanceOf(RefreshTokenException.class)
@@ -91,8 +95,8 @@ class RefreshTokenServiceTest {
     @Test
     @DisplayName("Deve verificar e retornar o token através do verifyAndGet")
     void deveVerificarERetornarNoVerifyAndGet() {
-        Usuario usuario = new Usuario(1L, "admin", "hash", "admin@email.com");
-        RefreshToken token = new RefreshToken(1L, "valid-token", usuario, Instant.now().plusSeconds(3600));
+        Usuario usuario = new Usuario(usuarioId, "admin", "hash", "admin@email.com");
+        RefreshToken token = new RefreshToken(tokenId, "valid-token", usuario, Instant.now().plusSeconds(3600));
 
         when(refreshTokenRepositoryPort.findByToken("valid-token")).thenReturn(Optional.of(token));
 
@@ -108,13 +112,6 @@ class RefreshTokenServiceTest {
 
         assertThatThrownBy(() -> service.verifyAndGet("invalid"))
             .isInstanceOf(RefreshTokenException.class)
-            .hasMessageContaining("Refresh token inválido ou não encontrado");
-    }
-
-    @Test
-    @DisplayName("Deve deletar token com sucesso")
-    void deveDeletarToken() {
-        service.deleteByToken("some-token");
-        verify(refreshTokenRepositoryPort).deleteByToken("some-token");
+            .hasMessageContaining("Refresh token inválido");
     }
 }

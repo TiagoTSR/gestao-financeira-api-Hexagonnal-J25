@@ -2,6 +2,7 @@ package com.decodex.br.adapters.out.persistence.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.decodex.br.domain.model.TipoLancamento;
 
@@ -23,8 +24,8 @@ import jakarta.validation.constraints.NotNull;
 public class LancamentoEntity {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 	
 	@NotBlank
     @Column(length = 80)
@@ -56,11 +57,11 @@ public class LancamentoEntity {
     @JoinColumn(name = "pessoa_id", nullable = false)
     private PessoaEntity pessoa;
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

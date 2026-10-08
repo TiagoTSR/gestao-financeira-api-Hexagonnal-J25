@@ -60,7 +60,7 @@ public class LancamentoEstatisticaAdapter implements LancamentoEstatisticaPort {
 
     private LancamentoEstatisticaPessoa mapearParaDominio(Object[] row) {
         TipoLancamento tipo = (TipoLancamento) row[0];
-        Long pessoaId = (Long) row[1];
+        java.util.UUID pessoaId = (java.util.UUID) row[1];
         String pessoaNome = (String) row[2];
         BigDecimal total = (BigDecimal) row[3];
 

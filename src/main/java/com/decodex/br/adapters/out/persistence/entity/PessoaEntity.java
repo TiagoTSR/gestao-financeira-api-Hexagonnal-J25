@@ -1,5 +1,7 @@
 package com.decodex.br.adapters.out.persistence.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,8 +18,8 @@ import jakarta.validation.constraints.NotNull;
 public class PessoaEntity {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @NotBlank
     @Column(length = 50)
@@ -30,11 +32,11 @@ public class PessoaEntity {
     @Column(nullable = false)
     private Boolean ativo;
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

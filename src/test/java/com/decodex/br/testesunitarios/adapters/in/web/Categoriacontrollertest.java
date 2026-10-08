@@ -11,6 +11,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +46,8 @@ class CategoriaControllerUnitarioTest {
     @InjectMocks
     private CategoriaController controller;
 
+    private final UUID idPadrao = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -55,7 +58,7 @@ class CategoriaControllerUnitarioTest {
     @DisplayName("Deve retornar lista paginada de categorias com status 200")
     void findAll_deveRetornar200() {
         PageResult<Categoria> pageResult = new PageResult<>(
-            List.of(new Categoria(1L, "Lazer")), 0, 10, 1L, 1
+            List.of(new Categoria(idPadrao, "Lazer")), 0, 10, 1L, 1
         );
 
         when(categoriaInputPort.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
@@ -76,42 +79,43 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar categoria por ID com status 200")
     void findById_deveRetornar200() {
-        doReturn(new Categoria(1L, "Lazer")).when(categoriaInputPort).findById(1L);
+        doReturn(new Categoria(idPadrao, "Lazer")).when(categoriaInputPort).findById(idPadrao);
 
-        ResponseEntity<CategoriaResponseDTO> response = controller.findById(1L);
+        ResponseEntity<CategoriaResponseDTO> response = controller.findById(idPadrao);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1L, response.getBody().id());
+        assertEquals(idPadrao, response.getBody().id());
     }
 
     @Test
     @DisplayName("Deve repassar exceção quando categoria não for encontrada")
     void findById_deveLancarExcecao() {
-        doThrow(new ResourceNotFoundException("Erro")).when(categoriaInputPort).findById(99L);
+        UUID idInexistente = UUID.randomUUID();
+        doThrow(new ResourceNotFoundException("Erro")).when(categoriaInputPort).findById(idInexistente);
 
-        assertThrows(ResourceNotFoundException.class, () -> controller.findById(99L));
+        assertThrows(ResourceNotFoundException.class, () -> controller.findById(idInexistente));
     }
 
     @Test
     @DisplayName("Deve criar categoria e retornar status 201")
     void create_deveRetornar201() {
         CategoriaCreateDTO dto = new CategoriaCreateDTO("Lazer");
-        doReturn(new Categoria(1L, "Lazer")).when(categoriaInputPort).create(any(Categoria.class));
+        doReturn(new Categoria(idPadrao, "Lazer")).when(categoriaInputPort).create(any(Categoria.class));
 
         ResponseEntity<CategoriaResponseDTO> response = controller.create(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getHeaders().getLocation());
-        assertEquals(1L, response.getBody().id());
+        assertEquals(idPadrao, response.getBody().id());
     }
 
     @Test
     @DisplayName("Deve atualizar categoria e retornar status 200")
     void update_deveRetornar200() {
         CategoriaUpdateDTO dto = new CategoriaUpdateDTO("Atualizado");
-        doReturn(new Categoria(1L, "Atualizado")).when(categoriaInputPort).update(eq(1L), any(Categoria.class));
+        doReturn(new Categoria(idPadrao, "Atualizado")).when(categoriaInputPort).update(eq(idPadrao), any(Categoria.class));
 
-        ResponseEntity<CategoriaResponseDTO> response = controller.update(1L, dto);
+        ResponseEntity<CategoriaResponseDTO> response = controller.update(idPadrao, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Atualizado", response.getBody().nome());
@@ -120,9 +124,9 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar categoria e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(categoriaInputPort).delete(1L);
+        doNothing().when(categoriaInputPort).delete(idPadrao);
 
-        ResponseEntity<Void> response = controller.delete(1L);
+        ResponseEntity<Void> response = controller.delete(idPadrao);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }

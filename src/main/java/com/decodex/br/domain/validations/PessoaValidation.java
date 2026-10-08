@@ -1,5 +1,7 @@
 package com.decodex.br.domain.validations;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.model.Endereco;
 
@@ -8,7 +10,7 @@ public final class PessoaValidation {
     private PessoaValidation() {
     }
 
-    public static Long validarId(Long id) {
+    public static UUID validarId(UUID id) {
         if (id == null) {
             throw new RegraDeNegocioException("Id não pode ser nulo");
         }

@@ -1,5 +1,7 @@
 package com.decodex.br.domain.service;
 
+import java.util.UUID;
+
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
@@ -40,7 +42,7 @@ public class LancamentoService implements LancamentoInputPort {
     }
 
     @Override
-    public Lancamento findById(Long id) {
+    public Lancamento findById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lancamento não encontrado: " + id));
     }
@@ -70,7 +72,7 @@ public class LancamentoService implements LancamentoInputPort {
     }
 
     @Override
-    public Lancamento update(Long id, LancamentoUpdateDTO dto) {
+    public Lancamento update(UUID id, LancamentoUpdateDTO dto) {
         Lancamento existing = findById(id);
         Categoria categoria = buscarCategoria(dto.categoriaId());
         Pessoa pessoa = buscarPessoa(dto.pessoaId());
@@ -90,19 +92,19 @@ public class LancamentoService implements LancamentoInputPort {
     }
 
     @Override
-    public Lancamento update(Long id, Lancamento lancamentoDetails) {
+    public Lancamento update(UUID id, Lancamento lancamentoDetails) {
         Lancamento existing = findById(id);
         existing.atualizarCampos(lancamentoDetails);
         return repository.save(existing);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         findById(id);
         repository.deleteById(id);
     }
 
-    private Categoria buscarCategoria(Long categoriaId) {
+    private Categoria buscarCategoria(UUID categoriaId) {
         if (categoriaRepository == null) {
             throw new IllegalStateException("CategoriaRepositoryPort não foi configurado em LancamentoService");
         }
@@ -110,7 +112,7 @@ public class LancamentoService implements LancamentoInputPort {
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada: " + categoriaId));
     }
 
-    private Pessoa buscarPessoa(Long pessoaId) {
+    private Pessoa buscarPessoa(UUID pessoaId) {
         if (pessoaRepository == null) {
             throw new IllegalStateException("PessoaRepositoryPort não foi configurado em LancamentoService");
         }

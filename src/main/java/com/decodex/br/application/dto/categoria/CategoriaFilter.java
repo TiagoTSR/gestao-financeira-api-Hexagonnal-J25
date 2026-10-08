@@ -1,18 +1,20 @@
 package com.decodex.br.application.dto.categoria;
 
+import java.util.UUID;
+
 public class CategoriaFilter {
 	
-	private Long id;
+	private UUID id;
     private String nome;
 
     public CategoriaFilter() {
     }
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 

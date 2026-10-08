@@ -1,5 +1,7 @@
 package com.decodex.br.testesunitarios.application.mapper;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
@@ -57,7 +59,8 @@ class PessoaDTOMapperTest {
     @Test
     void update_ShouldAtualizarPessoa_QuandoToDomainEAtualizarCamposCombinados() {
         // Simula exatamente o que o PessoaService.update() faz
-        Pessoa existing = new Pessoa(1L, "Nome Antigo", endereco, false);
+        UUID id = UUID.randomUUID();
+        Pessoa existing = new Pessoa(id, "Nome Antigo", endereco, false);
         PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "Novo Nome", "Rua B", "456", null, "Bairro B", "20000-000", "Rio", "RJ", true
         );
@@ -65,7 +68,7 @@ class PessoaDTOMapperTest {
         Pessoa novosDados = dto.toDomain();
         existing.atualizarCampos(novosDados);
 
-        assertThat(existing.getId()).isEqualTo(1L); // id preservado
+        assertThat(existing.getId()).isEqualTo(id); // id preservado
         assertThat(existing.getNome()).isEqualTo("Novo Nome");
         assertThat(existing.getEndereco().getLogradouro()).isEqualTo("Rua B");
         assertThat(existing.getEndereco().getCidade()).isEqualTo("Rio");
@@ -76,11 +79,12 @@ class PessoaDTOMapperTest {
 
     @Test
     void from_ShouldConvertPessoaToResponseDTO() {
-        Pessoa pessoa = new Pessoa(2L, "Maria Souza", endereco, false);
+        UUID id = UUID.randomUUID();
+        Pessoa pessoa = new Pessoa(id, "Maria Souza", endereco, false);
 
         PessoaResponseDTO dto = PessoaResponseDTO.from(pessoa);
 
-        assertThat(dto.id()).isEqualTo(2L);
+        assertThat(dto.id()).isEqualTo(id);
         assertThat(dto.nome()).isEqualTo("Maria Souza");
         assertThat(dto.logradouro()).isEqualTo("Rua A");
         assertThat(dto.cidade()).isEqualTo("São Paulo");
@@ -99,11 +103,12 @@ class PessoaDTOMapperTest {
 
     @Test
     void from_ShouldConvertPessoaToResumoDTO() {
-        Pessoa pessoa = new Pessoa(2L, "Maria Souza", endereco, false);
+        UUID id = UUID.randomUUID();
+        Pessoa pessoa = new Pessoa(id, "Maria Souza", endereco, false);
 
         PessoaResumoDTO dto = PessoaResumoDTO.from(pessoa);
 
-        assertThat(dto.id()).isEqualTo(2L);
+        assertThat(dto.id()).isEqualTo(id);
         assertThat(dto.nome()).isEqualTo("Maria Souza");
     }
 
@@ -116,7 +121,8 @@ class PessoaDTOMapperTest {
 
     @Test
     void pessoaConstructor_ShouldThrow_WhenEnderecoIsNull() {
-        assertThatThrownBy(() -> new Pessoa(3L, "Sem Endereço", null, true))
+        UUID id = UUID.randomUUID();
+        assertThatThrownBy(() -> new Pessoa(id, "Sem Endereço", null, true))
             .isInstanceOf(RegraDeNegocioException.class)
             .hasMessageContaining("Endereço não pode ser nulo");
     }

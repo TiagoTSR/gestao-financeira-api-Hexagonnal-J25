@@ -49,7 +49,7 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Lancamento> findById(Long id) {
+    public Optional<Lancamento> findById(java.util.UUID id) {
         return repository.findById(id)
             .map(mapper::toDomain);
     }
@@ -83,7 +83,7 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(java.util.UUID id) {
         repository.deleteById(id);
     }
 

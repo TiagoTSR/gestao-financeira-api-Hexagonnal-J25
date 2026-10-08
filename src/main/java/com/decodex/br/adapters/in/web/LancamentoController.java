@@ -65,7 +65,7 @@ public class LancamentoController implements LancamentoControllerDoc {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable java.util.UUID id) {
         Lancamento lancamento = lancamentoInputPort.findById(id);
         return ResponseEntity.ok(mapper.toDTO(lancamento));
     }
@@ -87,7 +87,7 @@ public class LancamentoController implements LancamentoControllerDoc {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<LancamentoResponseDTO> update(
-            @PathVariable Long id,
+            @PathVariable java.util.UUID id,
             @RequestBody @Valid LancamentoUpdateDTO dto) {
 
         Lancamento atualizado = lancamentoInputPort.update(id, dto);
@@ -97,7 +97,7 @@ public class LancamentoController implements LancamentoControllerDoc {
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable java.util.UUID id) {
         lancamentoInputPort.delete(id);
         return ResponseEntity.noContent().build();
     }

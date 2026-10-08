@@ -2,6 +2,9 @@ package com.decodex.br.testesunitarios.adapters.out.persistence.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.UUID;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -33,14 +36,15 @@ class PessoaMapperTest {
         enderecoEmbeddable.setEstado("SP");
     }
 
-    private final Pessoa pessoa = new Pessoa(1L, "Maria", endereco, true);
+    private final UUID id = UUID.randomUUID();
+    private final Pessoa pessoa = new Pessoa(id, "Maria", endereco, true);
 
     @Test
     @DisplayName("Deve converter Entity para Domain corretamente")
     void toDomain() {
         // given
         PessoaEntity entity = new PessoaEntity();
-        entity.setId(1L);
+        entity.setId(id);
         entity.setNome("Maria");
         entity.setEndereco(enderecoEmbeddable);
         entity.setAtivo(true);
@@ -49,7 +53,7 @@ class PessoaMapperTest {
         Pessoa result = mapper.toDomain(entity);
 
         // then
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(id);
         assertThat(result.getNome()).isEqualTo("Maria");
         assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua X");
         assertThat(result.getEndereco().getBairro()).isEqualTo("Centro");   // ✅
@@ -65,7 +69,7 @@ class PessoaMapperTest {
         PessoaEntity entity = mapper.toEntity(pessoa);
 
         // then
-        assertThat(entity.getId()).isEqualTo(1L);
+        assertThat(entity.getId()).isEqualTo(id);
         assertThat(entity.getNome()).isEqualTo("Maria");
         assertThat(entity.getEndereco().getLogradouro()).isEqualTo("Rua X");
         assertThat(entity.getEndereco().getBairro()).isEqualTo("Centro"); 
@@ -77,8 +81,9 @@ class PessoaMapperTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar Pessoa com endereço nulo")
     void pessoaComEnderecoNulo_DeveLancarExcecao() {
+        UUID randomId = UUID.randomUUID();
         assertThrows(RegraDeNegocioException.class, () ->
-            new Pessoa(2L, "José", null, false)
+            new Pessoa(randomId, "José", null, false)
         );
     }
 }

@@ -2,6 +2,8 @@ package com.decodex.br.testesunitarios.adapters.out.persistence.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,24 +19,26 @@ class CategoriaMapperTest {
     @Test
     @DisplayName("Deve converter Entity para Domain corretamente")
     void toDomain() {
+        UUID id = UUID.randomUUID();
         CategoriaEntity entity = new CategoriaEntity();
-        entity.setId(10L);
+        entity.setId(id);
         entity.setNome("Moradia");
 
         Categoria domain = mapper.toDomain(entity);
 
-        assertThat(domain.getId()).isEqualTo(10L);
+        assertThat(domain.getId()).isEqualTo(id);
         assertThat(domain.getNome()).isEqualTo("Moradia");
     }
 
     @Test
     @DisplayName("Deve converter Domain para Entity corretamente")
     void toEntity() {
-        Categoria domain = new Categoria(20L, "Lazer");
+        UUID id = UUID.randomUUID();
+        Categoria domain = new Categoria(id, "Lazer");
 
         CategoriaEntity entity = mapper.toEntity(domain);
 
-        assertThat(entity.getId()).isEqualTo(20L);
+        assertThat(entity.getId()).isEqualTo(id);
         assertThat(entity.getNome()).isEqualTo("Lazer");
     }
 

@@ -1,18 +1,20 @@
 package com.decodex.br.domain.model;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.UsuarioValidation.validarEmail;
 import static com.decodex.br.domain.validations.UsuarioValidation.validarUsername;
 
 public class Usuario {
 
-    private Long id;
+    private UUID id;
     private String username;
     private Senha password;
     private String email;
 
     @Default
-    public Usuario(Long id, String username, String password, String email) {
+    public Usuario(UUID id, String username, String password, String email) {
         this.id = id;
         this.username = validarUsername(username);
         this.password = new Senha(password);
@@ -31,7 +33,7 @@ public class Usuario {
         this.email = validarEmail(novoEmail);
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

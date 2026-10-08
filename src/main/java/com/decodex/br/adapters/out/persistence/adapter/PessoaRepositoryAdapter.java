@@ -46,7 +46,7 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Pessoa> findById(Long id) {
+    public Optional<Pessoa> findById(java.util.UUID id) {
         return repository.findById(id)
             .map(mapper::toDomain);
     }
@@ -80,7 +80,7 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(java.util.UUID id) {
         repository.deleteById(id);
     }
 

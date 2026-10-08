@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ class PessoaRepositoryIntegrationTest extends PostgresIntegrationBase {
 
         PessoaEntity saved = repository.save(entity);
 
-        assertThat(saved.getId()).isNotNull().isPositive();
+        assertThat(saved.getId()).isNotNull();
         assertThat(saved.getNome()).isEqualTo("João Silva");
         assertThat(saved.getAtivo()).isTrue();
         assertThat(saved.getEndereco().getLogradouro()).isEqualTo("Rua das Flores");
@@ -100,7 +101,7 @@ class PessoaRepositoryIntegrationTest extends PostgresIntegrationBase {
     @Test
     @DisplayName("Deve retornar Optional vazio para ID inexistente")
     void findById_DeveRetornarVazioQuandoNaoExiste() {
-        Optional<PessoaEntity> found = repository.findById(999L);
+        Optional<PessoaEntity> found = repository.findById(UUID.randomUUID());
 
         assertThat(found).isEmpty();
     }

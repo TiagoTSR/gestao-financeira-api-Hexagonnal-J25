@@ -2,6 +2,8 @@ package com.decodex.br.testesIntegração.adapters.out.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,7 +91,7 @@ class CategoriaRepositoryAdapterIT extends PostgresIntegrationBase {
     @DisplayName("Deve filtrar corretamente pelo ID exato")
     void findAll_ComFiltroPorId_DeveRetornarCorrespondente() {
         // Pegamos um ID real que o banco acabou de gerar no setUp()
-        Long idExistente = repository.findAll().get(0).getId();
+        UUID idExistente = repository.findAll().get(0).getId();
         
         CategoriaFilter filtro = new CategoriaFilter();
         filtro.setId(idExistente);

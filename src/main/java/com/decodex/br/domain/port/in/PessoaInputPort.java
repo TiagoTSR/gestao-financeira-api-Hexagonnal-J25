@@ -1,5 +1,7 @@
 package com.decodex.br.domain.port.in;
 
+import java.util.UUID;
+
 import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -9,12 +11,12 @@ public interface PessoaInputPort {
 	
 	PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest pageRequest);
 
-    Pessoa findById(Long id);
+    Pessoa findById(UUID id);
 
     Pessoa create(Pessoa pessoa);
 
-    Pessoa update(Long id, Pessoa pessoa);
+    Pessoa update(UUID id, Pessoa pessoa);
 
-    void delete(Long id);
+    void delete(UUID id);
 
 }

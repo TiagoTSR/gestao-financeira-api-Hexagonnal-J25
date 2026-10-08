@@ -1,7 +1,8 @@
 package com.decodex.br.adapters.in.web.documentation;
 
-import org.springframework.http.ResponseEntity;
+import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
@@ -15,7 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Pessoas", description = "Endpoints para gerenciamento de pessoas (clientes, fornecedores, etc.)")
+@Tag(name = "Pessoas", description = "Endpoints para gerenciamento de pessoas do sistema")
 public interface PessoaControllerDoc {
 
     @Operation(summary = "Listar pessoas com paginação e filtro", description = "Retorna uma página de pessoas cadastradas, com suporte a filtros e ordenação.")
@@ -35,7 +36,7 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Pessoa não encontrada", content = @Content)
     })
     ResponseEntity<PessoaResponseDTO> findById(
-            @Parameter(description = "ID da pessoa a ser pesquisada", required = true) Long id);
+            @Parameter(description = "ID da pessoa a ser pesquisada", required = true) UUID id);
 
     @Operation(summary = "Criar nova pessoa", description = "Cria e retorna uma nova pessoa baseada nos dados fornecidos.")
     @ApiResponses(value = {
@@ -52,7 +53,7 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
     ResponseEntity<PessoaResponseDTO> update(
-            @Parameter(description = "ID da pessoa a ser atualizada", required = true) Long id,
+            @Parameter(description = "ID da pessoa a ser atualizada", required = true) UUID id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da pessoa", required = true) PessoaUpdateDTO dto);
 
     @Operation(summary = "Excluir pessoa", description = "Remove uma pessoa do sistema permanentemente através do ID informado.")
@@ -61,5 +62,5 @@ public interface PessoaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Pessoa não encontrada", content = @Content)
     })
     ResponseEntity<Void> delete(
-            @Parameter(description = "ID da pessoa a ser excluída", required = true) Long id);
+            @Parameter(description = "ID da pessoa a ser excluída", required = true) UUID id);
 }

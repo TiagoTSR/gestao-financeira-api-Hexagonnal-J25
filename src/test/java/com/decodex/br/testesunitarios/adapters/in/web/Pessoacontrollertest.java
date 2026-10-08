@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +43,8 @@ class PessoaControllerUnitarioTest {
     @InjectMocks
     private PessoaController controller;
 
+    private final UUID idPadrao = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -50,7 +53,7 @@ class PessoaControllerUnitarioTest {
 
     private Pessoa pessoaFake() {
         Endereco endereco = new Endereco("Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP");
-        return new Pessoa(1L, "João", endereco, true);
+        return new Pessoa(idPadrao, "João", endereco, true);
     }
 
     @Test
@@ -77,9 +80,9 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar pessoa por ID com status 200")
     void findById_deveRetornar200() {
-        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
+        when(pessoaInputPort.findById(idPadrao)).thenReturn(pessoaFake());
 
-        ResponseEntity<PessoaResponseDTO> response = controller.findById(1L);
+        ResponseEntity<PessoaResponseDTO> response = controller.findById(idPadrao);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("João", response.getBody().nome());
@@ -105,9 +108,9 @@ class PessoaControllerUnitarioTest {
         PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
         );
-        when(pessoaInputPort.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaFake());
+        when(pessoaInputPort.update(eq(idPadrao), any(Pessoa.class))).thenReturn(pessoaFake());
 
-        ResponseEntity<PessoaResponseDTO> response = controller.update(1L, dto);
+        ResponseEntity<PessoaResponseDTO> response = controller.update(idPadrao, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -115,9 +118,9 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar pessoa e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(pessoaInputPort).delete(1L);
+        doNothing().when(pessoaInputPort).delete(idPadrao);
 
-        ResponseEntity<Void> response = controller.delete(1L);
+        ResponseEntity<Void> response = controller.delete(idPadrao);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }

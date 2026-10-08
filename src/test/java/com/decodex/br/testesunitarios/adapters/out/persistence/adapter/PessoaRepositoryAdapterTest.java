@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,15 +49,17 @@ class PessoaRepositoryAdapterTest {
     @InjectMocks
     private PessoaRepositoryAdapter adapter;
 
+    private UUID pessoaId;
     private Pessoa domainPessoa;
     private PessoaEntity pessoaEntity;
 
     @BeforeEach
     void setUp() {
+        pessoaId = UUID.randomUUID();
         Endereco endereco = new Endereco(
             "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
         );
-        domainPessoa = new Pessoa(1L, "João Silva", endereco, true);
+        domainPessoa = new Pessoa(pessoaId, "João Silva", endereco, true);
 
         EnderecoEmbeddable enderecoEmbeddable = new EnderecoEmbeddable();
         enderecoEmbeddable.setLogradouro("Rua A");
@@ -67,7 +70,7 @@ class PessoaRepositoryAdapterTest {
         enderecoEmbeddable.setEstado("SP");
 
         pessoaEntity = new PessoaEntity();
-        pessoaEntity.setId(1L);
+        pessoaEntity.setId(pessoaId);
         pessoaEntity.setNome("João Silva");
         pessoaEntity.setEndereco(enderecoEmbeddable);
         pessoaEntity.setAtivo(true);
@@ -83,7 +86,7 @@ class PessoaRepositoryAdapterTest {
         Pessoa result = adapter.save(domainPessoa);
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(pessoaId);
         assertThat(result.getNome()).isEqualTo("João Silva");
         assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua A");
         assertThat(result.getAtivo()).isTrue();
@@ -96,28 +99,29 @@ class PessoaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve retornar domínio ao buscar por ID existente")
     void findById_WhenExists_ShouldReturnDomain() {
-        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoaEntity));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(pessoaEntity));
         when(pessoaMapper.toDomain(pessoaEntity)).thenReturn(domainPessoa);
 
-        Optional<Pessoa> result = adapter.findById(1L);
+        Optional<Pessoa> result = adapter.findById(pessoaId);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
+        assertThat(result.get().getId()).isEqualTo(pessoaId);
         assertThat(result.get().getNome()).isEqualTo("João Silva");
         assertThat(result.get().getEndereco().getCidade()).isEqualTo("São Paulo");
-        verify(pessoaRepository).findById(1L);
+        verify(pessoaRepository).findById(pessoaId);
         verify(pessoaMapper).toDomain(pessoaEntity);
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar por ID inexistente")
     void findById_WhenNotExists_ShouldReturnEmpty() {
-        when(pessoaRepository.findById(999L)).thenReturn(Optional.empty());
+        UUID nonExistentId = UUID.randomUUID();
+        when(pessoaRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-        Optional<Pessoa> result = adapter.findById(999L);
+        Optional<Pessoa> result = adapter.findById(nonExistentId);
 
         assertThat(result).isEmpty();
-        verify(pessoaRepository).findById(999L);
+        verify(pessoaRepository).findById(nonExistentId);
         verifyNoInteractions(pessoaMapper);
     }
 
@@ -171,11 +175,11 @@ class PessoaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve deletar pessoa por ID")
     void deleteById_ShouldCallRepository() {
-        doNothing().when(pessoaRepository).deleteById(1L);
+        doNothing().when(pessoaRepository).deleteById(pessoaId);
 
-        adapter.deleteById(1L);
+        adapter.deleteById(pessoaId);
 
-        verify(pessoaRepository).deleteById(1L);
+        verify(pessoaRepository).deleteById(pessoaId);
         verifyNoMoreInteractions(pessoaRepository);
     }
 }

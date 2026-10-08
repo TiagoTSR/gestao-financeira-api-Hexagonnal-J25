@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,27 +69,31 @@ class LancamentoControllerTest {
         return new Endereco("Rua das Flores", "10", null, "Centro", "01000-000", "São Paulo", "SP");
     }
 
-    private Pessoa pessoaFake(Long id, String nome) {
+    private Pessoa pessoaFake(UUID id, String nome) {
         return new Pessoa(id, nome, enderecoFake(), true);
     }
 
-    private Categoria categoriaFake(Long id, String nome) {
+    private Categoria categoriaFake(UUID id, String nome) {
         return new Categoria(id, nome);
     }
 
     @Test
     @DisplayName("Deve retornar 201 Created ao criar lançamento válido")
     void create_DeveRetornar201() throws Exception {
+        UUID lancId = UUID.randomUUID();
+        UUID catId = UUID.randomUUID();
+        UUID pesId = UUID.randomUUID();
+
         LancamentoCreateDTO requestDTO = new LancamentoCreateDTO(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
-            "Referente a maio", TipoLancamento.RECEITA, 1L, 1L
+            "Referente a maio", TipoLancamento.RECEITA, catId, pesId
         );
 
-        Categoria categoria = categoriaFake(1L, "Alimentação");
-        Pessoa pessoa = pessoaFake(1L, "João Silva");
+        Categoria categoria = categoriaFake(catId, "Alimentação");
+        Pessoa pessoa = pessoaFake(pesId, "João Silva");
         
         Lancamento lancamentoSalvo = new Lancamento(
-            1L, "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
+            lancId, "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
             "Referente a maio", TipoLancamento.RECEITA, categoria, pessoa
         );
 
@@ -98,17 +103,20 @@ class LancamentoControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isCreated())
-            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/lancamentos/1")))
-            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/lancamentos/" + lancId)))
+            .andExpect(jsonPath("$.id").value(lancId.toString()))
             .andExpect(jsonPath("$.descricao").value("Salário"));
     }
 
     @Test
     @DisplayName("Deve retornar 400 Bad Request ao enviar lançamento sem descricao")
     void create_DeveRetornar400_QuandoDadosInvalidos() throws Exception {
+        UUID catId = UUID.randomUUID();
+        UUID pesId = UUID.randomUUID();
+
         LancamentoCreateDTO requestDTO = new LancamentoCreateDTO(
             null, LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
-            null, TipoLancamento.RECEITA, 1L, 1L
+            null, TipoLancamento.RECEITA, catId, pesId
         );
 
         mockMvc.perform(post("/lancamentos")
@@ -120,24 +128,32 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao buscar lançamento existente")
     void findById_DeveRetornar200() throws Exception {
+        UUID lancId = UUID.randomUUID();
+        UUID catId = UUID.randomUUID();
+        UUID pesId = UUID.randomUUID();
+
         Lancamento lancamento = new Lancamento(
-            1L, "Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("50.00"),
-            null, TipoLancamento.DESPESA, categoriaFake(1L, "Lazer"), pessoaFake(1L, "Maria")
+            lancId, "Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("50.00"),
+            null, TipoLancamento.DESPESA, categoriaFake(catId, "Lazer"), pessoaFake(pesId, "Maria")
         );
 
-        when(lancamentoInputPort.findById(1L)).thenReturn(lancamento);
+        when(lancamentoInputPort.findById(lancId)).thenReturn(lancamento);
 
-        mockMvc.perform(get("/lancamentos/{id}", 1L))
+        mockMvc.perform(get("/lancamentos/{id}", lancId))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1));
+            .andExpect(jsonPath("$.id").value(lancId.toString()));
     }
 
     @Test
     @DisplayName("Deve retornar 200 OK e listar lançamentos paginados")
     void findAll_DeveRetornar200() throws Exception {
+        UUID lancId = UUID.randomUUID();
+        UUID catId = UUID.randomUUID();
+        UUID pesId = UUID.randomUUID();
+
         Lancamento lancamento = new Lancamento(
-            1L, "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
-            null, TipoLancamento.RECEITA, categoriaFake(1L, "Renda"), pessoaFake(1L, "João")
+            lancId, "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("6500.00"),
+            null, TipoLancamento.RECEITA, categoriaFake(catId, "Renda"), pessoaFake(pesId, "João")
         );
 
         PageResult<Lancamento> pageResult = new PageResult<>(
@@ -158,22 +174,26 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar lançamento")
     void update_DeveRetornar200() throws Exception {
+        UUID lancId = UUID.randomUUID();
+        UUID catId = UUID.randomUUID();
+        UUID pesId = UUID.randomUUID();
+
         LancamentoUpdateDTO requestDTO = new LancamentoUpdateDTO(
             "Aluguel", LocalDate.of(2025, 6, 5), LocalDate.of(2025, 6, 5), new BigDecimal("1200.00"),
-            null, TipoLancamento.DESPESA, 2L, 2L
+            null, TipoLancamento.DESPESA, catId, pesId
         );
 
-        Categoria categoria = categoriaFake(2L, "Moradia");
-        Pessoa pessoa = pessoaFake(2L, "Proprietário");
+        Categoria categoria = categoriaFake(catId, "Moradia");
+        Pessoa pessoa = pessoaFake(pesId, "Proprietário");
         
         Lancamento lancamentoAtualizado = new Lancamento(
-            1L, "Aluguel", LocalDate.of(2025, 6, 5), LocalDate.of(2025, 6, 5), new BigDecimal("1200.00"),
+            lancId, "Aluguel", LocalDate.of(2025, 6, 5), LocalDate.of(2025, 6, 5), new BigDecimal("1200.00"),
             null, TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        when(lancamentoInputPort.update(eq(1L), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoAtualizado);
+        when(lancamentoInputPort.update(eq(lancId), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoAtualizado);
 
-        mockMvc.perform(put("/lancamentos/{id}", 1L)
+        mockMvc.perform(put("/lancamentos/{id}", lancId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isOk())
@@ -183,8 +203,9 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar lançamento")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(lancamentoInputPort).delete(1L);
-        mockMvc.perform(delete("/lancamentos/{id}", 1L))
+        UUID lancId = UUID.randomUUID();
+        doNothing().when(lancamentoInputPort).delete(lancId);
+        mockMvc.perform(delete("/lancamentos/{id}", lancId))
             .andExpect(status().isNoContent());
     }
 }

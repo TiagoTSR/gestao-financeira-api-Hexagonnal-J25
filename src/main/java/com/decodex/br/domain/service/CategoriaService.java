@@ -1,5 +1,7 @@
 package com.decodex.br.domain.service;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -7,7 +9,6 @@ import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
-
 
 public class CategoriaService implements CategoriaInputPort {
 
@@ -17,12 +18,12 @@ public class CategoriaService implements CategoriaInputPort {
         this.repository = repository;
     }
 
-    public PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest pageRequest) {
-        return repository.findAll(filter,pageRequest);
+    public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest) {
+        return repository.findAll(filter, pageRequest);
     }
 
     @Override
-    public Categoria findById(Long id) {
+    public Categoria findById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrado: " + id));
     }
@@ -33,14 +34,14 @@ public class CategoriaService implements CategoriaInputPort {
     }
 
     @Override
-    public Categoria update(Long id, Categoria categoriaDetails) {
+    public Categoria update(UUID id, Categoria categoriaDetails) {
         Categoria existing = findById(id);
         existing.atualizarCampos(categoriaDetails);
         return repository.save(existing);
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
         findById(id);
         repository.deleteById(id);
     }

@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,8 +63,9 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created e o Header Location ao criar categoria")
     void create_DeveRetornar201() throws Exception {
+        UUID idCriado = UUID.randomUUID();
         CategoriaCreateDTO requestDTO = new CategoriaCreateDTO("Lazer");
-        Categoria categoriaCriada = new Categoria(1L, "Lazer");
+        Categoria categoriaCriada = new Categoria(idCriado, "Lazer");
 
         when(categoriaInputPort.create(any(Categoria.class))).thenReturn(categoriaCriada);
 
@@ -71,8 +73,8 @@ class CategoriaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isCreated())
-            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/categorias/1")))
-            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/categorias/" + idCriado)))
+            .andExpect(jsonPath("$.id").value(idCriado.toString()))
             .andExpect(jsonPath("$.nome").value("Lazer"));
     }
 
@@ -91,22 +93,24 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao buscar categoria por ID existente")
     void findById_DeveRetornar200() throws Exception {
-        Categoria categoria = new Categoria(1L, "Lazer");
-        when(categoriaInputPort.findById(1L)).thenReturn(categoria);
+        UUID id = UUID.randomUUID();
+        Categoria categoria = new Categoria(id, "Lazer");
+        when(categoriaInputPort.findById(id)).thenReturn(categoria);
 
-        mockMvc.perform(get("/categorias/{id}", 1L))
+        mockMvc.perform(get("/categorias/{id}", id))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.id").value(id.toString()))
             .andExpect(jsonPath("$.nome").value("Lazer"));
     }
 
     @Test
     @DisplayName("Deve retornar 404 Not Found quando categoria não existir")
     void findById_DeveRetornar404_QuandoNaoEncontrada() throws Exception {
-        when(categoriaInputPort.findById(99L))
+        UUID idInexistente = UUID.randomUUID();
+        when(categoriaInputPort.findById(idInexistente))
             .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
-        mockMvc.perform(get("/categorias/{id}", 99L))
+        mockMvc.perform(get("/categorias/{id}", idInexistente))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value("Categoria não encontrada"));
@@ -115,8 +119,10 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK e lista paginada de categorias")
     void findAll_DeveRetornar200ELista() throws Exception {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
         PageResult<Categoria> pageResult = new PageResult<>(
-            List.of(new Categoria(1L, "Lazer"), new Categoria(2L, "Alimentação")),
+            List.of(new Categoria(id1, "Lazer"), new Categoria(id2, "Alimentação")),
             0, 10, 2L, 1
         );
 
@@ -138,8 +144,9 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK na rota /categorias/paginada com ordenacao")
     void findAll_RotaPaginadaComSort_DeveRetornar200() throws Exception {
+        UUID id = UUID.randomUUID();
         PageResult<Categoria> pageResult = new PageResult<>(
-            List.of(new Categoria(1L, "Lazer")),
+            List.of(new Categoria(id, "Lazer")),
             0, 10, 1L, 1
         );
 
@@ -159,12 +166,13 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar categoria")
     void update_DeveRetornar200() throws Exception {
+        UUID id = UUID.randomUUID();
         CategoriaUpdateDTO requestDTO = new CategoriaUpdateDTO("Saúde");
-        Categoria categoriaAtualizada = new Categoria(1L, "Saúde");
+        Categoria categoriaAtualizada = new Categoria(id, "Saúde");
 
-        when(categoriaInputPort.update(eq(1L), any(Categoria.class))).thenReturn(categoriaAtualizada);
+        when(categoriaInputPort.update(eq(id), any(Categoria.class))).thenReturn(categoriaAtualizada);
 
-        mockMvc.perform(put("/categorias/{id}", 1L)
+        mockMvc.perform(put("/categorias/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isOk())
@@ -174,9 +182,10 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar categoria")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(categoriaInputPort).delete(1L);
+        UUID id = UUID.randomUUID();
+        doNothing().when(categoriaInputPort).delete(id);
 
-        mockMvc.perform(delete("/categorias/{id}", 1L))
+        mockMvc.perform(delete("/categorias/{id}", id))
             .andExpect(status().isNoContent());
     }
 }

@@ -1,5 +1,7 @@
 package com.decodex.br.domain.model;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.PessoaValidation.validarAtivo;
 import static com.decodex.br.domain.validations.PessoaValidation.validarEndereco;
@@ -8,7 +10,7 @@ import static com.decodex.br.domain.validations.PessoaValidation.validarNome;
 
 public class Pessoa {
 
-	private Long id;
+	private UUID id;
 
 	private String nome;
 
@@ -17,7 +19,7 @@ public class Pessoa {
 	private Boolean ativo;
 
 	@Default
-	public Pessoa(Long id, String nome, Endereco endereco, Boolean ativo) {
+	public Pessoa(UUID id, String nome, Endereco endereco, Boolean ativo) {
 		this.id = id;
 		this.nome = validarNome(nome, "Nome");
 		this.endereco = validarEndereco(endereco);
@@ -28,7 +30,7 @@ public class Pessoa {
 		this(null, nome, endereco, ativo);
 	}
 
-	public Pessoa(Long id, String nome) {
+	public Pessoa(UUID id, String nome) {
 		this.id = validarId(id);
 		this.nome = validarNome(nome, "Nome");
 		this.endereco = null;
@@ -63,7 +65,7 @@ public class Pessoa {
 		}
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 

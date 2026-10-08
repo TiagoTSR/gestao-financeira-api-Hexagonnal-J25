@@ -1,15 +1,17 @@
 package com.decodex.br.domain.model;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.annotation.Default;
 import static com.decodex.br.domain.validations.CategoriaValidation.validarNome;
 
 public class Categoria {
 
-	private Long id;
+	private UUID id;
 	private String nome;
 
 	@Default
-	public Categoria(Long id, String nome) {
+	public Categoria(UUID id, String nome) {
 		this.id = id;
 		this.nome = validarNome(nome, "Nome");
 	}
@@ -33,7 +35,7 @@ public class Categoria {
 		}
 	}
 
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
 

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,14 +47,16 @@ class CategoriaRepositoryAdapterTest {
     @InjectMocks
     private CategoriaRepositoryAdapter adapter;
 
+    private UUID categoriaId;
     private Categoria domainCategoria;
     private CategoriaEntity categoriaEntity;
 
     @BeforeEach
     void setUp() {
-        domainCategoria = new Categoria(1L, "Alimentação");
+        categoriaId = UUID.randomUUID();
+        domainCategoria = new Categoria(categoriaId, "Alimentação");
         categoriaEntity = new CategoriaEntity();
-        categoriaEntity.setId(1L);
+        categoriaEntity.setId(categoriaId);
         categoriaEntity.setNome("Alimentação");
     }
 
@@ -67,7 +70,7 @@ class CategoriaRepositoryAdapterTest {
         Categoria result = adapter.save(domainCategoria);
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(categoriaId);
         assertThat(result.getNome()).isEqualTo("Alimentação");
 
         verify(categoriaMapper).toEntity(domainCategoria);
@@ -92,25 +95,26 @@ class CategoriaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve retornar domínio ao buscar por ID existente")
     void findById_WhenExists_ShouldReturnDomain() {
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEntity));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoriaEntity));
         when(categoriaMapper.toDomain(categoriaEntity)).thenReturn(domainCategoria);
 
-        Optional<Categoria> result = adapter.findById(1L);
+        Optional<Categoria> result = adapter.findById(categoriaId);
 
         assertThat(result).isPresent();
         assertThat(result.get().getNome()).isEqualTo("Alimentação");
-        verify(categoriaRepository).findById(1L);
+        verify(categoriaRepository).findById(categoriaId);
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar por ID inexistente")
     void findById_WhenNotExists_ShouldReturnEmpty() {
-        when(categoriaRepository.findById(999L)).thenReturn(Optional.empty());
+        UUID nonExistentId = UUID.randomUUID();
+        when(categoriaRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-        Optional<Categoria> result = adapter.findById(999L);
+        Optional<Categoria> result = adapter.findById(nonExistentId);
 
         assertThat(result).isEmpty();
-        verify(categoriaRepository).findById(999L);
+        verify(categoriaRepository).findById(nonExistentId);
         verifyNoInteractions(categoriaMapper);
     }
 
@@ -164,11 +168,11 @@ class CategoriaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve deletar categoria por ID")
     void deleteById_ShouldCallRepository() {
-        doNothing().when(categoriaRepository).deleteById(1L);
+        doNothing().when(categoriaRepository).deleteById(categoriaId);
 
-        adapter.deleteById(1L);
+        adapter.deleteById(categoriaId);
 
-        verify(categoriaRepository).deleteById(1L);
+        verify(categoriaRepository).deleteById(categoriaId);
         verifyNoMoreInteractions(categoriaRepository);
     }
 }

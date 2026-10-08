@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,8 @@ class LancamentoMapperTest {
 
     private LancamentoMapper mapper;
 
+    private UUID categoriaId;
+    private UUID pessoaId;
     private CategoriaEntity categoriaEntity;
     private PessoaEntity pessoaEntity;
     private Categoria categoriaDomain;
@@ -39,11 +42,14 @@ class LancamentoMapperTest {
     void setUp() {
         mapper = new LancamentoMapperImpl(CategoriaMapper.INSTANCE, PessoaMapper.INSTANCE);
 
+        categoriaId = UUID.randomUUID();
+        pessoaId = UUID.randomUUID();
+
         categoriaEntity = new CategoriaEntity();
-        categoriaEntity.setId(1L);
+        categoriaEntity.setId(categoriaId);
         categoriaEntity.setNome("Alimentação");
 
-        categoriaDomain = new Categoria(1L, "Alimentação");
+        categoriaDomain = new Categoria(categoriaId, "Alimentação");
 
         Endereco endereco = new Endereco(
             "Rua das Flores", "100", "Apto 201", "Centro", "12345-678", "São Paulo", "SP"
@@ -59,19 +65,20 @@ class LancamentoMapperTest {
         enderecoEmbeddable.setEstado("SP");
 
         pessoaEntity = new PessoaEntity();
-        pessoaEntity.setId(2L);
+        pessoaEntity.setId(pessoaId);
         pessoaEntity.setNome("Maria Silva");
         pessoaEntity.setEndereco(enderecoEmbeddable);
         pessoaEntity.setAtivo(true);
 
-        pessoaDomain = new Pessoa(2L, "Maria Silva", endereco, true);
+        pessoaDomain = new Pessoa(pessoaId, "Maria Silva", endereco, true);
     }
 
     @Test
     @DisplayName("Deve converter LancamentoEntity para Lancamento (domínio) com categoria e pessoa mapeados")
     void toDomain_ShouldMapAllFieldsIncludingNestedObjects() {
+        UUID lancamentoId = UUID.randomUUID();
         LancamentoEntity entity = new LancamentoEntity();
-        entity.setId(100L);
+        entity.setId(lancamentoId);
         entity.setDescricao("Compra no supermercado");
         entity.setDataVencimento(LocalDate.of(2025, 5, 20));
         entity.setDataPagamento(LocalDate.of(2025, 5, 18));
@@ -83,7 +90,7 @@ class LancamentoMapperTest {
 
         Lancamento domain = mapper.toDomain(entity);
 
-        assertThat(domain.getId()).isEqualTo(100L);
+        assertThat(domain.getId()).isEqualTo(lancamentoId);
         assertThat(domain.getDescricao()).isEqualTo("Compra no supermercado");
         assertThat(domain.getDataVencimento()).isEqualTo(LocalDate.of(2025, 5, 20));
         assertThat(domain.getDataPagamento()).isEqualTo(LocalDate.of(2025, 5, 18));
@@ -97,8 +104,9 @@ class LancamentoMapperTest {
     @Test
     @DisplayName("Deve converter Lancamento (domínio) para LancamentoEntity com categoria e pessoa mapeados")
     void toEntity_ShouldMapAllFieldsIncludingNestedObjects() {
+        UUID lancamentoId = UUID.randomUUID();
         Lancamento domain = new Lancamento(
-            200L, "Salário mensal",
+            lancamentoId, "Salário mensal",
             LocalDate.of(2025, 6, 1), LocalDate.of(2025, 5, 30),
             new BigDecimal("5000.00"), "Depósito em conta",
             TipoLancamento.RECEITA, categoriaDomain, pessoaDomain
@@ -106,16 +114,16 @@ class LancamentoMapperTest {
 
         LancamentoEntity entity = mapper.toEntity(domain);
 
-        assertThat(entity.getId()).isEqualTo(200L);
+        assertThat(entity.getId()).isEqualTo(lancamentoId);
         assertThat(entity.getDescricao()).isEqualTo("Salário mensal");
         assertThat(entity.getDataVencimento()).isEqualTo(LocalDate.of(2025, 6, 1));
         assertThat(entity.getDataPagamento()).isEqualTo(LocalDate.of(2025, 5, 30));
         assertThat(entity.getValor()).isEqualTo(new BigDecimal("5000.00"));
         assertThat(entity.getObservacao()).isEqualTo("Depósito em conta");
         assertThat(entity.getTipo()).isEqualTo(TipoLancamento.RECEITA);
-        assertThat(entity.getCategoria().getId()).isEqualTo(1L);
+        assertThat(entity.getCategoria().getId()).isEqualTo(categoriaId);
         assertThat(entity.getCategoria().getNome()).isEqualTo("Alimentação");
-        assertThat(entity.getPessoa().getId()).isEqualTo(2L);
+        assertThat(entity.getPessoa().getId()).isEqualTo(pessoaId);
         assertThat(entity.getPessoa().getNome()).isEqualTo("Maria Silva");
         assertThat(entity.getPessoa().getEndereco().getLogradouro()).isEqualTo("Rua das Flores");
         assertThat(entity.getPessoa().getEndereco().getBairro()).isEqualTo("Centro");    // ✅
@@ -127,8 +135,9 @@ class LancamentoMapperTest {
     @Test
     @DisplayName("Deve lançar exceção quando Categoria for nula")
     void toDomain_WhenCategoriaIsNull_ShouldThrowException() {
+        UUID lancamentoId = UUID.randomUUID();
         LancamentoEntity entity = new LancamentoEntity();
-        entity.setId(300L);
+        entity.setId(lancamentoId);
         entity.setDescricao("Teste sem categoria");
         entity.setDataVencimento(LocalDate.now());
         entity.setValor(BigDecimal.TEN);
@@ -146,8 +155,9 @@ class LancamentoMapperTest {
     @Test
     @DisplayName("Deve lançar exceção quando Pessoa for nula")
     void toDomain_WhenPessoaIsNull_ShouldThrowException() {
+        UUID lancamentoId = UUID.randomUUID();
         LancamentoEntity entity = new LancamentoEntity();
-        entity.setId(301L);
+        entity.setId(lancamentoId);
         entity.setDescricao("Teste sem pessoa");
         entity.setDataVencimento(LocalDate.now());
         entity.setValor(BigDecimal.TEN);
@@ -165,8 +175,9 @@ class LancamentoMapperTest {
     @Test
     @DisplayName("Deve preservar integridade bidirecional após conversão dupla")
     void shouldBeBidirectionalConsistent() {
+        UUID lancamentoId = UUID.randomUUID();
         Lancamento originalDomain = new Lancamento(
-            500L, "Freelance",
+            lancamentoId, "Freelance",
             LocalDate.of(2025, 7, 15), null,
             new BigDecimal("1200.00"), "Projeto concluído",
             TipoLancamento.RECEITA, categoriaDomain, pessoaDomain

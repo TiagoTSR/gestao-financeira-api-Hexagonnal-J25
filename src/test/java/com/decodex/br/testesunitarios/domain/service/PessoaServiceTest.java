@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +41,8 @@ class PessoaServiceTest {
     @InjectMocks
     private PessoaService service;
 
+    private final UUID pessoaId = UUID.randomUUID();
+    private final UUID idInexistente = UUID.randomUUID();
     private Endereco endereco;
     private Pessoa pessoa;
     private PageRequest pageRequest;
@@ -49,7 +52,7 @@ class PessoaServiceTest {
         endereco = new Endereco(
             "Rua A", "123", null, "Centro", "12345-678", "São Paulo", "SP"
         );
-        pessoa = new Pessoa(1L, "João Silva", endereco, true);
+        pessoa = new Pessoa(pessoaId, "João Silva", endereco, true);
         pageRequest = new PageRequest(0, 10);
     }
 
@@ -73,24 +76,24 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Deve buscar pessoa por ID com sucesso")
     void findById_WhenExists_ShouldReturnPessoa() {
-        when(repository.findById(1L)).thenReturn(Optional.of(pessoa));
+        when(repository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
 
-        Pessoa found = service.findById(1L);
+        Pessoa found = service.findById(pessoaId);
 
         assertThat(found).isEqualTo(pessoa);
-        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).findById(pessoaId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao buscar pessoa por ID inexistente")
     void findById_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findById(99L))
+        assertThatThrownBy(() -> service.findById(idInexistente))
             .isInstanceOf(RuntimeException.class)
-            .hasMessage("Pessoa não encontrada: 99");
+            .hasMessage("Pessoa não encontrada: " + idInexistente);
 
-        verify(repository, times(1)).findById(99L);
+        verify(repository, times(1)).findById(idInexistente);
     }
 
     @Test
@@ -107,27 +110,27 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Deve atualizar pessoa existente")
     void update_ShouldUpdateFieldsAndSave() {
-        Pessoa existing = new Pessoa(1L, "João Silva", endereco, true);
+        Pessoa existing = new Pessoa(pessoaId, "João Silva", endereco, true);
 
         Endereco novoEndereco = new Endereco(
             "Rua B", "456", null, "Bairro Novo", "11111-111", "Rio", "RJ"
         );
         Pessoa updatedDetails = new Pessoa(null, "João Silva Atualizado", novoEndereco, false);
-        Pessoa expectedUpdated = new Pessoa(1L, "João Silva Atualizado", novoEndereco, false);
+        Pessoa expectedUpdated = new Pessoa(pessoaId, "João Silva Atualizado", novoEndereco, false);
 
-        when(repository.findById(1L)).thenReturn(Optional.of(existing));
+        when(repository.findById(pessoaId)).thenReturn(Optional.of(existing));
         when(repository.save(any(Pessoa.class))).thenReturn(expectedUpdated);
 
-        Pessoa result = service.update(1L, updatedDetails);
+        Pessoa result = service.update(pessoaId, updatedDetails);
 
         assertThat(result.getNome()).isEqualTo("João Silva Atualizado");
         assertThat(result.getAtivo()).isFalse();
         assertThat(result.getEndereco().getLogradouro()).isEqualTo("Rua B");
         assertThat(result.getEndereco().getCidade()).isEqualTo("Rio");
 
-        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).findById(pessoaId);
         verify(repository, times(1)).save(argThat(p ->
-            p.getId().equals(1L) &&
+            p.getId().equals(pessoaId) &&
             p.getNome().equals("João Silva Atualizado") &&
             p.getEndereco().getLogradouro().equals("Rua B") &&
             p.getAtivo().equals(false)
@@ -137,25 +140,25 @@ class PessoaServiceTest {
     @Test
     @DisplayName("Deve deletar pessoa existente")
     void delete_ShouldDeleteById() {
-        when(repository.findById(1L)).thenReturn(Optional.of(pessoa));
-        doNothing().when(repository).deleteById(1L);
+        when(repository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
+        doNothing().when(repository).deleteById(pessoaId);
 
-        service.delete(1L);
+        service.delete(pessoaId);
 
-        verify(repository, times(1)).findById(1L);
-        verify(repository, times(1)).deleteById(1L);
+        verify(repository, times(1)).findById(pessoaId);
+        verify(repository, times(1)).deleteById(pessoaId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar deletar pessoa inexistente")
     void delete_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.delete(99L))
+        assertThatThrownBy(() -> service.delete(idInexistente))
             .isInstanceOf(RuntimeException.class)
-            .hasMessage("Pessoa não encontrada: 99");
+            .hasMessage("Pessoa não encontrada: " + idInexistente);
 
-        verify(repository, times(1)).findById(99L);
+        verify(repository, times(1)).findById(idInexistente);
         verify(repository, never()).deleteById(any());
     }
 }

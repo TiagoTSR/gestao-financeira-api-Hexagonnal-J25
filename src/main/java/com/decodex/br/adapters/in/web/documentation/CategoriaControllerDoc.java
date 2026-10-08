@@ -1,5 +1,7 @@
 package com.decodex.br.adapters.in.web.documentation;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
@@ -34,7 +36,7 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content)
     })
     ResponseEntity<CategoriaResponseDTO> findById(
-            @Parameter(description = "ID da categoria a ser pesquisada", required = true) Long id);
+            @Parameter(description = "ID da categoria a ser pesquisada", required = true) UUID id);
 
     @Operation(summary = "Criar nova categoria", description = "Cria e retorna uma nova categoria baseada nos dados fornecidos.")
     @ApiResponses(value = {
@@ -51,7 +53,7 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
     ResponseEntity<CategoriaResponseDTO> update(
-            @Parameter(description = "ID da categoria a ser atualizada", required = true) Long id,
+            @Parameter(description = "ID da categoria a ser atualizada", required = true) UUID id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da categoria", required = true) CategoriaUpdateDTO dto);
 
     @Operation(summary = "Excluir categoria", description = "Remove uma categoria do sistema permanentemente através do ID informado.")
@@ -60,5 +62,5 @@ public interface CategoriaControllerDoc {
         @ApiResponse(responseCode = "404", description = "Categoria não encontrada", content = @Content)
     })
     ResponseEntity<Void> delete(
-            @Parameter(description = "ID da categoria a ser excluída", required = true) Long id);
+            @Parameter(description = "ID da categoria a ser excluída", required = true) UUID id);
 }

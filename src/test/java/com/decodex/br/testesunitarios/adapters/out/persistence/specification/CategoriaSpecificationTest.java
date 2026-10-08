@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -86,17 +88,18 @@ class CategoriaSpecificationTest {
     @Test
     @DisplayName("Deve filtrar por id quando informado")
     void deveFiltrarPorId() {
+        UUID id = UUID.randomUUID();
         CategoriaFilter filter = new CategoriaFilter();
-        filter.setId(42L);
+        filter.setId(id);
 
         when(cb.and(any(Predicate[].class))).thenReturn(idPredicate);
         when(root.get("id")).thenReturn(idPath);
-        when(cb.equal(idPath, 42L)).thenReturn(idPredicate);
+        when(cb.equal(idPath, id)).thenReturn(idPredicate);
 
         Specification<CategoriaEntity> spec = CategoriaSpecification.comFiltro(filter);
         Predicate resultado = spec.toPredicate(root, query, cb);
 
         assertThat(resultado).isSameAs(idPredicate);
-        verify(cb).equal(idPath, 42L);
+        verify(cb).equal(idPath, id);
     }
 }

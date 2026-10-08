@@ -1,7 +1,8 @@
 package com.decodex.br.adapters.in.web.documentation;
 
-import org.springframework.http.ResponseEntity;
+import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
@@ -18,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Lançamentos", description = "Endpoints para gerenciamento de lançamentos financeiros (receitas e despesas)")
 public interface LancamentoControllerDoc {
 
-    @Operation(summary = "Listar lançamentos com paginação e filtro", description = "Retorna uma página de lançamentos de acordo com os filtros e ordenação informados.")
+    @Operation(summary = "Listar lançamentos com paginação e filtro", description = "Retorna uma página de lançamentos financeiros cadastrados, com suporte a filtros e ordenação.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lançamentos listados com sucesso")
     })
@@ -26,7 +27,7 @@ public interface LancamentoControllerDoc {
             @Parameter(description = "Filtro para busca de lançamentos") LancamentoFilter filter,
             @Parameter(description = "Número da página (inicia em 0)") int page,
             @Parameter(description = "Quantidade de elementos por página") int size,
-            @Parameter(description = "Campo para ordenação (ex: id, dataVencimento, valor)") String sort,
+            @Parameter(description = "Campo para ordenação (ex: id, descricao, dataVencimento, valor)") String sort,
             @Parameter(description = "Direção da ordenação (asc/desc)") String direction);
 
     @Operation(summary = "Buscar lançamento por ID", description = "Retorna um lançamento específico através de seu identificador.")
@@ -35,7 +36,7 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
     })
     ResponseEntity<LancamentoResponseDTO> findById(
-            @Parameter(description = "ID do lançamento a ser pesquisado", required = true) Long id);
+            @Parameter(description = "ID do lançamento a ser pesquisado", required = true) UUID id);
 
     @Operation(summary = "Criar novo lançamento", description = "Cria e retorna um novo lançamento financeiro baseado nos dados fornecidos.")
     @ApiResponses(value = {
@@ -52,7 +53,7 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos", content = @Content)
     })
     ResponseEntity<LancamentoResponseDTO> update(
-            @Parameter(description = "ID do lançamento a ser atualizado", required = true) Long id,
+            @Parameter(description = "ID do lançamento a ser atualizado", required = true) UUID id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados do lançamento", required = true) LancamentoUpdateDTO dto);
 
     @Operation(summary = "Excluir lançamento", description = "Remove um lançamento do sistema permanentemente através do ID informado.")
@@ -61,5 +62,5 @@ public interface LancamentoControllerDoc {
         @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
     })
     ResponseEntity<Void> delete(
-            @Parameter(description = "ID do lançamento a ser excluído", required = true) Long id);
+            @Parameter(description = "ID do lançamento a ser excluído", required = true) UUID id);
 }

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,10 @@ class LancamentoControllerUnitarioTest {
 
     @InjectMocks private LancamentoController controller;
 
+    private final UUID lancamentoId = UUID.randomUUID();
+    private final UUID categoriaId = UUID.randomUUID();
+    private final UUID pessoaId = UUID.randomUUID();
+
     @BeforeEach
     void setUp() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -59,12 +64,12 @@ class LancamentoControllerUnitarioTest {
     }
 
     private Pessoa pessoaFake() {
-        return new Pessoa(1L, "João", enderecoFake(), true);
+        return new Pessoa(pessoaId, "João", enderecoFake(), true);
     }
 
     private Lancamento lancamentoFake() {
-        return new Lancamento(1L, "Salário", LocalDate.now(), null, BigDecimal.TEN, null, 
-                              TipoLancamento.RECEITA, new Categoria(1L, "Renda"), pessoaFake());
+        return new Lancamento(lancamentoId, "Salário", LocalDate.now(), null, BigDecimal.TEN, null, 
+                              TipoLancamento.RECEITA, new Categoria(categoriaId, "Renda"), pessoaFake());
     }
 
     @Test
@@ -91,9 +96,9 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar lançamento por ID com status 200")
     void findById_deveRetornar200() {
-        when(lancamentoInputPort.findById(1L)).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.findById(lancamentoId)).thenReturn(lancamentoFake());
 
-        ResponseEntity<LancamentoResponseDTO> response = controller.findById(1L);
+        ResponseEntity<LancamentoResponseDTO> response = controller.findById(lancamentoId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Salário", response.getBody().descricao());
@@ -103,7 +108,7 @@ class LancamentoControllerUnitarioTest {
     @DisplayName("Deve criar lançamento e retornar status 201")
     void create_deveRetornar201() {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
-            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
+            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
         when(lancamentoInputPort.create(any(LancamentoCreateDTO.class))).thenReturn(lancamentoFake());
 
@@ -117,11 +122,11 @@ class LancamentoControllerUnitarioTest {
     @DisplayName("Deve atualizar lançamento e retornar status 200")
     void update_deveRetornar200() {
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
-            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
+            "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
-        when(lancamentoInputPort.update(eq(1L), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.update(eq(lancamentoId), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoFake());
 
-        ResponseEntity<LancamentoResponseDTO> response = controller.update(1L, dto);
+        ResponseEntity<LancamentoResponseDTO> response = controller.update(lancamentoId, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -129,8 +134,8 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar lançamento e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(lancamentoInputPort).delete(1L);
-        ResponseEntity<Void> response = controller.delete(1L);
+        doNothing().when(lancamentoInputPort).delete(lancamentoId);
+        ResponseEntity<Void> response = controller.delete(lancamentoId);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }

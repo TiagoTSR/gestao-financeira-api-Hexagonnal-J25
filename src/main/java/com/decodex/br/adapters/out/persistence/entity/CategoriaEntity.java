@@ -1,5 +1,7 @@
 package com.decodex.br.adapters.out.persistence.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,18 +19,18 @@ import jakarta.validation.constraints.Size;
 public class CategoriaEntity {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 	
 	@NotBlank
     @Size(min = 3, max = 50)
     @Column(length = 50, nullable = false)
     private String nome;
     
-	public Long getId() {
+	public UUID getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(UUID id) {
 		this.id = id;
 	}
 	public String getNome() {

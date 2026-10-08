@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -62,13 +63,14 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created ao criar pessoa válida")
     void create_DeveRetornar201() throws Exception {
+        UUID idCriado = UUID.randomUUID();
         PessoaCreateDTO requestDTO = new PessoaCreateDTO(
             "João Silva", "Rua das Flores", "10", null, "Centro",
             "01000-000", "São Paulo", "SP", true
         );
 
         Endereco endereco = new Endereco("Rua das Flores", "10", null, "Centro", "01000-000", "São Paulo", "SP");
-        Pessoa pessoaSalva = new Pessoa(1L, "João Silva", endereco, true);
+        Pessoa pessoaSalva = new Pessoa(idCriado, "João Silva", endereco, true);
 
         when(pessoaInputPort.create(any(Pessoa.class))).thenReturn(pessoaSalva);
 
@@ -76,8 +78,8 @@ class PessoaControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isCreated())
-            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/pessoas/1")))
-            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/pessoas/" + idCriado)))
+            .andExpect(jsonPath("$.id").value(idCriado.toString()))
             .andExpect(jsonPath("$.nome").value("João Silva"))
             .andExpect(jsonPath("$.logradouro").value("Rua das Flores"))
             .andExpect(jsonPath("$.cidade").value("São Paulo"))
@@ -103,14 +105,15 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK ao buscar pessoa existente")
     void findById_DeveRetornar200() throws Exception {
+        UUID id = UUID.randomUUID();
         Endereco endereco = new Endereco("Rua X", "S/N", null, "Bairro Y", "12345-000", "Cidade Z", "MG");
-        Pessoa pessoa = new Pessoa(1L, "Maria", endereco, true);
+        Pessoa pessoa = new Pessoa(id, "Maria", endereco, true);
 
-        when(pessoaInputPort.findById(1L)).thenReturn(pessoa);
+        when(pessoaInputPort.findById(id)).thenReturn(pessoa);
 
-        mockMvc.perform(get("/pessoas/{id}", 1L))
+        mockMvc.perform(get("/pessoas/{id}", id))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.id").value(id.toString()))
             .andExpect(jsonPath("$.nome").value("Maria"))
             .andExpect(jsonPath("$.logradouro").value("Rua X"));
     }
@@ -118,35 +121,38 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 200 OK e listar pessoas paginadas")
     void findAll_DeveRetornar200() throws Exception {
+        UUID id = UUID.randomUUID();
         Endereco endereco = new Endereco("Rua X", "123", null, "Bairro Y", "12345-000", "Cidade Z", "MG");
-        Pessoa pessoa = new Pessoa(1L, "Maria", endereco, false);
+        Pessoa pessoa = new Pessoa(id, "Maria", endereco, false);
 
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
         when(pessoaInputPort.findAll(any(PessoaFilter.class), any(PageRequest.class)))
-        .thenReturn(pageResult);
+            .thenReturn(pageResult);
 
-    mockMvc.perform(get("/pessoas")
-            .param("page", "0")
-            .param("size", "10"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.content.length()").value(1));
-}
+        mockMvc.perform(get("/pessoas")
+                .param("page", "0")
+                .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.content.length()").value(1));
+    }
+
     @Test
     @DisplayName("Deve retornar 200 OK ao atualizar pessoa")
     void update_DeveRetornar200() throws Exception {
+        UUID id = UUID.randomUUID();
         PessoaUpdateDTO requestDTO = new PessoaUpdateDTO(
             "Maria Atualizada", "Rua Nova", "100", "Apt 2", "Centro",
             "11111-000", "Belo Horizonte", "MG", false
         );
 
         Endereco enderecoAtualizado = new Endereco("Rua Nova", "100", "Apt 2", "Centro", "11111-000", "Belo Horizonte", "MG");
-        Pessoa pessoaAtualizada = new Pessoa(1L, "Maria Atualizada", enderecoAtualizado, false);
+        Pessoa pessoaAtualizada = new Pessoa(id, "Maria Atualizada", enderecoAtualizado, false);
 
-        when(pessoaInputPort.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaAtualizada);
+        when(pessoaInputPort.update(eq(id), any(Pessoa.class))).thenReturn(pessoaAtualizada);
 
-        mockMvc.perform(put("/pessoas/{id}", 1L)
+        mockMvc.perform(put("/pessoas/{id}", id)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDTO)))
             .andExpect(status().isOk())
@@ -158,9 +164,10 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar pessoa")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(pessoaInputPort).delete(1L);
+        UUID id = UUID.randomUUID();
+        doNothing().when(pessoaInputPort).delete(id);
 
-        mockMvc.perform(delete("/pessoas/{id}", 1L))
+        mockMvc.perform(delete("/pessoas/{id}", id))
             .andExpect(status().isNoContent());
     }
 }

@@ -1,6 +1,7 @@
 package com.decodex.br.domain.port.out;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
@@ -11,10 +12,10 @@ public interface CategoriaRepositoryPort {
 	
 	Categoria save(Categoria person);
 
-    Optional<Categoria> findById(Long id);
+    Optional<Categoria> findById(UUID id);
 
-    PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest pageRequest);
+    PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest);
 
-    void deleteById(Long id);
+    void deleteById(UUID id);
 
 }

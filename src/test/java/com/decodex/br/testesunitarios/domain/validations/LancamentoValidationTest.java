@@ -88,7 +88,7 @@ class LancamentoValidationTest {
     @Test
     @DisplayName("Deve validar categoria com sucesso")
     void deveValidarCategoriaComSucesso() {
-        Categoria categoria = new Categoria(1L, "Alimentação");
+        Categoria categoria = new Categoria(java.util.UUID.randomUUID(), "Alimentação");
         Categoria resultado = LancamentoValidation.validarCategoria(categoria);
         assertThat(resultado).isEqualTo(categoria);
     }
@@ -105,7 +105,7 @@ class LancamentoValidationTest {
     @DisplayName("Deve validar pessoa com sucesso")
     void deveValidarPessoaComSucesso() {
         Endereco endereco = new Endereco("Rua 1", "10", null, "Bairro", "12345-000", "Cidade", "SP");
-        Pessoa pessoa = new Pessoa(1L, "José", endereco, true);
+        Pessoa pessoa = new Pessoa(java.util.UUID.randomUUID(), "José", endereco, true);
         Pessoa resultado = LancamentoValidation.validarPessoa(pessoa);
         assertThat(resultado).isEqualTo(pessoa);
     }

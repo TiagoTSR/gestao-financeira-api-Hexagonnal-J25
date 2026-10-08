@@ -16,8 +16,9 @@ class PessoaValidationTest {
     @Test
     @DisplayName("Deve validar id com sucesso")
     void deveValidarIdComSucesso() {
-        Long id = PessoaValidation.validarId(1L);
-        assertThat(id).isEqualTo(1L);
+        java.util.UUID idEsperado = java.util.UUID.randomUUID();
+        java.util.UUID id = PessoaValidation.validarId(idEsperado);
+        assertThat(id).isEqualTo(idEsperado);
     }
 
     @Test

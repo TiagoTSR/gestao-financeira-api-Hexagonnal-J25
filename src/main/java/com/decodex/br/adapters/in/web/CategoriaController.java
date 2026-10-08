@@ -60,7 +60,7 @@ public class CategoriaController implements CategoriaControllerDoc {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable java.util.UUID id) {
         Categoria categoria = inputPort.findById(id);
         return ResponseEntity.ok(CategoriaResponseDTO.from(categoria));
     }
@@ -82,7 +82,7 @@ public class CategoriaController implements CategoriaControllerDoc {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> update(
-            @PathVariable Long id,
+            @PathVariable java.util.UUID id,
             @RequestBody @Valid CategoriaUpdateDTO dto) {
 
         Categoria atualizada = inputPort.update(id, dto.toDomain());
@@ -92,7 +92,7 @@ public class CategoriaController implements CategoriaControllerDoc {
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable java.util.UUID id) {
         inputPort.delete(id);
         return ResponseEntity.noContent().build();
     }

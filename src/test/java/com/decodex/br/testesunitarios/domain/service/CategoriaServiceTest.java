@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,12 +40,14 @@ class CategoriaServiceTest {
     @InjectMocks
     private CategoriaService service;
 
+    private final UUID categoriaId = UUID.randomUUID();
+    private final UUID idInexistente = UUID.randomUUID();
     private Categoria categoria;
     private PageRequest pageRequest;
 
     @BeforeEach
     void setUp() {
-        categoria = new Categoria(1L, "Alimentação");
+        categoria = new Categoria(categoriaId, "Alimentação");
         pageRequest = new PageRequest(0, 10);
     }
 
@@ -68,23 +71,23 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("Deve buscar categoria por ID com sucesso")
     void findById_WhenExists_ShouldReturnCategoria() {
-        when(repository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(repository.findById(categoriaId)).thenReturn(Optional.of(categoria));
 
-        Categoria found = service.findById(1L);
+        Categoria found = service.findById(categoriaId);
 
         assertThat(found).isEqualTo(categoria);
-        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).findById(categoriaId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao buscar categoria por ID inexistente")
     void findById_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findById(99L))
+        assertThatThrownBy(() -> service.findById(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Categoria não encontrado: 99");
-        verify(repository, times(1)).findById(99L);
+                .hasMessage("Categoria não encontrado: " + idInexistente);
+        verify(repository, times(1)).findById(idInexistente);
     }
 
     @Test
@@ -101,44 +104,44 @@ class CategoriaServiceTest {
     @Test
     @DisplayName("Deve atualizar categoria existente")
     void update_ShouldUpdateNomeAndSave() {
-        Categoria existing = new Categoria(1L, "Alimentação");
+        Categoria existing = new Categoria(categoriaId, "Alimentação");
         Categoria updatedDetails = new Categoria(null, "Comida Saudável");
-        Categoria expectedUpdated = new Categoria(1L, "Comida Saudável");
+        Categoria expectedUpdated = new Categoria(categoriaId, "Comida Saudável");
 
-        when(repository.findById(1L)).thenReturn(Optional.of(existing));
+        when(repository.findById(categoriaId)).thenReturn(Optional.of(existing));
         when(repository.save(any(Categoria.class))).thenReturn(expectedUpdated);
 
-        Categoria result = service.update(1L, updatedDetails);
+        Categoria result = service.update(categoriaId, updatedDetails);
 
         assertThat(result.getNome()).isEqualTo("Comida Saudável");
-        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).findById(categoriaId);
         verify(repository, times(1)).save(argThat(c -> 
-            c.getId().equals(1L) && c.getNome().equals("Comida Saudável")
+            c.getId().equals(categoriaId) && c.getNome().equals("Comida Saudável")
         ));
     }
 
     @Test
     @DisplayName("Deve deletar categoria existente")
     void delete_ShouldDeleteById() {
-        when(repository.findById(1L)).thenReturn(Optional.of(categoria));
-        doNothing().when(repository).deleteById(1L);
+        when(repository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        doNothing().when(repository).deleteById(categoriaId);
 
-        service.delete(1L);
+        service.delete(categoriaId);
 
-        verify(repository, times(1)).findById(1L);
-        verify(repository, times(1)).deleteById(1L);
+        verify(repository, times(1)).findById(categoriaId);
+        verify(repository, times(1)).deleteById(categoriaId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar deletar categoria inexistente")
     void delete_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.delete(99L))
+        assertThatThrownBy(() -> service.delete(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Categoria não encontrado: 99");
+                .hasMessage("Categoria não encontrado: " + idInexistente);
 
-        verify(repository, times(1)).findById(99L);
+        verify(repository, times(1)).findById(idInexistente);
         verify(repository, never()).deleteById(any());
     }
 }

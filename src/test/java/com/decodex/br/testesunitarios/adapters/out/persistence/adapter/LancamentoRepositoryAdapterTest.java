@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -52,22 +53,24 @@ class LancamentoRepositoryAdapterTest {
     @InjectMocks
     private LancamentoRepositoryAdapter adapter;
 
+    private UUID lancamentoId;
     private Lancamento domainLancamento;
     private LancamentoEntity lancamentoEntity;
 
     @BeforeEach
     void setUp() {
-        Categoria categoria = new Categoria(1L, "Alimentação");
+        lancamentoId = UUID.randomUUID();
+        Categoria categoria = new Categoria(UUID.randomUUID(), "Alimentação");
         Endereco endereco = new Endereco("Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP");
-        Pessoa pessoa = new Pessoa(1L, "João Silva", endereco, true);
+        Pessoa pessoa = new Pessoa(UUID.randomUUID(), "João Silva", endereco, true);
 
         domainLancamento = new Lancamento(
-            1L, "Conta de luz", LocalDate.of(2025, 6, 10), null,
+            lancamentoId, "Conta de luz", LocalDate.of(2025, 6, 10), null,
             new BigDecimal("350.00"), "Observação teste", TipoLancamento.DESPESA, categoria, pessoa
         );
 
         lancamentoEntity = new LancamentoEntity();
-        lancamentoEntity.setId(1L);
+        lancamentoEntity.setId(lancamentoId);
         lancamentoEntity.setDescricao("Conta de luz");
     }
 
@@ -81,7 +84,7 @@ class LancamentoRepositoryAdapterTest {
         Lancamento result = adapter.save(domainLancamento);
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(lancamentoId);
         assertThat(result.getDescricao()).isEqualTo("Conta de luz");
         verify(lancamentoMapper).toEntity(domainLancamento);
         verify(lancamentoRepository).save(lancamentoEntity);
@@ -91,26 +94,27 @@ class LancamentoRepositoryAdapterTest {
     @Test
     @DisplayName("Deve retornar domínio ao buscar por ID existente")
     void findById_WhenExists_ShouldReturnDomain() {
-        when(lancamentoRepository.findById(1L)).thenReturn(Optional.of(lancamentoEntity));
+        when(lancamentoRepository.findById(lancamentoId)).thenReturn(Optional.of(lancamentoEntity));
         when(lancamentoMapper.toDomain(lancamentoEntity)).thenReturn(domainLancamento);
 
-        Optional<Lancamento> result = adapter.findById(1L);
+        Optional<Lancamento> result = adapter.findById(lancamentoId);
 
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(1L);
-        verify(lancamentoRepository).findById(1L);
+        assertThat(result.get().getId()).isEqualTo(lancamentoId);
+        verify(lancamentoRepository).findById(lancamentoId);
         verify(lancamentoMapper).toDomain(lancamentoEntity);
     }
 
     @Test
     @DisplayName("Deve retornar vazio ao buscar por ID inexistente")
     void findById_WhenNotExists_ShouldReturnEmpty() {
-        when(lancamentoRepository.findById(999L)).thenReturn(Optional.empty());
+        UUID nonExistentId = UUID.randomUUID();
+        when(lancamentoRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-        Optional<Lancamento> result = adapter.findById(999L);
+        Optional<Lancamento> result = adapter.findById(nonExistentId);
 
         assertThat(result).isEmpty();
-        verify(lancamentoRepository).findById(999L);
+        verify(lancamentoRepository).findById(nonExistentId);
         verifyNoInteractions(lancamentoMapper);
     }
 
@@ -164,11 +168,11 @@ class LancamentoRepositoryAdapterTest {
     @Test
     @DisplayName("Deve deletar lançamento por ID")
     void deleteById_ShouldCallRepository() {
-        doNothing().when(lancamentoRepository).deleteById(1L);
+        doNothing().when(lancamentoRepository).deleteById(lancamentoId);
 
-        adapter.deleteById(1L);
+        adapter.deleteById(lancamentoId);
 
-        verify(lancamentoRepository).deleteById(1L);
+        verify(lancamentoRepository).deleteById(lancamentoId);
         verifyNoMoreInteractions(lancamentoRepository);
     }
 }

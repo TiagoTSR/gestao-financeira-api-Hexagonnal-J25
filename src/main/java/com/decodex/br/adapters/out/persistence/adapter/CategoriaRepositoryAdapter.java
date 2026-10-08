@@ -54,7 +54,7 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Categoria> findById(Long id) {
+    public Optional<Categoria> findById(java.util.UUID id) {
         return repository.findById(id)
                 .map(mapper::toDomain);
     }
@@ -88,7 +88,7 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
 
     @Override
     @Transactional
-    public void deleteById(Long id) {
+    public void deleteById(java.util.UUID id) {
         repository.deleteById(id);
     }
 

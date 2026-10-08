@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,53 +45,57 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 404 e ErrorResponse quando lançar ResourceNotFoundException")
     void handleResourceNotFound() throws Exception {
-        when(categoriaInputPort.findById(1L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new ResourceNotFoundException("Recurso não encontrado no sistema"));
 
-        mockMvc.perform(get("/categorias/1"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.status").value(404))
             .andExpect(jsonPath("$.error").value("Not Found"))
             .andExpect(jsonPath("$.message").value("Recurso não encontrado no sistema"))
-            .andExpect(jsonPath("$.path").value("/categorias/1"))
+            .andExpect(jsonPath("$.path").value("/categorias/" + id))
             .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test
     @DisplayName("Deve retornar 400 e ErrorResponse quando lançar RegraDeNegocioException")
     void handleRegraDeNegocio() throws Exception {
-        when(categoriaInputPort.findById(10L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new com.decodex.br.domain.exception.RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: Lazer"));
 
-        mockMvc.perform(get("/categorias/10"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message").value("Já existe uma categoria cadastrada com o nome: Lazer"))
-            .andExpect(jsonPath("$.path").value("/categorias/10"));
+            .andExpect(jsonPath("$.path").value("/categorias/" + id));
     }
 
     @Test
     @DisplayName("Deve retornar 400 e mensagem amigável quando lançar DataIntegrityViolationException")
     void handleDataIntegrityViolation() throws Exception {
-        when(categoriaInputPort.findById(11L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new org.springframework.dao.DataIntegrityViolationException("Unique constraint: uk_categoria_nome violated"));
 
-        mockMvc.perform(get("/categorias/11"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message").value("Já existe uma categoria cadastrada com este nome."))
-            .andExpect(jsonPath("$.path").value("/categorias/11"));
+            .andExpect(jsonPath("$.path").value("/categorias/" + id));
     }
 
     @Test
     @DisplayName("Deve retornar 404 sem corpo quando lançar JPA EntityNotFoundException")
     void handleEntityNotFound() throws Exception {
-        when(categoriaInputPort.findById(2L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new EntityNotFoundException("Erro do JPA"));
 
-        mockMvc.perform(get("/categorias/2"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$").doesNotExist());
     }
@@ -97,15 +103,16 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 400 e ErrorResponse quando lançar IllegalArgumentException")
     void handleIllegalArgument() throws Exception {
-        when(categoriaInputPort.findById(3L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new IllegalArgumentException("Parâmetro inválido fornecido"));
 
-        mockMvc.perform(get("/categorias/3"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message").value("Parâmetro inválido fornecido"))
-            .andExpect(jsonPath("$.path").value("/categorias/3"));
+            .andExpect(jsonPath("$.path").value("/categorias/" + id));
     }
 
     @Test
@@ -139,21 +146,22 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 500 genérico para exceções não mapeadas (Exception.class)")
     void handleGenericException() throws Exception {
-        when(categoriaInputPort.findById(4L))
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
             .thenThrow(new NullPointerException("Nulo inesperado"));
 
-        mockMvc.perform(get("/categorias/4"))
+        mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.status").value(500))
             .andExpect(jsonPath("$.error").value("Internal Server Error"))
             .andExpect(jsonPath("$.message").value("Erro inesperado"))
-            .andExpect(jsonPath("$.path").value("/categorias/4"));
+            .andExpect(jsonPath("$.path").value("/categorias/" + id));
     }
 
     @Test
     @DisplayName("Deve retornar 400 e ErrorResponse quando o tipo do parâmetro de path for inválido (MethodArgumentTypeMismatchException)")
     void handleTypeMismatch() throws Exception {
-        // O ID da rota não é um número válido (deveria ser Long)
+        // O ID da rota não é um UUID válido
         mockMvc.perform(get("/categorias/abc"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status").value(400))

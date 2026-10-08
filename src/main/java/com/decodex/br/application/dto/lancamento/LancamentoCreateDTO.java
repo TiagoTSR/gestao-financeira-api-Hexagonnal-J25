@@ -2,6 +2,7 @@ package com.decodex.br.application.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.decodex.br.domain.model.TipoLancamento;
 
@@ -26,8 +27,8 @@ public record LancamentoCreateDTO(
     TipoLancamento tipo,
 
     @NotNull
-    Long categoriaId,
+    UUID categoriaId,
 
     @NotNull
-    Long pessoaId
+    UUID pessoaId
 ) {}

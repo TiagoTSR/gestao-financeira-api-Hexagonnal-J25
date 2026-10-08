@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +25,10 @@ class LancamentoDTOMapperTest {
     private final Endereco endereco = new Endereco(
         "Rua Teste", "10", null, "Centro", "00000-000", "São Paulo", "SP"
     );
-    private final Categoria categoria = new Categoria(1L, "Categoria Teste");
-    private final Pessoa pessoa = new Pessoa(1L, "Pessoa Teste", endereco, true);
+    private final UUID catId = UUID.randomUUID();
+    private final UUID pesId = UUID.randomUUID();
+    private final Categoria categoria = new Categoria(catId, "Categoria Teste");
+    private final Pessoa pessoa = new Pessoa(pesId, "Pessoa Teste", endereco, true);
     private final LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     //  toDomain(Create)
@@ -39,7 +42,7 @@ class LancamentoDTOMapperTest {
             new BigDecimal("100.50"),
             "Observação",
             TipoLancamento.RECEITA,
-            1L, 1L
+            catId, pesId
         );
 
         Lancamento lancamento = mapper.toDomain(dto, categoria, pessoa);
@@ -66,6 +69,8 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDomain_UpdateDTO_ShouldReturnLancamentoComNovosDados() {
+        UUID novaCatId = UUID.randomUUID();
+        UUID novaPesId = UUID.randomUUID();
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Nova Descrição",
             LocalDate.of(2026, 1, 1),
@@ -73,12 +78,12 @@ class LancamentoDTOMapperTest {
             new BigDecimal("200.00"),
             "Nova Observação",
             TipoLancamento.RECEITA,
-            2L, 2L
+            novaCatId, novaPesId
         );
 
-        Categoria novaCategoria = new Categoria(2L, "Nova Categoria");
+        Categoria novaCategoria = new Categoria(novaCatId, "Nova Categoria");
         Endereco novoEndereco = new Endereco("Rua Nova", "20", null, "Bairro Novo", "11111-111", "Rio", "RJ");
-        Pessoa novaPessoa = new Pessoa(2L, "Nova Pessoa", novoEndereco, false);
+        Pessoa novaPessoa = new Pessoa(novaPesId, "Nova Pessoa", novoEndereco, false);
 
         Lancamento novosDados = mapper.toDomain(dto, novaCategoria, novaPessoa);
 
@@ -99,14 +104,17 @@ class LancamentoDTOMapperTest {
 
     @Test
     void update_ShouldAtualizarLancamento_QuandoToDomainEAtualizarCamposCombinados() {
+        UUID lancamentoId = UUID.randomUUID();
         Lancamento existing = new Lancamento(
-            1L, "Descrição Antiga", LocalDate.now(), null,
+            lancamentoId, "Descrição Antiga", LocalDate.now(), null,
             BigDecimal.ZERO, "", TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        Categoria novaCategoria = new Categoria(2L, "Nova Categoria");
+        UUID novaCatId = UUID.randomUUID();
+        UUID novaPesId = UUID.randomUUID();
+        Categoria novaCategoria = new Categoria(novaCatId, "Nova Categoria");
         Endereco novoEndereco = new Endereco("Rua Nova", "20", null, "Bairro Novo", "11111-111", "Rio", "RJ");
-        Pessoa novaPessoa = new Pessoa(2L, "Nova Pessoa", novoEndereco, false);
+        Pessoa novaPessoa = new Pessoa(novaPesId, "Nova Pessoa", novoEndereco, false);
 
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Nova Descrição",
@@ -115,13 +123,13 @@ class LancamentoDTOMapperTest {
             new BigDecimal("200.00"),
             "Nova Observação",
             TipoLancamento.RECEITA,
-            2L, 2L
+            novaCatId, novaPesId
         );
 
         Lancamento novosDados = mapper.toDomain(dto, novaCategoria, novaPessoa);
         existing.atualizarCampos(novosDados);
 
-        assertThat(existing.getId()).isEqualTo(1L); // id preservado
+        assertThat(existing.getId()).isEqualTo(lancamentoId); // id preservado
         assertThat(existing.getDescricao()).isEqualTo("Nova Descrição");
         assertThat(existing.getDataVencimento()).isEqualTo(LocalDate.of(2026, 1, 1));
         assertThat(existing.getDataPagamento()).isEqualTo(LocalDate.of(2026, 1, 2));
@@ -135,28 +143,31 @@ class LancamentoDTOMapperTest {
 
     @Test
     void toDTO_ShouldConvertLancamentoToResponseDTO() {
+        UUID catId3 = UUID.randomUUID();
+        UUID pesId3 = UUID.randomUUID();
+        UUID lancId = UUID.randomUUID();
         Endereco enderecoDTO = new Endereco("Rua DTO", "30", null, "Bairro DTO", "22222-222", "Curitiba", "PR");
-        Categoria cat = new Categoria(3L, "Categoria DTO");
-        Pessoa pes = new Pessoa(3L, "Pessoa DTO", enderecoDTO, true);
+        Categoria cat = new Categoria(catId3, "Categoria DTO");
+        Pessoa pes = new Pessoa(pesId3, "Pessoa DTO", enderecoDTO, true);
 
         Lancamento lancamento = new Lancamento(
-            5L, "Descrição", LocalDate.of(2025, 5, 5),
+            lancId, "Descrição", LocalDate.of(2025, 5, 5),
             LocalDate.of(2025, 5, 6), new BigDecimal("99.99"),
             "Obs", TipoLancamento.DESPESA, cat, pes
         );
 
         LancamentoResponseDTO responseDTO = mapper.toDTO(lancamento);
 
-        assertThat(responseDTO.id()).isEqualTo(5L);
+        assertThat(responseDTO.id()).isEqualTo(lancId);
         assertThat(responseDTO.descricao()).isEqualTo("Descrição");
         assertThat(responseDTO.dataVencimento()).isEqualTo(LocalDate.of(2025, 5, 5));
         assertThat(responseDTO.dataPagamento()).isEqualTo(LocalDate.of(2025, 5, 6));
         assertThat(responseDTO.valor()).isEqualByComparingTo("99.99");
         assertThat(responseDTO.observacao()).isEqualTo("Obs");
         assertThat(responseDTO.tipo()).isEqualTo(TipoLancamento.DESPESA);
-        assertThat(responseDTO.categoria().id()).isEqualTo(3L);
+        assertThat(responseDTO.categoria().id()).isEqualTo(catId3);
         assertThat(responseDTO.categoria().nome()).isEqualTo("Categoria DTO");
-        assertThat(responseDTO.pessoa().id()).isEqualTo(3L);
+        assertThat(responseDTO.pessoa().id()).isEqualTo(pesId3);
         assertThat(responseDTO.pessoa().nome()).isEqualTo("Pessoa DTO");
     }
 

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,7 +73,7 @@ class LancamentoRepositoryIntegrationTest extends PostgresIntegrationBase {
 
         LancamentoEntity saved = lancamentoRepository.save(entity);
 
-        assertThat(saved.getId()).isNotNull().isPositive();
+        assertThat(saved.getId()).isNotNull();
         assertThat(saved.getDescricao()).isEqualTo("Salário");
         assertThat(saved.getValor()).isEqualByComparingTo("6500.00");
         assertThat(saved.getTipo()).isEqualTo(TipoLancamento.RECEITA);
@@ -134,7 +135,7 @@ class LancamentoRepositoryIntegrationTest extends PostgresIntegrationBase {
     @Test
     @DisplayName("Deve retornar Optional vazio para ID inexistente")
     void findById_DeveRetornarVazioQuandoNaoExiste() {
-        Optional<LancamentoEntity> found = lancamentoRepository.findById(999L);
+        Optional<LancamentoEntity> found = lancamentoRepository.findById(UUID.randomUUID());
 
         assertThat(found).isEmpty();
     }
@@ -192,7 +193,7 @@ class LancamentoRepositoryIntegrationTest extends PostgresIntegrationBase {
         LancamentoEntity saved = lancamentoRepository.save(
             lancamentoEntity("A Deletar", BigDecimal.TEN, TipoLancamento.DESPESA)
         );
-        Long lancamentoId = saved.getId();
+        UUID lancamentoId = saved.getId();
 
         lancamentoRepository.deleteById(lancamentoId);
 

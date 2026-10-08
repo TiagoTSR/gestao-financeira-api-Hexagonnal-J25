@@ -60,7 +60,7 @@ public class PessoaController implements PessoaControllerDoc {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PessoaResponseDTO> findById(@PathVariable java.util.UUID id) {
         Pessoa pessoa = inputPort.findById(id);
         return ResponseEntity.ok(PessoaResponseDTO.from(pessoa));
     }
@@ -82,7 +82,7 @@ public class PessoaController implements PessoaControllerDoc {
     @Override
     @PutMapping("/{id}")
     public ResponseEntity<PessoaResponseDTO> update(
-            @PathVariable Long id,
+            @PathVariable java.util.UUID id,
             @RequestBody @Valid PessoaUpdateDTO dto) {
 
         Pessoa atualizada = inputPort.update(id, dto.toDomain());
@@ -92,7 +92,7 @@ public class PessoaController implements PessoaControllerDoc {
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable java.util.UUID id) {
         inputPort.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,16 +57,21 @@ class LancamentoServiceTest {
     @InjectMocks
     private LancamentoService service;
 
+    private final UUID lancamentoId = UUID.randomUUID();
+    private final UUID categoriaId = UUID.randomUUID();
+    private final UUID pessoaId = UUID.randomUUID();
+    private final UUID idInexistente = UUID.randomUUID();
+
     private Categoria categoria;
     private Pessoa pessoa;
     private Lancamento lancamento;
 
     @BeforeEach
     void setUp() {
-        categoria = new Categoria(1L, "Lazer");
+        categoria = new Categoria(categoriaId, "Lazer");
         Endereco endereco = new Endereco("Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP");
-        pessoa = new Pessoa(2L, "Ana", endereco, true);
-        lancamento = new Lancamento(10L, "Cinema", LocalDate.of(2025, 6, 10), null,
+        pessoa = new Pessoa(pessoaId, "Ana", endereco, true);
+        lancamento = new Lancamento(lancamentoId, "Cinema", LocalDate.of(2025, 6, 10), null,
                 new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa);
     }
 
@@ -90,23 +96,23 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve buscar lançamento por ID com sucesso")
     void findById_WhenExists_ShouldReturnLancamento() {
-        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
 
-        Lancamento found = service.findById(10L);
+        Lancamento found = service.findById(lancamentoId);
 
         assertThat(found).isEqualTo(lancamento);
-        verify(repository, times(1)).findById(10L);
+        verify(repository, times(1)).findById(lancamentoId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao buscar lançamento por ID inexistente")
     void findById_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findById(99L))
+        assertThatThrownBy(() -> service.findById(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Lancamento não encontrado: 99");
-        verify(repository, times(1)).findById(99L);
+                .hasMessage("Lancamento não encontrado: " + idInexistente);
+        verify(repository, times(1)).findById(idInexistente);
     }
 
     @Test
@@ -124,7 +130,7 @@ class LancamentoServiceTest {
     @DisplayName("Deve atualizar lançamento existente")
     void update_ShouldUpdateFieldsAndSave() {
         Lancamento existing = new Lancamento(
-            10L, "Cinema", LocalDate.of(2025, 6, 10), null,
+            lancamentoId, "Cinema", LocalDate.of(2025, 6, 10), null,
             new BigDecimal("50.00"), null, TipoLancamento.DESPESA, categoria, pessoa
         );
         Lancamento updatedDetails = new Lancamento(
@@ -133,24 +139,24 @@ class LancamentoServiceTest {
             TipoLancamento.DESPESA, categoria, pessoa
         );
         Lancamento expectedUpdated = new Lancamento(
-            10L, "Cinema IMAX", LocalDate.of(2025, 6, 15),
+            lancamentoId, "Cinema IMAX", LocalDate.of(2025, 6, 15),
             LocalDate.of(2025, 6, 14), new BigDecimal("75.00"), "Ingresso VIP",
             TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        when(repository.findById(10L)).thenReturn(Optional.of(existing));
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(existing));
         when(repository.save(any(Lancamento.class))).thenReturn(expectedUpdated);
 
-        Lancamento result = service.update(10L, updatedDetails);
+        Lancamento result = service.update(lancamentoId, updatedDetails);
 
         assertThat(result.getDescricao()).isEqualTo("Cinema IMAX");
         assertThat(result.getDataVencimento()).isEqualTo(LocalDate.of(2025, 6, 15));
         assertThat(result.getValor()).isEqualTo(new BigDecimal("75.00"));
         assertThat(result.getObservacao()).isEqualTo("Ingresso VIP");
 
-        verify(repository).findById(10L);
+        verify(repository).findById(lancamentoId);
         verify(repository).save(argThat(l -> 
-            l.getId().equals(10L) &&
+            l.getId().equals(lancamentoId) &&
             l.getDescricao().equals("Cinema IMAX") &&
             l.getValor().equals(new BigDecimal("75.00"))
         ));
@@ -159,25 +165,25 @@ class LancamentoServiceTest {
     @Test
     @DisplayName("Deve deletar lançamento existente")
     void delete_ShouldDeleteById() {
-        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
-        doNothing().when(repository).deleteById(10L);
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        doNothing().when(repository).deleteById(lancamentoId);
 
-        service.delete(10L);
+        service.delete(lancamentoId);
 
-        verify(repository, times(1)).findById(10L);
-        verify(repository, times(1)).deleteById(10L);
+        verify(repository, times(1)).findById(lancamentoId);
+        verify(repository, times(1)).deleteById(lancamentoId);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao tentar deletar lançamento inexistente")
     void delete_WhenNotExists_ShouldThrowException() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        when(repository.findById(idInexistente)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.delete(99L))
+        assertThatThrownBy(() -> service.delete(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Lancamento não encontrado: 99");
+                .hasMessage("Lancamento não encontrado: " + idInexistente);
 
-        verify(repository, times(1)).findById(99L);
+        verify(repository, times(1)).findById(idInexistente);
         verify(repository, never()).deleteById(any());
     }
 
@@ -186,17 +192,17 @@ class LancamentoServiceTest {
     void create_WithDTO_ShouldFindDependenciesAndSave() {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
-            null, TipoLancamento.RECEITA, 1L, 2L
+            null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(pessoa));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
         when(repository.save(any(Lancamento.class))).thenReturn(lancamento);
 
         Lancamento result = service.create(dto);
 
         assertThat(result).isNotNull();
-        verify(categoriaRepository).findById(1L);
-        verify(pessoaRepository).findById(2L);
+        verify(categoriaRepository).findById(categoriaId);
+        verify(pessoaRepository).findById(pessoaId);
         verify(repository).save(any(Lancamento.class));
     }
 
@@ -205,13 +211,13 @@ class LancamentoServiceTest {
     void create_WithDTO_WhenCategoriaNotFound_ShouldThrowException() {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
-            null, TipoLancamento.RECEITA, 99L, 2L
+            null, TipoLancamento.RECEITA, idInexistente, pessoaId
         );
-        when(categoriaRepository.findById(99L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.create(dto))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Categoria não encontrada: 99");
+                .hasMessage("Categoria não encontrada: " + idInexistente);
     }
 
     @Test
@@ -219,26 +225,26 @@ class LancamentoServiceTest {
     void create_WithDTO_WhenPessoaNotFound_ShouldThrowException() {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
-            null, TipoLancamento.RECEITA, 1L, 99L
+            null, TipoLancamento.RECEITA, categoriaId, idInexistente
         );
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(idInexistente)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.create(dto))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Pessoa não encontrada: 99");
+                .hasMessage("Pessoa não encontrada: " + idInexistente);
     }
 
     @Test
     @DisplayName("Deve lançar RegraDeNegocioException ao criar com DTO para pessoa inativa")
     void create_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
-        Pessoa inativa = new Pessoa(2L, "Inativa", pessoa.getEndereco(), false);
+        Pessoa inativa = new Pessoa(pessoaId, "Inativa", pessoa.getEndereco(), false);
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
-            null, TipoLancamento.RECEITA, 1L, 2L
+            null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(inativa));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(inativa));
 
         assertThatThrownBy(() -> service.create(dto))
                 .isInstanceOf(RegraDeNegocioException.class)
@@ -250,35 +256,35 @@ class LancamentoServiceTest {
     void update_WithDTO_ShouldFindDependenciesAndUpdate() {
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
-            "Com pipoca", TipoLancamento.DESPESA, 1L, 2L
+            "Com pipoca", TipoLancamento.DESPESA, categoriaId, pessoaId
         );
-        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(pessoa));
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
         when(repository.save(any(Lancamento.class))).thenReturn(lancamento);
 
-        Lancamento result = service.update(10L, dto);
+        Lancamento result = service.update(lancamentoId, dto);
 
         assertThat(result).isNotNull();
-        verify(repository).findById(10L);
-        verify(categoriaRepository).findById(1L);
-        verify(pessoaRepository).findById(2L);
+        verify(repository).findById(lancamentoId);
+        verify(categoriaRepository).findById(categoriaId);
+        verify(pessoaRepository).findById(pessoaId);
         verify(repository).save(lancamento);
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao atualizar com DTO quando pessoa for inativa")
     void update_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
-        Pessoa inativa = new Pessoa(2L, "Inativa", pessoa.getEndereco(), false);
+        Pessoa inativa = new Pessoa(pessoaId, "Inativa", pessoa.getEndereco(), false);
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
-            "Com pipoca", TipoLancamento.DESPESA, 1L, 2L
+            "Com pipoca", TipoLancamento.DESPESA, categoriaId, pessoaId
         );
-        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
-        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(inativa));
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(inativa));
 
-        assertThatThrownBy(() -> service.update(10L, dto))
+        assertThatThrownBy(() -> service.update(lancamentoId, dto))
                 .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessage("Não é possível salvar lançamento para pessoa inativa.");
     }

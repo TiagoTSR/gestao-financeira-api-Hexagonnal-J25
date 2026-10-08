@@ -1,9 +1,11 @@
 package com.decodex.br.application.dto.categoria;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.model.Categoria;
 
 public record CategoriaResponseDTO(
-    Long id,
+    UUID id,
     String nome
 ) {
     public static CategoriaResponseDTO from(Categoria categoria) {

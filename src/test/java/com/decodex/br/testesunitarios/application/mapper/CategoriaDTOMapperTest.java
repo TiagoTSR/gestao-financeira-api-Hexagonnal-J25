@@ -46,7 +46,8 @@ class CategoriaDTOMapperTest {
     @Test
     void update_ShouldAtualizarCategoria_QuandoToDomainEAtualizarCamposCombinados() {
         // given
-        Categoria existing = new Categoria(1L, "Antigo Nome");
+        java.util.UUID id = java.util.UUID.randomUUID();
+        Categoria existing = new Categoria(id, "Antigo Nome");
         CategoriaUpdateDTO updateDTO = new CategoriaUpdateDTO("Novo Nome");
 
         // when
@@ -54,7 +55,7 @@ class CategoriaDTOMapperTest {
         existing.atualizarCampos(novosDados);
 
         // then
-        assertThat(existing.getId()).isEqualTo(1L); 
+        assertThat(existing.getId()).isEqualTo(id); 
         assertThat(existing.getNome()).isEqualTo("Novo Nome");
     }
 
@@ -63,13 +64,14 @@ class CategoriaDTOMapperTest {
     @Test
     void from_ShouldConvertCategoriaToResponseDTO() {
         // given
-        Categoria categoria = new Categoria(10L, "Transporte");
+        java.util.UUID catId = java.util.UUID.randomUUID();
+        Categoria categoria = new Categoria(catId, "Transporte");
 
         // when
         CategoriaResponseDTO responseDTO = CategoriaResponseDTO.from(categoria);
 
         // then
-        assertThat(responseDTO.id()).isEqualTo(10L);
+        assertThat(responseDTO.id()).isEqualTo(catId);
         assertThat(responseDTO.nome()).isEqualTo("Transporte");
     }
 

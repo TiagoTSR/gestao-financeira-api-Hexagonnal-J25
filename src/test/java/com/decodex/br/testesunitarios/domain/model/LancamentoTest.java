@@ -19,18 +19,18 @@ import com.decodex.br.domain.model.TipoLancamento;
 @DisplayName("Testes unitários para Lancamento")
 class LancamentoTest {
 
-    private static final Long ID = 1L;
+    private static final java.util.UUID ID = java.util.UUID.randomUUID();
     private static final String DESCRICAO = "Compra no supermercado";
     private static final LocalDate DATA_VENCIMENTO = LocalDate.of(2025, 5, 10);
     private static final LocalDate DATA_PAGAMENTO = LocalDate.of(2025, 5, 5);
     private static final BigDecimal VALOR = new BigDecimal("150.75");
     private static final String OBSERVACAO = "Pagamento com desconto";
     private static final TipoLancamento TIPO = TipoLancamento.DESPESA;
-    private static final Categoria CATEGORIA = new Categoria(1L, "Alimentação");
+    private static final Categoria CATEGORIA = new Categoria(java.util.UUID.randomUUID(), "Alimentação");
     private static final Endereco ENDERECO_PESSOA = new Endereco(
     	    "Rua A", "10", null, "Centro", "00000-000", "São Paulo", "SP"
     	);
-    private static final Pessoa PESSOA = new Pessoa(1L, "João Silva", ENDERECO_PESSOA, true);
+    private static final Pessoa PESSOA = new Pessoa(java.util.UUID.randomUUID(), "João Silva", ENDERECO_PESSOA, true);
 
     @Test
     @DisplayName("Deve criar lançamento válido com todos os campos")
@@ -128,7 +128,7 @@ class LancamentoTest {
     @DisplayName("Deve considerar lançamentos diferentes quando IDs mudarem ou comparados com null/outros tipos")
     void testEqualsDiferentes() {
         Lancamento lancamento1 = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
-        Lancamento lancamento2 = new Lancamento(2L, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA); // ID diferente
+        Lancamento lancamento2 = new Lancamento(java.util.UUID.randomUUID(), DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA); // ID diferente
 
         assertThat(lancamento1).isNotEqualTo(lancamento2);
         assertThat(lancamento1).isNotEqualTo(null);
@@ -139,8 +139,8 @@ class LancamentoTest {
     @DisplayName("Deve atualizar lançamento atomicamente com sucesso")
     void deveAtualizarLancamentoAtomicamente() {
         Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
-        Categoria novaCategoria = new Categoria(2L, "Transporte");
-        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        Categoria novaCategoria = new Categoria(java.util.UUID.randomUUID(), "Transporte");
+        Pessoa novaPessoa = new Pessoa(java.util.UUID.randomUUID(), "Maria Silva", ENDERECO_PESSOA, true);
         LocalDate novoVencimento = LocalDate.of(2025, 8, 1);
         LocalDate novoPagamento = LocalDate.of(2025, 8, 2);
         BigDecimal novoValor = new BigDecimal("350.00");
@@ -174,8 +174,8 @@ class LancamentoTest {
     @DisplayName("Deve atualizar campos via atualizarCampos e ignorar nulo")
     void deveAtualizarCamposEIgnorarNulo() {
         Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
-        Categoria novaCategoria = new Categoria(2L, "Transporte");
-        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        Categoria novaCategoria = new Categoria(java.util.UUID.randomUUID(), "Transporte");
+        Pessoa novaPessoa = new Pessoa(java.util.UUID.randomUUID(), "Maria Silva", ENDERECO_PESSOA, true);
         Lancamento novosDados = new Lancamento("Nova Descrição", DATA_VENCIMENTO, null, new BigDecimal("200.00"), null, TipoLancamento.RECEITA, novaCategoria, novaPessoa);
 
         lancamento.atualizarCampos(novosDados);
@@ -189,8 +189,8 @@ class LancamentoTest {
     @DisplayName("Deve permitir alterações pontuais via métodos alterar")
     void devePermitirAlteracoesPontuais() {
         Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, OBSERVACAO, TIPO, CATEGORIA, PESSOA);
-        Categoria novaCategoria = new Categoria(2L, "Transporte");
-        Pessoa novaPessoa = new Pessoa(2L, "Maria Silva", ENDERECO_PESSOA, true);
+        Categoria novaCategoria = new Categoria(java.util.UUID.randomUUID(), "Transporte");
+        Pessoa novaPessoa = new Pessoa(java.util.UUID.randomUUID(), "Maria Silva", ENDERECO_PESSOA, true);
         LocalDate novoVencimento = LocalDate.of(2025, 9, 1);
         LocalDate novoPagamento = LocalDate.of(2025, 9, 2);
 

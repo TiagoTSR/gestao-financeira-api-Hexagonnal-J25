@@ -65,8 +65,8 @@ class AuthControllerTest {
     void deveAutenticarERetornarToken() {
         LoginRequestDTO loginRequest = new LoginRequestDTO("admin", "123456");
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
-        Usuario userDomain = new Usuario(1L, "admin", "hash", "admin@email.com");
-        RefreshToken refreshToken = new RefreshToken(1L, "mocked-refresh-token", userDomain, Instant.now().plusSeconds(3600));
+        Usuario userDomain = new Usuario(java.util.UUID.randomUUID(), "admin", "hash", "admin@email.com");
+        RefreshToken refreshToken = new RefreshToken(java.util.UUID.randomUUID(), "mocked-refresh-token", userDomain, Instant.now().plusSeconds(3600));
 
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -89,9 +89,9 @@ class AuthControllerTest {
     @DisplayName("Deve rotacionar o refresh token e retornar novo token de acesso no refresh")
     void deveRotacionarTokensNoRefresh() {
         Cookie cookie = new Cookie("refreshToken", "valid-refresh-token");
-        Usuario userDomain = new Usuario(1L, "admin", "hash", "admin@email.com");
-        RefreshToken oldRefreshToken = new RefreshToken(1L, "valid-refresh-token", userDomain, Instant.now().plusSeconds(3600));
-        RefreshToken newRefreshToken = new RefreshToken(2L, "new-refresh-token", userDomain, Instant.now().plusSeconds(3600));
+        Usuario userDomain = new Usuario(java.util.UUID.randomUUID(), "admin", "hash", "admin@email.com");
+        RefreshToken oldRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "valid-refresh-token", userDomain, Instant.now().plusSeconds(3600));
+        RefreshToken newRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "new-refresh-token", userDomain, Instant.now().plusSeconds(3600));
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});

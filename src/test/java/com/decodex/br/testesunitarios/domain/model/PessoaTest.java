@@ -13,7 +13,7 @@ import com.decodex.br.domain.model.Pessoa;
 @DisplayName("Testes unitários para Pessoa")
 class PessoaTest {
 
-    private static final Long ID = 1L;
+    private static final java.util.UUID ID = java.util.UUID.randomUUID();
     private static final String NOME = "Maria Oliveira";
     private static final Endereco ENDERECO = new Endereco(
         "Rua B", "456", null, "Jardim", "98765-432", "Rio de Janeiro", "RJ"
@@ -80,7 +80,7 @@ class PessoaTest {
     @DisplayName("Deve considerar pessoas diferentes quando IDs mudarem ou comparadas com null/outros tipos")
     void testEqualsDiferentes() {
         Pessoa pessoa1 = new Pessoa(ID, NOME, ENDERECO, ATIVO);
-        Pessoa pessoa2 = new Pessoa(2L, NOME, ENDERECO, ATIVO);
+        Pessoa pessoa2 = new Pessoa(java.util.UUID.randomUUID(), NOME, ENDERECO, ATIVO);
 
         assertThat(pessoa1).isNotEqualTo(pessoa2);
         assertThat(pessoa1).isNotEqualTo(null);

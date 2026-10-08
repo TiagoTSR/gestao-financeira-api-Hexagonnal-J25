@@ -1,9 +1,11 @@
 package com.decodex.br.application.dto.pessoa;
 
+import java.util.UUID;
+
 import com.decodex.br.domain.model.Pessoa;
 
 public record PessoaResponseDTO(
-    Long id,
+    UUID id,
     String nome,
     String logradouro,
     String numero,
