@@ -30,7 +30,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -48,7 +48,7 @@ class CategoriaControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private CategoriaUseCase categoriaUseCase;
+    private CategoriaInputPort categoriaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
@@ -65,7 +65,7 @@ class CategoriaControllerTest {
         CategoriaCreateDTO requestDTO = new CategoriaCreateDTO("Lazer");
         Categoria categoriaCriada = new Categoria(1L, "Lazer");
 
-        when(categoriaUseCase.create(any(Categoria.class))).thenReturn(categoriaCriada);
+        when(categoriaInputPort.create(any(Categoria.class))).thenReturn(categoriaCriada);
 
         mockMvc.perform(post("/categorias")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class CategoriaControllerTest {
     @DisplayName("Deve retornar 200 OK ao buscar categoria por ID existente")
     void findById_DeveRetornar200() throws Exception {
         Categoria categoria = new Categoria(1L, "Lazer");
-        when(categoriaUseCase.findById(1L)).thenReturn(categoria);
+        when(categoriaInputPort.findById(1L)).thenReturn(categoria);
 
         mockMvc.perform(get("/categorias/{id}", 1L))
             .andExpect(status().isOk())
@@ -103,7 +103,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 404 Not Found quando categoria não existir")
     void findById_DeveRetornar404_QuandoNaoEncontrada() throws Exception {
-        when(categoriaUseCase.findById(99L))
+        when(categoriaInputPort.findById(99L))
             .thenThrow(new ResourceNotFoundException("Categoria não encontrada"));
 
         mockMvc.perform(get("/categorias/{id}", 99L))
@@ -120,7 +120,7 @@ class CategoriaControllerTest {
             0, 10, 2L, 1
         );
 
-        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+        when(categoriaInputPort.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         mockMvc.perform(get("/categorias")
@@ -143,7 +143,7 @@ class CategoriaControllerTest {
             0, 10, 1L, 1
         );
 
-        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+        when(categoriaInputPort.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         mockMvc.perform(get("/categorias/paginada")
@@ -162,7 +162,7 @@ class CategoriaControllerTest {
         CategoriaUpdateDTO requestDTO = new CategoriaUpdateDTO("Saúde");
         Categoria categoriaAtualizada = new Categoria(1L, "Saúde");
 
-        when(categoriaUseCase.update(eq(1L), any(Categoria.class))).thenReturn(categoriaAtualizada);
+        when(categoriaInputPort.update(eq(1L), any(Categoria.class))).thenReturn(categoriaAtualizada);
 
         mockMvc.perform(put("/categorias/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +174,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar categoria")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(categoriaUseCase).delete(1L);
+        doNothing().when(categoriaInputPort).delete(1L);
 
         mockMvc.perform(delete("/categorias/{id}", 1L))
             .andExpect(status().isNoContent());

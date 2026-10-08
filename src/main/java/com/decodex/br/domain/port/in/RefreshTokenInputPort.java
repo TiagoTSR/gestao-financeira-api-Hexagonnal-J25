@@ -2,7 +2,7 @@ package com.decodex.br.domain.port.in;
 
 import com.decodex.br.domain.model.RefreshToken;
 
-public interface RefreshTokenUseCase {
+public interface RefreshTokenInputPort {
 
     RefreshToken create(String username);
 

@@ -5,10 +5,10 @@ import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 
-public class PessoaService implements PessoaUseCase {
+public class PessoaService implements PessoaInputPort {
     
     private final PessoaRepositoryPort repository;
 

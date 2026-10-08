@@ -19,7 +19,7 @@ import com.decodex.br.application.dto.auth.TokenResponseDTO;
 import com.decodex.br.config.security.TokenService;
 import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.model.RefreshToken;
-import com.decodex.br.domain.port.in.RefreshTokenUseCase;
+import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,18 +30,18 @@ public class AuthController implements AuthControllerDoc {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final RefreshTokenUseCase refreshTokenUseCase;
+    private final RefreshTokenInputPort refreshTokenInputPort;
     private final UserDetailsService userDetailsService;
 
     public AuthController(
         AuthenticationManager authenticationManager,
         TokenService tokenService,
-        RefreshTokenUseCase refreshTokenUseCase,
+        RefreshTokenInputPort refreshTokenInputPort,
         @Lazy UserDetailsService userDetailsService
     ) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
-        this.refreshTokenUseCase = refreshTokenUseCase;
+        this.refreshTokenInputPort = refreshTokenInputPort;
         this.userDetailsService = userDetailsService;
     }
 
@@ -56,7 +56,7 @@ public class AuthController implements AuthControllerDoc {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         
         var token = tokenService.generateToken(userDetails);
-        var refreshToken = refreshTokenUseCase.create(userDetails.getUsername());
+        var refreshToken = refreshTokenInputPort.create(userDetails.getUsername());
         
         setAuthCookies(response, token, refreshToken.getToken());
         
@@ -74,12 +74,12 @@ public class AuthController implements AuthControllerDoc {
             throw new RefreshTokenException("Refresh token ausente. Por favor, faça login novamente.");
         }
 
-        RefreshToken validRefreshToken = refreshTokenUseCase.verifyAndGet(cookie.getValue());
+        RefreshToken validRefreshToken = refreshTokenInputPort.verifyAndGet(cookie.getValue());
         String username = validRefreshToken.getUsuario().getUsername();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         String newAccessToken = tokenService.generateToken(userDetails);
-        RefreshToken newRefreshToken = refreshTokenUseCase.create(username);
+        RefreshToken newRefreshToken = refreshTokenInputPort.create(username);
 
         setAuthCookies(response, newAccessToken, newRefreshToken.getToken());
 
@@ -94,7 +94,7 @@ public class AuthController implements AuthControllerDoc {
     ) {
         var cookie = WebUtils.getCookie(request, "refreshToken");
         if (cookie != null && cookie.getValue() != null && !cookie.getValue().isEmpty()) {
-            refreshTokenUseCase.deleteByToken(cookie.getValue());
+            refreshTokenInputPort.deleteByToken(cookie.getValue());
         }
 
         clearAuthCookies(response);

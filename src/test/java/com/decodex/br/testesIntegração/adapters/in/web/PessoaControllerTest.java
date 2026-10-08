@@ -30,7 +30,7 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -48,7 +48,7 @@ class PessoaControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private PessoaUseCase pessoaUseCase;
+    private PessoaInputPort pessoaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
@@ -70,7 +70,7 @@ class PessoaControllerTest {
         Endereco endereco = new Endereco("Rua das Flores", "10", null, "Centro", "01000-000", "São Paulo", "SP");
         Pessoa pessoaSalva = new Pessoa(1L, "João Silva", endereco, true);
 
-        when(pessoaUseCase.create(any(Pessoa.class))).thenReturn(pessoaSalva);
+        when(pessoaInputPort.create(any(Pessoa.class))).thenReturn(pessoaSalva);
 
         mockMvc.perform(post("/pessoas")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class PessoaControllerTest {
         Endereco endereco = new Endereco("Rua X", "S/N", null, "Bairro Y", "12345-000", "Cidade Z", "MG");
         Pessoa pessoa = new Pessoa(1L, "Maria", endereco, true);
 
-        when(pessoaUseCase.findById(1L)).thenReturn(pessoa);
+        when(pessoaInputPort.findById(1L)).thenReturn(pessoa);
 
         mockMvc.perform(get("/pessoas/{id}", 1L))
             .andExpect(status().isOk())
@@ -124,7 +124,7 @@ class PessoaControllerTest {
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
-        when(pessoaUseCase.findAll(any(PessoaFilter.class), any(PageRequest.class)))
+        when(pessoaInputPort.findAll(any(PessoaFilter.class), any(PageRequest.class)))
         .thenReturn(pageResult);
 
     mockMvc.perform(get("/pessoas")
@@ -144,7 +144,7 @@ class PessoaControllerTest {
         Endereco enderecoAtualizado = new Endereco("Rua Nova", "100", "Apt 2", "Centro", "11111-000", "Belo Horizonte", "MG");
         Pessoa pessoaAtualizada = new Pessoa(1L, "Maria Atualizada", enderecoAtualizado, false);
 
-        when(pessoaUseCase.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaAtualizada);
+        when(pessoaInputPort.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaAtualizada);
 
         mockMvc.perform(put("/pessoas/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -158,7 +158,7 @@ class PessoaControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar pessoa")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(pessoaUseCase).delete(1L);
+        doNothing().when(pessoaInputPort).delete(1L);
 
         mockMvc.perform(delete("/pessoas/{id}", 1L))
             .andExpect(status().isNoContent());

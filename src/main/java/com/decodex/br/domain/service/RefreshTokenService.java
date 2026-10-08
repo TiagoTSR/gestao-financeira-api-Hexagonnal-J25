@@ -7,11 +7,11 @@ import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.model.Usuario;
-import com.decodex.br.domain.port.in.RefreshTokenUseCase;
+import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import com.decodex.br.domain.port.out.RefreshTokenRepositoryPort;
 import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
 
-public class RefreshTokenService implements RefreshTokenUseCase {
+public class RefreshTokenService implements RefreshTokenInputPort {
 
     private final RefreshTokenRepositoryPort refreshTokenRepositoryPort;
     private final UsuarioRepositoryPort usuarioRepositoryPort;

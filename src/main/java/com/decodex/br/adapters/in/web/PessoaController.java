@@ -21,7 +21,7 @@ import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.adapters.in.web.documentation.PessoaControllerDoc;
 
 import jakarta.validation.Valid;
@@ -30,10 +30,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/pessoas")
 public class PessoaController implements PessoaControllerDoc {
 
-    private final PessoaUseCase useCase;
+    private final PessoaInputPort inputPort;
 
-    public PessoaController(PessoaUseCase useCase) {
-        this.useCase = useCase;
+    public PessoaController(PessoaInputPort inputPort) {
+        this.inputPort = inputPort;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class PessoaController implements PessoaControllerDoc {
             @RequestParam(required = false) String direction) {
 
         PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
-        return ResponseEntity.ok(useCase.findAll(filter, pageRequest)
+        return ResponseEntity.ok(inputPort.findAll(filter, pageRequest)
                 .map(PessoaResponseDTO::from));
     }
 
@@ -61,14 +61,14 @@ public class PessoaController implements PessoaControllerDoc {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<PessoaResponseDTO> findById(@PathVariable Long id) {
-        Pessoa pessoa = useCase.findById(id);
+        Pessoa pessoa = inputPort.findById(id);
         return ResponseEntity.ok(PessoaResponseDTO.from(pessoa));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<PessoaResponseDTO> create(@RequestBody @Valid PessoaCreateDTO dto) {
-        Pessoa pessoa = useCase.create(dto.toDomain());
+        Pessoa pessoa = inputPort.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -85,7 +85,7 @@ public class PessoaController implements PessoaControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid PessoaUpdateDTO dto) {
 
-        Pessoa atualizada = useCase.update(id, dto.toDomain());
+        Pessoa atualizada = inputPort.update(id, dto.toDomain());
 
         return ResponseEntity.ok(PessoaResponseDTO.from(atualizada));
     }
@@ -93,7 +93,7 @@ public class PessoaController implements PessoaControllerDoc {
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        useCase.delete(id);
+        inputPort.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

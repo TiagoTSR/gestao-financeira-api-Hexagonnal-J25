@@ -25,7 +25,7 @@ import com.decodex.br.config.security.TokenService;
 import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.model.Usuario;
-import com.decodex.br.domain.port.in.RefreshTokenUseCase;
+import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +43,7 @@ class AuthControllerTest {
     private TokenService tokenService;
 
     @Mock
-    private RefreshTokenUseCase refreshTokenUseCase;
+    private RefreshTokenInputPort refreshTokenInputPort;
 
     @Mock
     private UserDetailsService userDetailsService;
@@ -71,7 +71,7 @@ class AuthControllerTest {
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("mocked-jwt-token");
-        when(refreshTokenUseCase.create("admin")).thenReturn(refreshToken);
+        when(refreshTokenInputPort.create("admin")).thenReturn(refreshToken);
 
         ResponseEntity<TokenResponseDTO> responseEntity = authController.login(loginRequest, response);
 
@@ -95,10 +95,10 @@ class AuthControllerTest {
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        when(refreshTokenUseCase.verifyAndGet("valid-refresh-token")).thenReturn(oldRefreshToken);
+        when(refreshTokenInputPort.verifyAndGet("valid-refresh-token")).thenReturn(oldRefreshToken);
         when(userDetailsService.loadUserByUsername("admin")).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("new-access-token");
-        when(refreshTokenUseCase.create("admin")).thenReturn(newRefreshToken);
+        when(refreshTokenInputPort.create("admin")).thenReturn(newRefreshToken);
 
         ResponseEntity<TokenResponseDTO> responseEntity = authController.refresh(request, response);
 
@@ -127,7 +127,7 @@ class AuthControllerTest {
         ResponseEntity<Void> responseEntity = authController.logout(request, response);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(refreshTokenUseCase).deleteByToken("some-refresh-token");
+        verify(refreshTokenInputPort).deleteByToken("some-refresh-token");
         verify(response, times(2)).addHeader(eq(org.springframework.http.HttpHeaders.SET_COOKIE), anyString());
     }
 }

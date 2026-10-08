@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.decodex.br.adapters.in.web.CategoriaController;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -29,7 +29,7 @@ class GlobalExceptionHandlerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CategoriaUseCase categoriaUseCase;
+    private CategoriaInputPort categoriaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
@@ -43,7 +43,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 404 e ErrorResponse quando lançar ResourceNotFoundException")
     void handleResourceNotFound() throws Exception {
-        when(categoriaUseCase.findById(1L))
+        when(categoriaInputPort.findById(1L))
             .thenThrow(new ResourceNotFoundException("Recurso não encontrado no sistema"));
 
         mockMvc.perform(get("/categorias/1"))
@@ -58,7 +58,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 400 e ErrorResponse quando lançar RegraDeNegocioException")
     void handleRegraDeNegocio() throws Exception {
-        when(categoriaUseCase.findById(10L))
+        when(categoriaInputPort.findById(10L))
             .thenThrow(new com.decodex.br.domain.exception.RegraDeNegocioException("Já existe uma categoria cadastrada com o nome: Lazer"));
 
         mockMvc.perform(get("/categorias/10"))
@@ -72,7 +72,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 400 e mensagem amigável quando lançar DataIntegrityViolationException")
     void handleDataIntegrityViolation() throws Exception {
-        when(categoriaUseCase.findById(11L))
+        when(categoriaInputPort.findById(11L))
             .thenThrow(new org.springframework.dao.DataIntegrityViolationException("Unique constraint: uk_categoria_nome violated"));
 
         mockMvc.perform(get("/categorias/11"))
@@ -86,7 +86,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 404 sem corpo quando lançar JPA EntityNotFoundException")
     void handleEntityNotFound() throws Exception {
-        when(categoriaUseCase.findById(2L))
+        when(categoriaInputPort.findById(2L))
             .thenThrow(new EntityNotFoundException("Erro do JPA"));
 
         mockMvc.perform(get("/categorias/2"))
@@ -97,7 +97,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 400 e ErrorResponse quando lançar IllegalArgumentException")
     void handleIllegalArgument() throws Exception {
-        when(categoriaUseCase.findById(3L))
+        when(categoriaInputPort.findById(3L))
             .thenThrow(new IllegalArgumentException("Parâmetro inválido fornecido"));
 
         mockMvc.perform(get("/categorias/3"))
@@ -139,7 +139,7 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Deve retornar 500 genérico para exceções não mapeadas (Exception.class)")
     void handleGenericException() throws Exception {
-        when(categoriaUseCase.findById(4L))
+        when(categoriaInputPort.findById(4L))
             .thenThrow(new NullPointerException("Nulo inesperado"));
 
         mockMvc.perform(get("/categorias/4"))

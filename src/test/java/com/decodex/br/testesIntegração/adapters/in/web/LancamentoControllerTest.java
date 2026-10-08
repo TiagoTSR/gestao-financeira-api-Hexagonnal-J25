@@ -35,9 +35,9 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
-import com.decodex.br.domain.port.in.LancamentoUseCase;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -55,13 +55,13 @@ class LancamentoControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private LancamentoUseCase lancamentoUseCase;
+    private LancamentoInputPort lancamentoInputPort;
 
     @MockitoBean
-    private CategoriaUseCase categoriaUseCase;
+    private CategoriaInputPort categoriaInputPort;
 
     @MockitoBean
-    private PessoaUseCase pessoaUseCase;
+    private PessoaInputPort pessoaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
@@ -100,9 +100,9 @@ class LancamentoControllerTest {
             "Referente a maio", TipoLancamento.RECEITA, categoria, pessoa
         );
 
-        when(categoriaUseCase.findById(1L)).thenReturn(categoria);
-        when(pessoaUseCase.findById(1L)).thenReturn(pessoa);
-        when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoSalvo);
+        when(categoriaInputPort.findById(1L)).thenReturn(categoria);
+        when(pessoaInputPort.findById(1L)).thenReturn(pessoa);
+        when(lancamentoInputPort.create(any(Lancamento.class))).thenReturn(lancamentoSalvo);
 
         mockMvc.perform(post("/lancamentos")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +135,7 @@ class LancamentoControllerTest {
             null, TipoLancamento.DESPESA, categoriaFake(1L, "Lazer"), pessoaFake(1L, "Maria")
         );
 
-        when(lancamentoUseCase.findById(1L)).thenReturn(lancamento);
+        when(lancamentoInputPort.findById(1L)).thenReturn(lancamento);
 
         mockMvc.perform(get("/lancamentos/{id}", 1L))
             .andExpect(status().isOk())
@@ -154,7 +154,7 @@ class LancamentoControllerTest {
                 List.of(lancamento), 0, 10, 1L, 1
             );
 
-            when(lancamentoUseCase.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+            when(lancamentoInputPort.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
                 .thenReturn(pageResult);
 
             mockMvc.perform(get("/lancamentos")
@@ -181,9 +181,9 @@ class LancamentoControllerTest {
             null, TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        when(categoriaUseCase.findById(2L)).thenReturn(categoria);
-        when(pessoaUseCase.findById(2L)).thenReturn(pessoa);
-        when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoAtualizado);
+        when(categoriaInputPort.findById(2L)).thenReturn(categoria);
+        when(pessoaInputPort.findById(2L)).thenReturn(pessoa);
+        when(lancamentoInputPort.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoAtualizado);
 
         mockMvc.perform(put("/lancamentos/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +195,7 @@ class LancamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 204 No Content ao deletar lançamento")
     void delete_DeveRetornar204() throws Exception {
-        doNothing().when(lancamentoUseCase).delete(1L);
+        doNothing().when(lancamentoInputPort).delete(1L);
         mockMvc.perform(delete("/lancamentos/{id}", 1L))
             .andExpect(status().isNoContent());
     }

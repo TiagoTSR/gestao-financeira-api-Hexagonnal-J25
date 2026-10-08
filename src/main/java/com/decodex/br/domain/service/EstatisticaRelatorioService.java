@@ -1,14 +1,14 @@
 package com.decodex.br.domain.service;
 
 import com.decodex.br.domain.model.LancamentoEstatisticaPessoa;
-import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaUseCase;
+import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
 import com.decodex.br.domain.port.out.LancamentoEstatisticaPort;
 import com.decodex.br.domain.port.out.RelatorioPdfPort;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class EstatisticaRelatorioService implements GerarRelatorioEstatisticaUseCase {
+public class EstatisticaRelatorioService implements GerarRelatorioEstatisticaInputPort {
 
     private final LancamentoEstatisticaPort estatisticaPort;
     private final RelatorioPdfPort relatorioPdfPort;

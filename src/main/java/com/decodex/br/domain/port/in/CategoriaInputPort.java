@@ -5,9 +5,9 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
-public interface CategoriaUseCase {
+public interface CategoriaInputPort {
 	
-	PageResult<Categoria> findAll(CategoriaFilter filter,PageRequest pageRequest);
+	PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest);
 
     Categoria findById(Long id);
 

@@ -38,16 +38,16 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
-import com.decodex.br.domain.port.in.LancamentoUseCase;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 
 @ExtendWith(MockitoExtension.class)
 class LancamentoControllerUnitarioTest {
 
-    @Mock private LancamentoUseCase lancamentoUseCase;
-    @Mock private CategoriaUseCase categoriaUseCase;
-    @Mock private PessoaUseCase pessoaUseCase;
+    @Mock private LancamentoInputPort lancamentoInputPort;
+    @Mock private CategoriaInputPort categoriaInputPort;
+    @Mock private PessoaInputPort pessoaInputPort;
     @Spy private LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     @InjectMocks private LancamentoController controller;
@@ -77,7 +77,7 @@ class LancamentoControllerUnitarioTest {
         PageResult<Lancamento> pageResult = new PageResult<>(
             List.of(lancamentoFake()), 0, 10, 1L, 1
         );
-        when(lancamentoUseCase.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+        when(lancamentoInputPort.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         LancamentoFilter filter = new LancamentoFilter();
@@ -95,7 +95,7 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar lançamento por ID com status 200")
     void findById_deveRetornar200() {
-        when(lancamentoUseCase.findById(1L)).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.findById(1L)).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.findById(1L);
 
@@ -109,9 +109,9 @@ class LancamentoControllerUnitarioTest {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
-        when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
-        when(lancamentoUseCase.create(any(Lancamento.class))).thenReturn(lancamentoFake());
+        when(categoriaInputPort.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
+        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
+        when(lancamentoInputPort.create(any(Lancamento.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.create(dto);
 
@@ -125,9 +125,9 @@ class LancamentoControllerUnitarioTest {
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
-        when(categoriaUseCase.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
-        when(lancamentoUseCase.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
+        when(categoriaInputPort.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
+        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
+        when(lancamentoInputPort.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.update(1L, dto);
 
@@ -137,7 +137,7 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar lançamento e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(lancamentoUseCase).delete(1L);
+        doNothing().when(lancamentoInputPort).delete(1L);
         ResponseEntity<Void> response = controller.delete(1L);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }

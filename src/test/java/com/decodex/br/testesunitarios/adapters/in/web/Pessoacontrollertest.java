@@ -31,13 +31,13 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 
 @ExtendWith(MockitoExtension.class)
 class PessoaControllerUnitarioTest {
 
     @Mock
-    private PessoaUseCase pessoaUseCase;
+    private PessoaInputPort pessoaInputPort;
 
     @InjectMocks
     private PessoaController controller;
@@ -59,7 +59,7 @@ class PessoaControllerUnitarioTest {
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoaFake()), 0, 10, 1L, 1
         );
-        when(pessoaUseCase.findAll(any(PessoaFilter.class), any(PageRequest.class)))
+        when(pessoaInputPort.findAll(any(PessoaFilter.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         PessoaFilter filter = new PessoaFilter();
@@ -77,7 +77,7 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar pessoa por ID com status 200")
     void findById_deveRetornar200() {
-        when(pessoaUseCase.findById(1L)).thenReturn(pessoaFake());
+        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
 
         ResponseEntity<PessoaResponseDTO> response = controller.findById(1L);
 
@@ -91,7 +91,7 @@ class PessoaControllerUnitarioTest {
         PessoaCreateDTO dto = new PessoaCreateDTO(
             "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
         );
-        when(pessoaUseCase.create(any(Pessoa.class))).thenReturn(pessoaFake());
+        when(pessoaInputPort.create(any(Pessoa.class))).thenReturn(pessoaFake());
 
         ResponseEntity<PessoaResponseDTO> response = controller.create(dto);
 
@@ -105,7 +105,7 @@ class PessoaControllerUnitarioTest {
         PessoaUpdateDTO dto = new PessoaUpdateDTO(
             "João", "Rua X", "123", null, "Bairro Y", "00000", "Cidade", "SP", true
         );
-        when(pessoaUseCase.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaFake());
+        when(pessoaInputPort.update(eq(1L), any(Pessoa.class))).thenReturn(pessoaFake());
 
         ResponseEntity<PessoaResponseDTO> response = controller.update(1L, dto);
 
@@ -115,7 +115,7 @@ class PessoaControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar pessoa e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(pessoaUseCase).delete(1L);
+        doNothing().when(pessoaInputPort).delete(1L);
 
         ResponseEntity<Void> response = controller.delete(1L);
 

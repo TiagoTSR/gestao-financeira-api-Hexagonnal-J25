@@ -5,9 +5,9 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
-public interface LancamentoUseCase {
+public interface LancamentoInputPort {
 	
-	PageResult<Lancamento> findAll(LancamentoFilter filter,PageRequest pageRequest);
+	PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest pageRequest);
 
     Lancamento findById(Long id);
 

@@ -24,9 +24,9 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
-import com.decodex.br.domain.port.in.LancamentoUseCase;
-import com.decodex.br.domain.port.in.PessoaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.adapters.in.web.documentation.LancamentoControllerDoc;
 
 import jakarta.validation.Valid;
@@ -35,19 +35,19 @@ import jakarta.validation.Valid;
 @RequestMapping("/lancamentos")
 public class LancamentoController implements LancamentoControllerDoc {
 
-    private final LancamentoUseCase lancamentoUseCase;
-    private final CategoriaUseCase categoriaUseCase;
-    private final PessoaUseCase pessoaUseCase;
+    private final LancamentoInputPort lancamentoInputPort;
+    private final CategoriaInputPort categoriaInputPort;
+    private final PessoaInputPort pessoaInputPort;
     private final LancamentoDTOMapper mapper;
 
     public LancamentoController(
-            LancamentoUseCase lancamentoUseCase,
-            CategoriaUseCase categoriaUseCase,
-            PessoaUseCase pessoaUseCase,
+            LancamentoInputPort lancamentoInputPort,
+            CategoriaInputPort categoriaInputPort,
+            PessoaInputPort pessoaInputPort,
             LancamentoDTOMapper mapper) {
-        this.lancamentoUseCase = lancamentoUseCase;
-        this.categoriaUseCase = categoriaUseCase;
-        this.pessoaUseCase = pessoaUseCase;
+        this.lancamentoInputPort = lancamentoInputPort;
+        this.categoriaInputPort = categoriaInputPort;
+        this.pessoaInputPort = pessoaInputPort;
         this.mapper = mapper;
     }
 
@@ -61,7 +61,7 @@ public class LancamentoController implements LancamentoControllerDoc {
             @RequestParam(required = false) String direction) {
 
         PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
-        return ResponseEntity.ok(lancamentoUseCase.findAll(filter, pageRequest)
+        return ResponseEntity.ok(lancamentoInputPort.findAll(filter, pageRequest)
                 .map(mapper::toDTO));
     }
 
@@ -76,17 +76,17 @@ public class LancamentoController implements LancamentoControllerDoc {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<LancamentoResponseDTO> findById(@PathVariable Long id) {
-        Lancamento lancamento = lancamentoUseCase.findById(id);
+        Lancamento lancamento = lancamentoInputPort.findById(id);
         return ResponseEntity.ok(mapper.toDTO(lancamento));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoCreateDTO dto) {
-        Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
-        Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());
+        Categoria categoria = categoriaInputPort.findById(dto.categoriaId());
+        Pessoa pessoa = pessoaInputPort.findById(dto.pessoaId());
 
-        Lancamento lancamento = lancamentoUseCase.create(
+        Lancamento lancamento = lancamentoInputPort.create(
             mapper.toDomain(dto, categoria, pessoa)
         );
 
@@ -105,11 +105,11 @@ public class LancamentoController implements LancamentoControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid LancamentoUpdateDTO dto) {
 
-        Categoria categoria = categoriaUseCase.findById(dto.categoriaId());
-        Pessoa pessoa = pessoaUseCase.findById(dto.pessoaId());
+        Categoria categoria = categoriaInputPort.findById(dto.categoriaId());
+        Pessoa pessoa = pessoaInputPort.findById(dto.pessoaId());
 
         Lancamento novosDados = mapper.toDomain(dto, categoria, pessoa);
-        Lancamento atualizado = lancamentoUseCase.update(id, novosDados);
+        Lancamento atualizado = lancamentoInputPort.update(id, novosDados);
 
         return ResponseEntity.ok(mapper.toDTO(atualizado));
     }
@@ -117,7 +117,7 @@ public class LancamentoController implements LancamentoControllerDoc {
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        lancamentoUseCase.delete(id);
+        lancamentoInputPort.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,5 +1,6 @@
 package com.decodex.br.config;
 
+import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
 import com.decodex.br.domain.port.out.LancamentoEstatisticaPort;
 import com.decodex.br.domain.port.out.RelatorioPdfPort;
 import com.decodex.br.domain.service.EstatisticaRelatorioService;
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class RelatorioConfig {
 
     @Bean
-    public EstatisticaRelatorioService estatisticaRelatorioService(
+    public GerarRelatorioEstatisticaInputPort gerarRelatorioEstatisticaInputPort(
             LancamentoEstatisticaPort estatisticaPort,
             RelatorioPdfPort relatorioPdfPort) {
 

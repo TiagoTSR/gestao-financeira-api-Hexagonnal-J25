@@ -5,11 +5,11 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 
 
-public class CategoriaService implements CategoriaUseCase {
+public class CategoriaService implements CategoriaInputPort {
 
 	private final CategoriaRepositoryPort repository;
 

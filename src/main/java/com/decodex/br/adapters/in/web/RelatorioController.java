@@ -1,6 +1,6 @@
 package com.decodex.br.adapters.in.web;
 
-import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaUseCase;
+import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,10 +19,10 @@ import com.decodex.br.adapters.in.web.documentation.RelatorioControllerDoc;
 @CrossOrigin("http://localhost:4200")
 public class RelatorioController implements RelatorioControllerDoc {
 
-    private final GerarRelatorioEstatisticaUseCase gerarRelatorioUseCase;
+    private final GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort;
 
-    public RelatorioController(GerarRelatorioEstatisticaUseCase gerarRelatorioUseCase) {
-        this.gerarRelatorioUseCase = gerarRelatorioUseCase;
+    public RelatorioController(GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort) {
+        this.gerarRelatorioInputPort = gerarRelatorioInputPort;
     }
 
     @GetMapping("/lancamentos-por-pessoa")
@@ -30,7 +30,7 @@ public class RelatorioController implements RelatorioControllerDoc {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
 
-        byte[] relatorio = gerarRelatorioUseCase.executarPorPessoa(inicio, fim);
+        byte[] relatorio = gerarRelatorioInputPort.executarPorPessoa(inicio, fim);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)

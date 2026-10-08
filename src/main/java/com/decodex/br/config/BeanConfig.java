@@ -3,10 +3,10 @@ package com.decodex.br.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.decodex.br.domain.port.in.CategoriaUseCase;
-import com.decodex.br.domain.port.in.LancamentoUseCase;
-import com.decodex.br.domain.port.in.PessoaUseCase;
-import com.decodex.br.domain.port.in.RefreshTokenUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.domain.port.in.PessoaInputPort;
+import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
@@ -18,22 +18,22 @@ import com.decodex.br.domain.service.PessoaService;
 public class BeanConfig {
 
     @Bean
-    public CategoriaUseCase categoriaUseCase(CategoriaRepositoryPort categoriaRepositoryPort) {
+    public CategoriaInputPort categoriaInputPort(CategoriaRepositoryPort categoriaRepositoryPort) {
         return new CategoriaService(categoriaRepositoryPort);
     }
 
     @Bean
-    public PessoaUseCase pessoaUseCase(PessoaRepositoryPort pessoaRepositoryPort) {
+    public PessoaInputPort pessoaInputPort(PessoaRepositoryPort pessoaRepositoryPort) {
         return new PessoaService(pessoaRepositoryPort);
     }
 
     @Bean
-    public LancamentoUseCase lancamentoUseCase(LancamentoRepositoryPort lancamentoRepositoryPort) {
+    public LancamentoInputPort lancamentoInputPort(LancamentoRepositoryPort lancamentoRepositoryPort) {
         return new LancamentoService(lancamentoRepositoryPort);
     }
 
     @Bean
-    public RefreshTokenUseCase refreshTokenUseCase(
+    public RefreshTokenInputPort refreshTokenInputPort(
             com.decodex.br.domain.port.out.RefreshTokenRepositoryPort refreshTokenRepositoryPort,
             com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort) {
         return new com.decodex.br.domain.service.RefreshTokenService(refreshTokenRepositoryPort, usuarioRepositoryPort);

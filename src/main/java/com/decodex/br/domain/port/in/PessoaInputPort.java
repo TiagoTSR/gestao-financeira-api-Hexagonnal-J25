@@ -5,9 +5,9 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
-public interface PessoaUseCase {
+public interface PessoaInputPort {
 	
-	PageResult<Pessoa> findAll(PessoaFilter filter,PageRequest pageRequest);
+	PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest pageRequest);
 
     Pessoa findById(Long id);
 

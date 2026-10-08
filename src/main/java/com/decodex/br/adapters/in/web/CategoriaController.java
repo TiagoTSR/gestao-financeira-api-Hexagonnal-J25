@@ -21,7 +21,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.adapters.in.web.documentation.CategoriaControllerDoc;
 
 import jakarta.validation.Valid;
@@ -30,10 +30,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/categorias")
 public class CategoriaController implements CategoriaControllerDoc {
 
-    private final CategoriaUseCase useCase;
+    private final CategoriaInputPort inputPort;
 
-    public CategoriaController(CategoriaUseCase useCase) {
-        this.useCase = useCase;
+    public CategoriaController(CategoriaInputPort inputPort) {
+        this.inputPort = inputPort;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CategoriaController implements CategoriaControllerDoc {
             @RequestParam(required = false) String direction) {
 
         PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
-        return ResponseEntity.ok(useCase.findAll(filter, pageRequest)
+        return ResponseEntity.ok(inputPort.findAll(filter, pageRequest)
                 .map(CategoriaResponseDTO::from));
     }
 
@@ -61,14 +61,14 @@ public class CategoriaController implements CategoriaControllerDoc {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDTO> findById(@PathVariable Long id) {
-        Categoria categoria = useCase.findById(id);
+        Categoria categoria = inputPort.findById(id);
         return ResponseEntity.ok(CategoriaResponseDTO.from(categoria));
     }
 
     @Override
     @PostMapping
     public ResponseEntity<CategoriaResponseDTO> create(@RequestBody @Valid CategoriaCreateDTO dto) {
-        Categoria categoria = useCase.create(dto.toDomain());
+        Categoria categoria = inputPort.create(dto.toDomain());
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -85,7 +85,7 @@ public class CategoriaController implements CategoriaControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid CategoriaUpdateDTO dto) {
 
-        Categoria atualizada = useCase.update(id, dto.toDomain());
+        Categoria atualizada = inputPort.update(id, dto.toDomain());
 
         return ResponseEntity.ok(CategoriaResponseDTO.from(atualizada));
     }
@@ -93,7 +93,7 @@ public class CategoriaController implements CategoriaControllerDoc {
     @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        useCase.delete(id);
+        inputPort.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

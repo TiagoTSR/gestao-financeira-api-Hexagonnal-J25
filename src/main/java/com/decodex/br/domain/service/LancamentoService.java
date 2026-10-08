@@ -5,10 +5,10 @@ import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.LancamentoUseCase;
+import com.decodex.br.domain.port.in.LancamentoInputPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 
-public class LancamentoService implements LancamentoUseCase {
+public class LancamentoService implements LancamentoInputPort {
 	
 	private final LancamentoRepositoryPort repository;
 

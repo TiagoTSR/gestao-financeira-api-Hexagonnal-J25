@@ -34,13 +34,13 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaUseCase;
+import com.decodex.br.domain.port.in.CategoriaInputPort;
 
 @ExtendWith(MockitoExtension.class)
 class CategoriaControllerUnitarioTest {
 
     @Mock
-    private CategoriaUseCase categoriaUseCase;
+    private CategoriaInputPort categoriaInputPort;
 
     @InjectMocks
     private CategoriaController controller;
@@ -58,7 +58,7 @@ class CategoriaControllerUnitarioTest {
             List.of(new Categoria(1L, "Lazer")), 0, 10, 1L, 1
         );
 
-        when(categoriaUseCase.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+        when(categoriaInputPort.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         CategoriaFilter filter = new CategoriaFilter();
@@ -76,7 +76,7 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve retornar categoria por ID com status 200")
     void findById_deveRetornar200() {
-        doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).findById(1L);
+        doReturn(new Categoria(1L, "Lazer")).when(categoriaInputPort).findById(1L);
 
         ResponseEntity<CategoriaResponseDTO> response = controller.findById(1L);
 
@@ -87,7 +87,7 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve repassar exceção quando categoria não for encontrada")
     void findById_deveLancarExcecao() {
-        doThrow(new ResourceNotFoundException("Erro")).when(categoriaUseCase).findById(99L);
+        doThrow(new ResourceNotFoundException("Erro")).when(categoriaInputPort).findById(99L);
 
         assertThrows(ResourceNotFoundException.class, () -> controller.findById(99L));
     }
@@ -96,7 +96,7 @@ class CategoriaControllerUnitarioTest {
     @DisplayName("Deve criar categoria e retornar status 201")
     void create_deveRetornar201() {
         CategoriaCreateDTO dto = new CategoriaCreateDTO("Lazer");
-        doReturn(new Categoria(1L, "Lazer")).when(categoriaUseCase).create(any(Categoria.class));
+        doReturn(new Categoria(1L, "Lazer")).when(categoriaInputPort).create(any(Categoria.class));
 
         ResponseEntity<CategoriaResponseDTO> response = controller.create(dto);
 
@@ -109,7 +109,7 @@ class CategoriaControllerUnitarioTest {
     @DisplayName("Deve atualizar categoria e retornar status 200")
     void update_deveRetornar200() {
         CategoriaUpdateDTO dto = new CategoriaUpdateDTO("Atualizado");
-        doReturn(new Categoria(1L, "Atualizado")).when(categoriaUseCase).update(eq(1L), any(Categoria.class));
+        doReturn(new Categoria(1L, "Atualizado")).when(categoriaInputPort).update(eq(1L), any(Categoria.class));
 
         ResponseEntity<CategoriaResponseDTO> response = controller.update(1L, dto);
 
@@ -120,7 +120,7 @@ class CategoriaControllerUnitarioTest {
     @Test
     @DisplayName("Deve deletar categoria e retornar status 204")
     void delete_deveRetornar204() {
-        doNothing().when(categoriaUseCase).delete(1L);
+        doNothing().when(categoriaInputPort).delete(1L);
 
         ResponseEntity<Void> response = controller.delete(1L);
 
