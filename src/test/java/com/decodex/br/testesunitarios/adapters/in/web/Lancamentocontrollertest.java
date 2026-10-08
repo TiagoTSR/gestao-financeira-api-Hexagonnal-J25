@@ -38,16 +38,12 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.in.LancamentoInputPort;
-import com.decodex.br.domain.port.in.PessoaInputPort;
 
 @ExtendWith(MockitoExtension.class)
 class LancamentoControllerUnitarioTest {
 
     @Mock private LancamentoInputPort lancamentoInputPort;
-    @Mock private CategoriaInputPort categoriaInputPort;
-    @Mock private PessoaInputPort pessoaInputPort;
     @Spy private LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     @InjectMocks private LancamentoController controller;
@@ -109,9 +105,7 @@ class LancamentoControllerUnitarioTest {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
-        when(categoriaInputPort.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
-        when(lancamentoInputPort.create(any(Lancamento.class))).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.create(any(LancamentoCreateDTO.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.create(dto);
 
@@ -125,9 +119,7 @@ class LancamentoControllerUnitarioTest {
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, 1L, 1L
         );
-        when(categoriaInputPort.findById(1L)).thenReturn(new Categoria(1L, "Renda"));
-        when(pessoaInputPort.findById(1L)).thenReturn(pessoaFake());
-        when(lancamentoInputPort.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.update(eq(1L), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.update(1L, dto);
 

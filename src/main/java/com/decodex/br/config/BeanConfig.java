@@ -28,8 +28,11 @@ public class BeanConfig {
     }
 
     @Bean
-    public LancamentoInputPort lancamentoInputPort(LancamentoRepositoryPort lancamentoRepositoryPort) {
-        return new LancamentoService(lancamentoRepositoryPort);
+    public LancamentoInputPort lancamentoInputPort(
+            LancamentoRepositoryPort lancamentoRepositoryPort,
+            CategoriaRepositoryPort categoriaRepositoryPort,
+            PessoaRepositoryPort pessoaRepositoryPort) {
+        return new LancamentoService(lancamentoRepositoryPort, categoriaRepositoryPort, pessoaRepositoryPort);
     }
 
     @Bean

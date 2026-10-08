@@ -32,7 +32,12 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
+import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
+import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
+import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.domain.service.LancamentoService;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +46,12 @@ class LancamentoServiceTest {
 
     @Mock
     private LancamentoRepositoryPort repository;
+
+    @Mock
+    private CategoriaRepositoryPort categoriaRepository;
+
+    @Mock
+    private PessoaRepositoryPort pessoaRepository;
 
     @InjectMocks
     private LancamentoService service;
@@ -168,5 +179,107 @@ class LancamentoServiceTest {
 
         verify(repository, times(1)).findById(99L);
         verify(repository, never()).deleteById(any());
+    }
+
+    @Test
+    @DisplayName("Deve criar lançamento a partir de DTO buscando categoria e pessoa")
+    void create_WithDTO_ShouldFindDependenciesAndSave() {
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
+            null, TipoLancamento.RECEITA, 1L, 2L
+        );
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(pessoa));
+        when(repository.save(any(Lancamento.class))).thenReturn(lancamento);
+
+        Lancamento result = service.create(dto);
+
+        assertThat(result).isNotNull();
+        verify(categoriaRepository).findById(1L);
+        verify(pessoaRepository).findById(2L);
+        verify(repository).save(any(Lancamento.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao criar com DTO quando categoria não for encontrada")
+    void create_WithDTO_WhenCategoriaNotFound_ShouldThrowException() {
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
+            null, TipoLancamento.RECEITA, 99L, 2L
+        );
+        when(categoriaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Categoria não encontrada: 99");
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao criar com DTO quando pessoa não for encontrada")
+    void create_WithDTO_WhenPessoaNotFound_ShouldThrowException() {
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
+            null, TipoLancamento.RECEITA, 1L, 99L
+        );
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Pessoa não encontrada: 99");
+    }
+
+    @Test
+    @DisplayName("Deve lançar RegraDeNegocioException ao criar com DTO para pessoa inativa")
+    void create_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
+        Pessoa inativa = new Pessoa(2L, "Inativa", pessoa.getEndereco(), false);
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
+            null, TipoLancamento.RECEITA, 1L, 2L
+        );
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(inativa));
+
+        assertThatThrownBy(() -> service.create(dto))
+                .isInstanceOf(RegraDeNegocioException.class)
+                .hasMessage("Não é possível salvar lançamento para pessoa inativa.");
+    }
+
+    @Test
+    @DisplayName("Deve atualizar lançamento a partir de DTO buscando categoria e pessoa")
+    void update_WithDTO_ShouldFindDependenciesAndUpdate() {
+        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+            "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
+            "Com pipoca", TipoLancamento.DESPESA, 1L, 2L
+        );
+        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(pessoa));
+        when(repository.save(any(Lancamento.class))).thenReturn(lancamento);
+
+        Lancamento result = service.update(10L, dto);
+
+        assertThat(result).isNotNull();
+        verify(repository).findById(10L);
+        verify(categoriaRepository).findById(1L);
+        verify(pessoaRepository).findById(2L);
+        verify(repository).save(lancamento);
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao atualizar com DTO quando pessoa for inativa")
+    void update_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
+        Pessoa inativa = new Pessoa(2L, "Inativa", pessoa.getEndereco(), false);
+        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+            "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
+            "Com pipoca", TipoLancamento.DESPESA, 1L, 2L
+        );
+        when(repository.findById(10L)).thenReturn(Optional.of(lancamento));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(2L)).thenReturn(Optional.of(inativa));
+
+        assertThatThrownBy(() -> service.update(10L, dto))
+                .isInstanceOf(RegraDeNegocioException.class)
+                .hasMessage("Não é possível salvar lançamento para pessoa inativa.");
     }
 }

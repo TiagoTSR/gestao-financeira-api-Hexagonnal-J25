@@ -19,14 +19,10 @@ import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.application.mapper.LancamentoDTOMapper;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
-import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
-import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.in.LancamentoInputPort;
-import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.adapters.in.web.documentation.LancamentoControllerDoc;
 
 import jakarta.validation.Valid;
@@ -36,18 +32,12 @@ import jakarta.validation.Valid;
 public class LancamentoController implements LancamentoControllerDoc {
 
     private final LancamentoInputPort lancamentoInputPort;
-    private final CategoriaInputPort categoriaInputPort;
-    private final PessoaInputPort pessoaInputPort;
     private final LancamentoDTOMapper mapper;
 
     public LancamentoController(
             LancamentoInputPort lancamentoInputPort,
-            CategoriaInputPort categoriaInputPort,
-            PessoaInputPort pessoaInputPort,
             LancamentoDTOMapper mapper) {
         this.lancamentoInputPort = lancamentoInputPort;
-        this.categoriaInputPort = categoriaInputPort;
-        this.pessoaInputPort = pessoaInputPort;
         this.mapper = mapper;
     }
 
@@ -83,12 +73,7 @@ public class LancamentoController implements LancamentoControllerDoc {
     @Override
     @PostMapping
     public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoCreateDTO dto) {
-        Categoria categoria = categoriaInputPort.findById(dto.categoriaId());
-        Pessoa pessoa = pessoaInputPort.findById(dto.pessoaId());
-
-        Lancamento lancamento = lancamentoInputPort.create(
-            mapper.toDomain(dto, categoria, pessoa)
-        );
+        Lancamento lancamento = lancamentoInputPort.create(dto);
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -105,11 +90,7 @@ public class LancamentoController implements LancamentoControllerDoc {
             @PathVariable Long id,
             @RequestBody @Valid LancamentoUpdateDTO dto) {
 
-        Categoria categoria = categoriaInputPort.findById(dto.categoriaId());
-        Pessoa pessoa = pessoaInputPort.findById(dto.pessoaId());
-
-        Lancamento novosDados = mapper.toDomain(dto, categoria, pessoa);
-        Lancamento atualizado = lancamentoInputPort.update(id, novosDados);
+        Lancamento atualizado = lancamentoInputPort.update(id, dto);
 
         return ResponseEntity.ok(mapper.toDTO(atualizado));
     }

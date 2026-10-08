@@ -35,9 +35,7 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.in.LancamentoInputPort;
-import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -56,12 +54,6 @@ class LancamentoControllerTest {
 
     @MockitoBean
     private LancamentoInputPort lancamentoInputPort;
-
-    @MockitoBean
-    private CategoriaInputPort categoriaInputPort;
-
-    @MockitoBean
-    private PessoaInputPort pessoaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
@@ -100,9 +92,7 @@ class LancamentoControllerTest {
             "Referente a maio", TipoLancamento.RECEITA, categoria, pessoa
         );
 
-        when(categoriaInputPort.findById(1L)).thenReturn(categoria);
-        when(pessoaInputPort.findById(1L)).thenReturn(pessoa);
-        when(lancamentoInputPort.create(any(Lancamento.class))).thenReturn(lancamentoSalvo);
+        when(lancamentoInputPort.create(any(LancamentoCreateDTO.class))).thenReturn(lancamentoSalvo);
 
         mockMvc.perform(post("/lancamentos")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -181,9 +171,7 @@ class LancamentoControllerTest {
             null, TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        when(categoriaInputPort.findById(2L)).thenReturn(categoria);
-        when(pessoaInputPort.findById(2L)).thenReturn(pessoa);
-        when(lancamentoInputPort.update(eq(1L), any(Lancamento.class))).thenReturn(lancamentoAtualizado);
+        when(lancamentoInputPort.update(eq(1L), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoAtualizado);
 
         mockMvc.perform(put("/lancamentos/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
