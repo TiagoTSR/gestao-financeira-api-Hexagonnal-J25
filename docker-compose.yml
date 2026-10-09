@@ -4,24 +4,40 @@ services:
   meu-postgres:
     image: postgres:16-alpine
     container_name: gestao_db
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB_NAME}
-      POSTGRES_USER: ${POSTGRES_USER_LOCAL}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_LOCAL}
+      POSTGRES_DB: ${POSTGRES_DB_NAME:-rest_spring}
+      POSTGRES_USER: ${POSTGRES_USER_LOCAL:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_LOCAL:-T2143Lo67r8}
     ports:
       - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER_LOCAL:-postgres} -d ${POSTGRES_DB_NAME:-rest_spring}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   minha-api-spring:
     image: gestao-financeira-api:latest
     container_name: spring_api
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
     ports:
       - "8081:8080"
     depends_on:
-      - meu-postgres
+      meu-postgres:
+        condition: service_healthy
     env_file:
       - .env
     environment:
-      DB_URL2: jdbc:postgresql://meu-postgres:5432/${POSTGRES_DB_NAME}
-      DB_USER1: ${POSTGRES_USER_LOCAL}
-      DB_PASSWORD1: ${POSTGRES_PASSWORD_LOCAL}
+      DB_URL2: jdbc:postgresql://meu-postgres:5432/${POSTGRES_DB_NAME:-rest_spring}
+      DB_USER1: ${POSTGRES_USER_LOCAL:-postgres}
+      DB_PASSWORD1: ${POSTGRES_PASSWORD_LOCAL:-T2143Lo67r8}
+
+volumes:
+  postgres_data:
+    name: gestao_financeira_postgres_data

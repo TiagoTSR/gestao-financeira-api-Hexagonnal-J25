@@ -105,32 +105,30 @@ src/
 
 ## Como Executar
 
-### 1. Clone o repositório
+> 💡 **Guia Detalhado do Docker:** Para um passo a passo completo, comandos úteis e soluções de problemas, consulte o [GUIA_DOCKER.md](file:///c:/Programas%20Baixados/gestao-financeira-api-Hexagonnal-J25/GUIA_DOCKER.md).
 
+### 1. Inicie o PostgreSQL no Docker
 ```bash
-git clone https://github.com/TiagoTSR/gestao-financeira-api-Hexagonnal-J25.git
-cd gestao-financeira-api-Hexagonnal-J25
+docker compose up -d meu-postgres
 ```
+*(Ou dê um duplo clique no arquivo `docker-start-db.bat` no Windows)*
 
-### 2. Configure o banco de dados
-
-Crie um banco PostgreSQL e configure as credenciais em `src/main/resources/application.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/gestao_financeira
-spring.datasource.username=seu_usuario
-spring.datasource.password=sua_senha
-```
-
-### 3. Execute a aplicação
+### 2. Execute a aplicação
 
 ```bash
 ./mvnw spring-boot:run
 ```
+*(Ou execute a classe `GestaoFinanceiraApiHexagonalJ25Application` na sua IDE)*
 
-A API estará disponível em `http://localhost:8080`.
+A API estará disponível em `http://localhost:8080` (Swagger: `http://localhost:8080/swagger-ui.html`).
 
 > As migrations do Flyway serão executadas automaticamente ao iniciar a aplicação.
+
+### 3. (Opcional) Executar tudo no Docker (API + Banco)
+```bash
+docker compose up -d --build
+```
+A API estará disponível em `http://localhost:8081`.
 
 ---
 
