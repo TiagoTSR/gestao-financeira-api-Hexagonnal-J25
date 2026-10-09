@@ -82,6 +82,14 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<Lancamento> findAll() {
+        return repository.findAll().stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void deleteById(java.util.UUID id) {
         repository.deleteById(id);

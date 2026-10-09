@@ -15,6 +15,8 @@ public interface LancamentoRepositoryPort {
     Optional<Lancamento> findById(UUID id);
 
     PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest pageRequest);
+
+    java.util.List<Lancamento> findAll();
     
     void deleteById(UUID id);
 
