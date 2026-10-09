@@ -25,4 +25,9 @@ public interface LancamentoInputPort {
 
     void delete(UUID id);
 
+    Lancamento quitar(UUID id, com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO);
+
+    Lancamento cancelar(UUID id);
+
+    Lancamento reabrir(UUID id);
 }

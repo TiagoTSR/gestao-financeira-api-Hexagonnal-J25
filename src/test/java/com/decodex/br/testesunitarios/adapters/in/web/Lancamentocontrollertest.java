@@ -138,4 +138,39 @@ class LancamentoControllerUnitarioTest {
         ResponseEntity<Void> response = controller.delete(lancamentoId);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
+    @Test
+    @DisplayName("Deve quitar lançamento e retornar status 200")
+    void quitar_deveRetornar200() {
+        com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO =
+            new com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO(LocalDate.now(), BigDecimal.TEN);
+        when(lancamentoInputPort.quitar(eq(lancamentoId), any())).thenReturn(lancamentoFake());
+
+        ResponseEntity<LancamentoResponseDTO> response = controller.quitar(lancamentoId, baixaDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    @DisplayName("Deve cancelar lançamento e retornar status 200")
+    void cancelar_deveRetornar200() {
+        when(lancamentoInputPort.cancelar(eq(lancamentoId))).thenReturn(lancamentoFake());
+
+        ResponseEntity<LancamentoResponseDTO> response = controller.cancelar(lancamentoId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    @DisplayName("Deve reabrir lançamento e retornar status 200")
+    void reabrir_deveRetornar200() {
+        when(lancamentoInputPort.reabrir(eq(lancamentoId))).thenReturn(lancamentoFake());
+
+        ResponseEntity<LancamentoResponseDTO> response = controller.reabrir(lancamentoId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
 }

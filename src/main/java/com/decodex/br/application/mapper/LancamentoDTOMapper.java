@@ -38,6 +38,10 @@ public interface LancamentoDTOMapper {
     @Mapping(target = "tipo", source = "dto.tipo")
     @Mapping(target = "categoria", source = "categoria")
     @Mapping(target = "pessoa", source = "pessoa")
+    @Mapping(target = "status", source = "dto.status")
+    @Mapping(target = "valorPago", source = "dto.valorPago")
+    @Mapping(target = "numeroParcela", source = "dto.numeroParcela")
+    @Mapping(target = "totalParcelas", source = "dto.totalParcelas")
     Lancamento toDomainInternal(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa);
 
     @Mapping(target = "id", ignore = true)
@@ -49,6 +53,10 @@ public interface LancamentoDTOMapper {
     @Mapping(target = "tipo", source = "dto.tipo")
     @Mapping(target = "categoria", source = "categoria")
     @Mapping(target = "pessoa", source = "pessoa")
+    @Mapping(target = "status", ignore = true)
+    @Mapping(target = "valorPago", ignore = true)
+    @Mapping(target = "numeroParcela", ignore = true)
+    @Mapping(target = "totalParcelas", ignore = true)
     Lancamento toDomainInternal(LancamentoUpdateDTO dto, Categoria categoria, Pessoa pessoa);
 
     @Mapping(target = "categoria", source = "categoria")

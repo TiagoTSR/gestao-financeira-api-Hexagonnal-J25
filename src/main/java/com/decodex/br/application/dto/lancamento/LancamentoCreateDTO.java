@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.decodex.br.domain.model.StatusLancamento;
 import com.decodex.br.domain.model.TipoLancamento;
 
 import jakarta.validation.constraints.NotBlank;
@@ -35,5 +36,28 @@ public record LancamentoCreateDTO(
 
     @NotNull
     @JsonAlias({"pessoa_id", "pessoaId"})
-    UUID pessoaId
-) {}
+    UUID pessoaId,
+
+    StatusLancamento status,
+
+    @JsonAlias({"valor_pago", "valorPago"})
+    BigDecimal valorPago,
+
+    @JsonAlias({"numero_parcela", "numeroParcela"})
+    Integer numeroParcela,
+
+    @JsonAlias({"total_parcelas", "totalParcelas"})
+    Integer totalParcelas
+) {
+    public LancamentoCreateDTO(
+            String descricao,
+            LocalDate dataVencimento,
+            LocalDate dataPagamento,
+            BigDecimal valor,
+            String observacao,
+            TipoLancamento tipo,
+            UUID categoriaId,
+            UUID pessoaId) {
+        this(descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoriaId, pessoaId, null, null, 1, 1);
+    }
+}

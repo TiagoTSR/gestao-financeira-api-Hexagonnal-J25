@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.decodex.br.domain.model.StatusLancamento;
 import com.decodex.br.domain.model.TipoLancamento;
 
 public class LancamentoFilter {
@@ -16,6 +17,7 @@ public class LancamentoFilter {
     private BigDecimal valor;
     private String observacao;
     private TipoLancamento tipo;
+    private StatusLancamento status;
     private String nomeCategoria;
     private String nomePessoa;
     private UUID categoriaId;
@@ -138,5 +140,13 @@ public class LancamentoFilter {
 
 	public void setPessoa_id(UUID pessoaId) {
 		this.pessoaId = pessoaId;
+	}
+
+	public StatusLancamento getStatus() {
+		return status;
+	}
+
+	public void setStatus(StatusLancamento status) {
+		this.status = status;
 	}
 }

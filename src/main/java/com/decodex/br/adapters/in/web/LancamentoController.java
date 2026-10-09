@@ -119,4 +119,27 @@ public class LancamentoController implements LancamentoControllerDoc {
         lancamentoInputPort.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/quitar")
+    public ResponseEntity<LancamentoResponseDTO> quitar(
+            @PathVariable java.util.UUID id,
+            @RequestBody(required = false) com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO) {
+        Lancamento quitado = lancamentoInputPort.quitar(id, baixaDTO);
+        return ResponseEntity.ok(mapper.toDTO(quitado));
+    }
+
+    @Override
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/cancelar")
+    public ResponseEntity<LancamentoResponseDTO> cancelar(@PathVariable java.util.UUID id) {
+        Lancamento cancelado = lancamentoInputPort.cancelar(id);
+        return ResponseEntity.ok(mapper.toDTO(cancelado));
+    }
+
+    @Override
+    @org.springframework.web.bind.annotation.PatchMapping("/{id}/reabrir")
+    public ResponseEntity<LancamentoResponseDTO> reabrir(@PathVariable java.util.UUID id) {
+        Lancamento reaberto = lancamentoInputPort.reabrir(id);
+        return ResponseEntity.ok(mapper.toDTO(reaberto));
+    }
 }

@@ -33,9 +33,25 @@ public class Lancamento {
 
     private Pessoa pessoa;
 
-    @Default
+    private StatusLancamento status;
+
+    private BigDecimal valorPago;
+
+    private Integer numeroParcela;
+
+    private Integer totalParcelas;
+
     public Lancamento(UUID id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
+        this(id, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa,
+             (dataPagamento != null) ? (tipo == TipoLancamento.RECEITA ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO) : StatusLancamento.PENDENTE,
+             (dataPagamento != null) ? valor : null, 1, 1);
+    }
+
+    @Default
+    public Lancamento(UUID id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
+            String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa, StatusLancamento status,
+            BigDecimal valorPago, Integer numeroParcela, Integer totalParcelas) {
         this.id = id;
         this.descricao = validarDescricao(descricao);
         this.dataVencimento = validarDataVencimento(dataVencimento);
@@ -45,11 +61,21 @@ public class Lancamento {
         this.tipo = validarTipo(tipo);
         this.categoria = validarCategoria(categoria);
         this.pessoa = validarPessoa(pessoa);
+        this.status = status != null ? status : ((dataPagamento != null) ? (tipo == TipoLancamento.RECEITA ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO) : StatusLancamento.PENDENTE);
+        this.valorPago = valorPago;
+        this.numeroParcela = numeroParcela != null ? numeroParcela : 1;
+        this.totalParcelas = totalParcelas != null ? totalParcelas : 1;
     }
 
     public Lancamento(String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
         this(null, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa);
+    }
+
+    public Lancamento(String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
+            String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa, StatusLancamento status,
+            BigDecimal valorPago, Integer numeroParcela, Integer totalParcelas) {
+        this(null, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa, status, valorPago, numeroParcela, totalParcelas);
     }
 
     public void alterarDescricao(String novaDescricao) {
@@ -62,6 +88,15 @@ public class Lancamento {
 
     public void alterarDataPagamento(LocalDate novaDataPagamento) {
         this.dataPagamento = novaDataPagamento;
+        if (novaDataPagamento != null && this.status == StatusLancamento.PENDENTE) {
+            this.status = (this.tipo == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+            if (this.valorPago == null) {
+                this.valorPago = this.valor;
+            }
+        } else if (novaDataPagamento == null && (this.status == StatusLancamento.PAGO || this.status == StatusLancamento.RECEBIDO)) {
+            this.status = StatusLancamento.PENDENTE;
+            this.valorPago = null;
+        }
     }
 
     public void alterarValor(BigDecimal novoValor) {
@@ -84,6 +119,38 @@ public class Lancamento {
         this.pessoa = validarPessoa(novaPessoa);
     }
 
+    public void quitar(LocalDate dataPagamento, BigDecimal valorPago) {
+        this.dataPagamento = dataPagamento != null ? dataPagamento : LocalDate.now();
+        this.valorPago = valorPago != null ? validarValor(valorPago) : this.valor;
+        this.status = (this.tipo == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+    }
+
+    public void cancelar() {
+        this.status = StatusLancamento.CANCELADO;
+    }
+
+    public void reabrir() {
+        this.status = StatusLancamento.PENDENTE;
+        this.dataPagamento = null;
+        this.valorPago = null;
+    }
+
+    public void alterarStatus(StatusLancamento novoStatus) {
+        this.status = novoStatus != null ? novoStatus : StatusLancamento.PENDENTE;
+    }
+
+    public void alterarValorPago(BigDecimal novoValorPago) {
+        this.valorPago = novoValorPago;
+    }
+
+    public void alterarNumeroParcela(Integer novoNumeroParcela) {
+        this.numeroParcela = novoNumeroParcela != null ? novoNumeroParcela : 1;
+    }
+
+    public void alterarTotalParcelas(Integer novoTotalParcelas) {
+        this.totalParcelas = novoTotalParcelas != null ? novoTotalParcelas : 1;
+    }
+
     public void atualizar(String novaDescricao, LocalDate novaDataVencimento, LocalDate novaDataPagamento,
                           BigDecimal novoValor, String novaObservacao, TipoLancamento novoTipo,
                           Categoria novaCategoria, Pessoa novaPessoa) {
@@ -102,6 +169,16 @@ public class Lancamento {
         this.tipo = tipoValidado;
         this.categoria = categoriaValidada;
         this.pessoa = pessoaValidada;
+
+        if (novaDataPagamento != null && this.status == StatusLancamento.PENDENTE) {
+            this.status = (tipoValidado == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+            if (this.valorPago == null) {
+                this.valorPago = valorValidado;
+            }
+        } else if (novaDataPagamento == null && (this.status == StatusLancamento.PAGO || this.status == StatusLancamento.RECEBIDO)) {
+            this.status = StatusLancamento.PENDENTE;
+            this.valorPago = null;
+        }
     }
 
     public void atualizarCampos(Lancamento novosDados) {
@@ -116,6 +193,18 @@ public class Lancamento {
                 novosDados.categoria,
                 novosDados.pessoa
             );
+            if (novosDados.status != null) {
+                this.status = novosDados.status;
+            }
+            if (novosDados.valorPago != null) {
+                this.valorPago = novosDados.valorPago;
+            }
+            if (novosDados.numeroParcela != null) {
+                this.numeroParcela = novosDados.numeroParcela;
+            }
+            if (novosDados.totalParcelas != null) {
+                this.totalParcelas = novosDados.totalParcelas;
+            }
         }
     }
 
@@ -153,6 +242,22 @@ public class Lancamento {
 
     public Pessoa getPessoa() {
         return pessoa;
+    }
+
+    public StatusLancamento getStatus() {
+        return status;
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public Integer getNumeroParcela() {
+        return numeroParcela;
+    }
+
+    public Integer getTotalParcelas() {
+        return totalParcelas;
     }
 
     @Override

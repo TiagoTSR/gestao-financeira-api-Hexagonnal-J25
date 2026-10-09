@@ -71,6 +71,10 @@ public final class LancamentoSpecification {
                 predicates.add(cb.equal(root.get("tipo"), filter.getTipo()));
             }
 
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+            }
+
             if (filter.getCategoriaId() != null) {
                 predicates.add(cb.equal(root.get("categoria").get("id"), filter.getCategoriaId()));
             }

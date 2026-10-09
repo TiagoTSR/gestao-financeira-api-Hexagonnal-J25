@@ -288,4 +288,69 @@ class LancamentoServiceTest {
                 .isInstanceOf(RegraDeNegocioException.class)
                 .hasMessage("Não é possível salvar lançamento para pessoa inativa.");
     }
+
+    @Test
+    @DisplayName("Deve quitar lançamento alterando status e dados de pagamento")
+    void quitar_ShouldUpdateStatusAndSave() {
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        when(repository.save(any(Lancamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO =
+            new com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO(LocalDate.of(2025, 6, 12), new BigDecimal("50.00"));
+
+        Lancamento result = service.quitar(lancamentoId, baixaDTO);
+
+        assertThat(result.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.PAGO);
+        assertThat(result.getDataPagamento()).isEqualTo(LocalDate.of(2025, 6, 12));
+        assertThat(result.getValorPago()).isEqualTo(new BigDecimal("50.00"));
+        verify(repository).save(lancamento);
+    }
+
+    @Test
+    @DisplayName("Deve cancelar lançamento alterando status para CANCELADO")
+    void cancelar_ShouldSetStatusCanceladoAndSave() {
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        when(repository.save(any(Lancamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Lancamento result = service.cancelar(lancamentoId);
+
+        assertThat(result.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.CANCELADO);
+        verify(repository).save(lancamento);
+    }
+
+    @Test
+    @DisplayName("Deve reabrir lançamento alterando status para PENDENTE e limpando pagamento")
+    void reabrir_ShouldSetStatusPendenteAndSave() {
+        lancamento.quitar(LocalDate.of(2025, 6, 11), new BigDecimal("50.00"));
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        when(repository.save(any(Lancamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Lancamento result = service.reabrir(lancamentoId);
+
+        assertThat(result.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.PENDENTE);
+        assertThat(result.getDataPagamento()).isNull();
+        assertThat(result.getValorPago()).isNull();
+        verify(repository).save(lancamento);
+    }
+
+    @Test
+    @DisplayName("Deve gerar múltiplas parcelas ao criar com totalParcelas > 1")
+    void create_WhenTotalParcelasGreaterThanOne_ShouldGenerateInstallments() {
+        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+            "Curso", LocalDate.of(2025, 1, 10), null, new BigDecimal("300.00"),
+            "Parcelado", TipoLancamento.DESPESA, categoriaId, pessoaId,
+            null, null, 1, 3
+        );
+        when(categoriaRepository.findById(categoriaId)).thenReturn(Optional.of(categoria));
+        when(pessoaRepository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
+        when(repository.save(any(Lancamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Lancamento primeiro = service.create(dto);
+
+        assertThat(primeiro).isNotNull();
+        assertThat(primeiro.getDescricao()).isEqualTo("Curso (1/3)");
+        assertThat(primeiro.getNumeroParcela()).isEqualTo(1);
+        assertThat(primeiro.getTotalParcelas()).isEqualTo(3);
+        verify(repository, times(3)).save(any(Lancamento.class));
+    }
 }

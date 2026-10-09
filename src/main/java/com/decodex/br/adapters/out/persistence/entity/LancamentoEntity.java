@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.decodex.br.domain.model.StatusLancamento;
 import com.decodex.br.domain.model.TipoLancamento;
 
 import jakarta.persistence.Column;
@@ -48,6 +49,20 @@ public class LancamentoEntity {
 	@NotNull
     @Enumerated(EnumType.STRING)
     private TipoLancamento tipo;
+
+	@NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private StatusLancamento status = StatusLancamento.PENDENTE;
+
+    @Column(name = "valor_pago", precision = 15, scale = 2)
+    private BigDecimal valorPago;
+
+    @Column(name = "numero_parcela")
+    private Integer numeroParcela;
+
+    @Column(name = "total_parcelas")
+    private Integer totalParcelas;
     
 	@ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
@@ -127,6 +142,38 @@ public class LancamentoEntity {
 
 	public void setPessoa(PessoaEntity pessoa) {
 		this.pessoa = pessoa;
+	}
+
+	public StatusLancamento getStatus() {
+		return status;
+	}
+
+	public void setStatus(StatusLancamento status) {
+		this.status = status;
+	}
+
+	public BigDecimal getValorPago() {
+		return valorPago;
+	}
+
+	public void setValorPago(BigDecimal valorPago) {
+		this.valorPago = valorPago;
+	}
+
+	public Integer getNumeroParcela() {
+		return numeroParcela;
+	}
+
+	public void setNumeroParcela(Integer numeroParcela) {
+		this.numeroParcela = numeroParcela;
+	}
+
+	public Integer getTotalParcelas() {
+		return totalParcelas;
+	}
+
+	public void setTotalParcelas(Integer totalParcelas) {
+		this.totalParcelas = totalParcelas;
 	}
 
 	@Override

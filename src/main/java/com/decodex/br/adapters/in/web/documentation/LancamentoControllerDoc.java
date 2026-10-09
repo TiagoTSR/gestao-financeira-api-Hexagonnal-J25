@@ -63,4 +63,29 @@ public interface LancamentoControllerDoc {
     })
     ResponseEntity<Void> delete(
             @Parameter(description = "ID do lançamento a ser excluído", required = true) UUID id);
+
+    @Operation(summary = "Dar baixa / quitar lançamento", description = "Altera o status do lançamento para PAGO ou RECEBIDO e registra data e valor do pagamento.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lançamento quitado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
+    })
+    ResponseEntity<LancamentoResponseDTO> quitar(
+            @Parameter(description = "ID do lançamento a ser quitado", required = true) UUID id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Dados complementares de quitação") com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO);
+
+    @Operation(summary = "Cancelar lançamento", description = "Altera o status do lançamento para CANCELADO.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lançamento cancelado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
+    })
+    ResponseEntity<LancamentoResponseDTO> cancelar(
+            @Parameter(description = "ID do lançamento a ser cancelado", required = true) UUID id);
+
+    @Operation(summary = "Reabrir lançamento", description = "Reverte o status do lançamento para PENDENTE e limpa dados de pagamento.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lançamento reaberto com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
+    })
+    ResponseEntity<LancamentoResponseDTO> reabrir(
+            @Parameter(description = "ID do lançamento a ser reaberto", required = true) UUID id);
 }

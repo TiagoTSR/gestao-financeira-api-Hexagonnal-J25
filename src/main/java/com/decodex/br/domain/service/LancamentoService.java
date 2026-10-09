@@ -1,5 +1,7 @@
 package com.decodex.br.domain.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
@@ -53,6 +55,41 @@ public class LancamentoService implements LancamentoInputPort {
         Pessoa pessoa = buscarPessoa(dto.pessoaId());
         validarPessoaAtiva(pessoa);
 
+        int total = (dto.totalParcelas() != null && dto.totalParcelas() > 1) ? dto.totalParcelas() : 1;
+        if (total > 1) {
+            BigDecimal valorTotal = dto.valor();
+            BigDecimal parcelaBase = valorTotal.divide(BigDecimal.valueOf(total), 2, java.math.RoundingMode.HALF_EVEN);
+            BigDecimal diferencaCentavos = valorTotal.subtract(parcelaBase.multiply(BigDecimal.valueOf(total)));
+
+            Lancamento primeiroLancamento = null;
+            for (int i = 1; i <= total; i++) {
+                BigDecimal valorDestaParcela = (i == 1) ? parcelaBase.add(diferencaCentavos) : parcelaBase;
+                String descricaoParcela = String.format("%s (%d/%d)", dto.descricao(), i, total);
+                LocalDate vencimentoParcela = dto.dataVencimento().plusMonths(i - 1);
+                LocalDate pagamentoParcela = (i == 1) ? dto.dataPagamento() : null;
+
+                Lancamento parcela = new Lancamento(
+                    descricaoParcela,
+                    vencimentoParcela,
+                    pagamentoParcela,
+                    valorDestaParcela,
+                    dto.observacao(),
+                    dto.tipo(),
+                    categoria,
+                    pessoa,
+                    dto.status(),
+                    pagamentoParcela != null ? valorDestaParcela : null,
+                    i,
+                    total
+                );
+                Lancamento salvo = repository.save(parcela);
+                if (i == 1) {
+                    primeiroLancamento = salvo;
+                }
+            }
+            return primeiroLancamento;
+        }
+
         Lancamento lancamento = new Lancamento(
             dto.descricao(),
             dto.dataVencimento(),
@@ -61,7 +98,11 @@ public class LancamentoService implements LancamentoInputPort {
             dto.observacao(),
             dto.tipo(),
             categoria,
-            pessoa
+            pessoa,
+            dto.status(),
+            dto.valorPago() != null ? dto.valorPago() : (dto.dataPagamento() != null ? dto.valor() : null),
+            dto.numeroParcela() != null ? dto.numeroParcela() : 1,
+            1
         );
         return repository.save(lancamento);
     }
@@ -102,6 +143,29 @@ public class LancamentoService implements LancamentoInputPort {
     public void delete(UUID id) {
         findById(id);
         repository.deleteById(id);
+    }
+
+    @Override
+    public Lancamento quitar(UUID id, com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO) {
+        Lancamento existing = findById(id);
+        java.time.LocalDate dataPag = (baixaDTO != null && baixaDTO.dataPagamento() != null) ? baixaDTO.dataPagamento() : java.time.LocalDate.now();
+        BigDecimal valorPag = (baixaDTO != null && baixaDTO.valorPago() != null) ? baixaDTO.valorPago() : existing.getValor();
+        existing.quitar(dataPag, valorPag);
+        return repository.save(existing);
+    }
+
+    @Override
+    public Lancamento cancelar(UUID id) {
+        Lancamento existing = findById(id);
+        existing.cancelar();
+        return repository.save(existing);
+    }
+
+    @Override
+    public Lancamento reabrir(UUID id) {
+        Lancamento existing = findById(id);
+        existing.reabrir();
+        return repository.save(existing);
     }
 
     private Categoria buscarCategoria(UUID categoriaId) {
