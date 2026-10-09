@@ -42,6 +42,8 @@ public class GlobalExceptionHandler {
             mensagem = "Já existe um usuário cadastrado com este e-mail.";
         } else if (causa.contains("uk_usuario_username") || causa.contains("usuario_username_key")) {
             mensagem = "Já existe um usuário cadastrado com este nome de usuário.";
+        } else if (causa.contains("fk_lancamento_pessoa") || causa.contains("lancamento_pessoa_id")) {
+            mensagem = "Não é possível excluir esta pessoa pois existem lançamentos financeiros vinculados a ela.";
         }
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", mensagem, request);
     }
