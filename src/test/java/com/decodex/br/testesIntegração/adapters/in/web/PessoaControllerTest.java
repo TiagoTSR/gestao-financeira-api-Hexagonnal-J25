@@ -162,6 +162,55 @@ class PessoaControllerTest {
     }
 
     @Test
+    @DisplayName("Deve retornar 201 Created ao criar pessoa com endereço aninhado (contrato Angular)")
+    void create_DeveRetornar201_ComEnderecoAninhado() throws Exception {
+        UUID idCriado = UUID.randomUUID();
+        String jsonAngular = """
+            {
+              "nome": "Carlos Drummond",
+              "ativo": true,
+              "endereco": {
+                "logradouro": "Rua Central",
+                "numero": "500",
+                "complemento": null,
+                "bairro": "Bairro Nobre",
+                "cep": "30140-000",
+                "cidade": "Belo Horizonte",
+                "estado": "MG"
+              }
+            }
+            """;
+
+        Endereco endereco = new Endereco("Rua Central", "500", null, "Bairro Nobre", "30140-000", "Belo Horizonte", "MG");
+        Pessoa pessoaSalva = new Pessoa(idCriado, "Carlos Drummond", endereco, true);
+
+        when(pessoaInputPort.create(any(Pessoa.class))).thenReturn(pessoaSalva);
+
+        mockMvc.perform(post("/pessoas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonAngular))
+            .andExpect(status().isCreated())
+            .andExpect(header().string("Location", org.hamcrest.Matchers.endsWith("/pessoas/" + idCriado)))
+            .andExpect(jsonPath("$.id").value(idCriado.toString()))
+            .andExpect(jsonPath("$.nome").value("Carlos Drummond"))
+            .andExpect(jsonPath("$.logradouro").value("Rua Central"))
+            .andExpect(jsonPath("$.cidade").value("Belo Horizonte"))
+            .andExpect(jsonPath("$.ativo").value(true));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 204 No Content ao atualizar status ativo da pessoa (contrato Angular)")
+    void atualizarAtivo_DeveRetornar204() throws Exception {
+        UUID id = UUID.randomUUID();
+        doNothing().when(pessoaInputPort).atualizarAtivo(id, false);
+
+        mockMvc.perform(put("/pessoas/{id}/ativo", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"ativo\": false}"))
+            .andExpect(status().isNoContent());
+    }
+
+    @Test
     @DisplayName("Deve retornar 204 No Content ao deletar pessoa")
     void delete_DeveRetornar204() throws Exception {
         UUID id = UUID.randomUUID();
