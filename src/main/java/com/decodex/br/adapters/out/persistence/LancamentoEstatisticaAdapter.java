@@ -1,6 +1,8 @@
 package com.decodex.br.adapters.out.persistence;
 
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
+import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
+import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.LancamentoEstatisticaPessoa;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
@@ -24,9 +26,11 @@ import java.util.List;
 public class LancamentoEstatisticaAdapter implements LancamentoEstatisticaPort {
 
     private final EntityManager manager;
+    private final LancamentoMapper lancamentoMapper;
 
-    public LancamentoEstatisticaAdapter(EntityManager manager) {
+    public LancamentoEstatisticaAdapter(EntityManager manager, LancamentoMapper lancamentoMapper) {
         this.manager = manager;
+        this.lancamentoMapper = lancamentoMapper;
     }
 
     @Override
@@ -55,6 +59,26 @@ public class LancamentoEstatisticaAdapter implements LancamentoEstatisticaPort {
                 .getResultList()
                 .stream()
                 .map(this::mapearParaDominio)
+                .toList();
+    }
+
+    @Override
+    public List<Lancamento> listarPorPeriodo(LocalDate inicio, LocalDate fim) {
+        CriteriaBuilder cb = manager.getCriteriaBuilder();
+        CriteriaQuery<LancamentoEntity> query = cb.createQuery(LancamentoEntity.class);
+
+        Root<LancamentoEntity> root = query.from(LancamentoEntity.class);
+        root.fetch("pessoa", jakarta.persistence.criteria.JoinType.LEFT);
+        root.fetch("categoria", jakarta.persistence.criteria.JoinType.LEFT);
+
+        query.select(root)
+                .where(criarRestricoesPorData(root, cb, inicio, fim))
+                .orderBy(cb.asc(root.get("dataVencimento")));
+
+        return manager.createQuery(query)
+                .getResultList()
+                .stream()
+                .map(lancamentoMapper::toDomain)
                 .toList();
     }
 

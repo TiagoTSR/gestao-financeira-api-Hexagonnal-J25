@@ -4,4 +4,6 @@ import java.time.LocalDate;
 
 public interface GerarRelatorioEstatisticaInputPort {
     byte[] executarPorPessoa(LocalDate inicio, LocalDate fim);
+    byte[] executarPorPessoaExcel(LocalDate inicio, LocalDate fim);
 }
+
