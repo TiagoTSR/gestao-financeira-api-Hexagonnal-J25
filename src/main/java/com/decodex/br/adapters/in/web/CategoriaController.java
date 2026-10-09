@@ -36,18 +36,36 @@ public class CategoriaController implements CategoriaControllerDoc {
         this.inputPort = inputPort;
     }
 
-    @Override
     @GetMapping(value = {"", "/paginada"})
     public ResponseEntity<PageResult<CategoriaResponseDTO>> findAll(
             CategoriaFilter filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sort,
-            @RequestParam(required = false) String direction) {
+            @RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "pagina", required = false) Integer pagina,
+            @RequestParam(name = "size", required = false) Integer size,
+            @RequestParam(name = "tamanho", required = false) Integer tamanho,
+            @RequestParam(name = "sort", required = false) String sort,
+            @RequestParam(name = "ordenar_por", required = false) String ordenarPor,
+            @RequestParam(name = "direction", required = false) String direction,
+            @RequestParam(name = "direcao", required = false) String direcao) {
 
-        PageRequest pageRequest = PageRequest.of(page, size, sort, direction);
+        int resolvedPage = page != null ? page : (pagina != null ? pagina : 0);
+        int resolvedSize = size != null ? size : (tamanho != null ? tamanho : 10);
+        String resolvedSort = sort != null ? sort : ordenarPor;
+        String resolvedDir = direction != null ? direction : direcao;
+
+        PageRequest pageRequest = PageRequest.of(resolvedPage, resolvedSize, resolvedSort, resolvedDir);
         return ResponseEntity.ok(inputPort.findAll(filter, pageRequest)
                 .map(CategoriaResponseDTO::from));
+    }
+
+    @Override
+    public ResponseEntity<PageResult<CategoriaResponseDTO>> findAll(
+            CategoriaFilter filter,
+            int page,
+            int size,
+            String sort,
+            String direction) {
+        return findAll(filter, page, null, size, null, sort, null, direction, null);
     }
 
     // Sobrecarga de conveniência para uso programático e testes unitários

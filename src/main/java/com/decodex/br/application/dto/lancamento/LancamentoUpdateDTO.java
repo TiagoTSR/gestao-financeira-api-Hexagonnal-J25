@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.decodex.br.domain.model.TipoLancamento;
 
 import jakarta.validation.constraints.NotBlank;
@@ -14,8 +15,10 @@ public record LancamentoUpdateDTO(
     String descricao,
 
     @NotNull
+    @JsonAlias({"data_vencimento", "dataVencimento"})
     LocalDate dataVencimento,
 
+    @JsonAlias({"data_pagamento", "dataPagamento"})
     LocalDate dataPagamento,
 
     @NotNull
@@ -27,8 +30,10 @@ public record LancamentoUpdateDTO(
     TipoLancamento tipo,
 
     @NotNull
+    @JsonAlias({"categoria_id", "categoriaId"})
     UUID categoriaId,
 
     @NotNull
+    @JsonAlias({"pessoa_id", "pessoaId"})
     UUID pessoaId
 ) {}

@@ -42,6 +42,11 @@ public class RateLimitingFilter implements Filter {
             return;
         }
 
+        if ("OPTIONS".equalsIgnoreCase(httpServletRequest.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String ip = getClientIp(httpServletRequest);
         Bucket bucket = cache.computeIfAbsent(ip, this::createNewBucket);
 

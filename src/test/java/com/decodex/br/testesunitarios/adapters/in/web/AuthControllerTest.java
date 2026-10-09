@@ -57,6 +57,9 @@ class AuthControllerTest {
     @Mock
     private HttpServletRequest request;
 
+    @Mock
+    private com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort;
+
     @InjectMocks
     private AuthController authController;
 

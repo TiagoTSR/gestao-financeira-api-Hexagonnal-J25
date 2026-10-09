@@ -101,4 +101,20 @@ class UsuarioRepositoryAdapterTest {
                 .isInstanceOf(com.decodex.br.domain.exception.RegraDeNegocioException.class)
                 .hasMessageContaining("Já existe um usuário cadastrado com o username: admin");
     }
+
+    @Test
+    @DisplayName("Deve retornar Usuario por username ou email")
+    void findByUsernameOrEmail_DeveRetornarUsuario() {
+        UsuarioEntity entity = new UsuarioEntity();
+        entity.setEmail("admin@email.com");
+        Usuario domain = new Usuario(UUID.randomUUID(), "admin", "hash", "admin@email.com");
+
+        when(repository.findByUsernameOrEmail("admin@email.com", "admin@email.com")).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(domain);
+
+        Optional<Usuario> result = adapter.findByUsernameOrEmail("admin@email.com", "admin@email.com");
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getEmail()).isEqualTo("admin@email.com");
+    }
 }

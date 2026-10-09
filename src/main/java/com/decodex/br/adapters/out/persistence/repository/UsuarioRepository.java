@@ -7,4 +7,5 @@ import com.decodex.br.adapters.out.persistence.entity.UsuarioEntity;
 
 public interface UsuarioRepository extends JpaRepository<UsuarioEntity, UUID> {
     Optional<UsuarioEntity> findByUsername(String username);
+    Optional<UsuarioEntity> findByUsernameOrEmail(String username, String email);
 }

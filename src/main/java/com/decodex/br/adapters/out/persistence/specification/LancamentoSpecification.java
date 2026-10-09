@@ -43,6 +43,14 @@ public final class LancamentoSpecification {
                 predicates.add(cb.equal(root.get("dataVencimento"), filter.getDataVencimento()));
             }
 
+            if (filter.getDataVencimentoDe() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("dataVencimento"), filter.getDataVencimentoDe()));
+            }
+
+            if (filter.getDataVencimentoAte() != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("dataVencimento"), filter.getDataVencimentoAte()));
+            }
+
             if (filter.getDataPagamento() != null) {
                 predicates.add(cb.equal(root.get("dataPagamento"), filter.getDataPagamento()));
             }
@@ -61,6 +69,14 @@ public final class LancamentoSpecification {
 
             if (filter.getTipo() != null) {
                 predicates.add(cb.equal(root.get("tipo"), filter.getTipo()));
+            }
+
+            if (filter.getCategoriaId() != null) {
+                predicates.add(cb.equal(root.get("categoria").get("id"), filter.getCategoriaId()));
+            }
+
+            if (filter.getPessoaId() != null) {
+                predicates.add(cb.equal(root.get("pessoa").get("id"), filter.getPessoaId()));
             }
 
             if (filter.getNomeCategoria() != null && !filter.getNomeCategoria().isBlank()) {

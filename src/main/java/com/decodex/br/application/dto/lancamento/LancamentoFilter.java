@@ -2,26 +2,24 @@ package com.decodex.br.application.dto.lancamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.decodex.br.domain.model.TipoLancamento;
 
 public class LancamentoFilter {
 	
 	private String descricao;
-
     private LocalDate dataVencimento;
-
+    private LocalDate dataVencimentoDe;
+    private LocalDate dataVencimentoAte;
     private LocalDate dataPagamento;
-
     private BigDecimal valor;
-
     private String observacao;
-
     private TipoLancamento tipo;
-
     private String nomeCategoria;
-
     private String nomePessoa;
+    private UUID categoriaId;
+    private UUID pessoaId;
     
     public LancamentoFilter() {
     }
@@ -42,11 +40,39 @@ public class LancamentoFilter {
 		this.dataVencimento = dataVencimento;
 	}
 
+	public LocalDate getDataVencimentoDe() {
+		return dataVencimentoDe;
+	}
+
+	public void setDataVencimentoDe(LocalDate dataVencimentoDe) {
+		this.dataVencimentoDe = dataVencimentoDe;
+	}
+
+	public void setData_vencimento_de(LocalDate dataVencimentoDe) {
+		this.dataVencimentoDe = dataVencimentoDe;
+	}
+
+	public LocalDate getDataVencimentoAte() {
+		return dataVencimentoAte;
+	}
+
+	public void setDataVencimentoAte(LocalDate dataVencimentoAte) {
+		this.dataVencimentoAte = dataVencimentoAte;
+	}
+
+	public void setData_vencimento_ate(LocalDate dataVencimentoAte) {
+		this.dataVencimentoAte = dataVencimentoAte;
+	}
+
 	public LocalDate getDataPagamento() {
 		return dataPagamento;
 	}
 
 	public void setDataPagamento(LocalDate dataPagamento) {
+		this.dataPagamento = dataPagamento;
+	}
+
+	public void setData_pagamento(LocalDate dataPagamento) {
 		this.dataPagamento = dataPagamento;
 	}
 
@@ -89,5 +115,28 @@ public class LancamentoFilter {
 	public void setNomePessoa(String nomePessoa) {
 		this.nomePessoa = nomePessoa;
 	}
-    
+
+	public UUID getCategoriaId() {
+		return categoriaId;
+	}
+
+	public void setCategoriaId(UUID categoriaId) {
+		this.categoriaId = categoriaId;
+	}
+
+	public void setCategoria_id(UUID categoriaId) {
+		this.categoriaId = categoriaId;
+	}
+
+	public UUID getPessoaId() {
+		return pessoaId;
+	}
+
+	public void setPessoaId(UUID pessoaId) {
+		this.pessoaId = pessoaId;
+	}
+
+	public void setPessoa_id(UUID pessoaId) {
+		this.pessoaId = pessoaId;
+	}
 }

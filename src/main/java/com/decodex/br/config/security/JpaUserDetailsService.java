@@ -19,7 +19,7 @@ public class JpaUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuarioRepositoryPort.findByUsername(username)
+        return usuarioRepositoryPort.findByUsernameOrEmail(username, username)
                 .map(usuario -> User.builder()
                         .username(usuario.getUsername())
                         .password(usuario.getPassword()) // Senha criptografada com BCrypt armazenada no banco

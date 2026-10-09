@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResumoDTO;
 import com.decodex.br.domain.model.TipoLancamento;
@@ -18,4 +19,14 @@ public record LancamentoResponseDTO(
     TipoLancamento tipo,
     CategoriaResponseDTO categoria,
     PessoaResumoDTO pessoa
-) {}
+) {
+    @JsonProperty("data_vencimento")
+    public LocalDate getDataVencimentoSnake() {
+        return dataVencimento;
+    }
+
+    @JsonProperty("data_pagamento")
+    public LocalDate getDataPagamentoSnake() {
+        return dataPagamento;
+    }
+}

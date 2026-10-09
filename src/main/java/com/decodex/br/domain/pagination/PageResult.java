@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public record PageResult<T>(
     List<T> content,
     int page,
@@ -21,6 +23,31 @@ public record PageResult<T>(
         this.size = size;
         this.totalElements = totalElements;
         this.totalPages = totalPages;
+    }
+
+    @JsonProperty("conteudo")
+    public List<T> getConteudo() {
+        return content;
+    }
+
+    @JsonProperty("pagina")
+    public int getPagina() {
+        return page;
+    }
+
+    @JsonProperty("tamanho")
+    public int getTamanho() {
+        return size;
+    }
+
+    @JsonProperty("total_elementos")
+    public long getTotalElementos() {
+        return totalElements;
+    }
+
+    @JsonProperty("total_paginas")
+    public int getTotalPaginas() {
+        return totalPages;
     }
 
     public boolean isEmpty()     { return content.isEmpty(); }

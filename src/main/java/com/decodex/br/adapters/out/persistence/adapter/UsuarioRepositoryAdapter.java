@@ -31,6 +31,13 @@ public class UsuarioRepositoryAdapter implements UsuarioRepositoryPort {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Usuario> findByUsernameOrEmail(String username, String email) {
+        return repository.findByUsernameOrEmail(username, email)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     @Transactional
     public Usuario save(Usuario usuario) {
         try {
