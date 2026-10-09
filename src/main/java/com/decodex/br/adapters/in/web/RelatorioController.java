@@ -15,8 +15,8 @@ import java.time.LocalDate;
 import com.decodex.br.adapters.in.web.documentation.RelatorioControllerDoc;
 
 @RestController
-@RequestMapping("/api/relatorios")
-@CrossOrigin("http://localhost:4200")
+@RequestMapping({"/api/relatorios", "/relatorios", "/lancamentos/relatorios"})
+@CrossOrigin(origins = {"http://localhost:4200", "http://localhost:3000"})
 public class RelatorioController implements RelatorioControllerDoc {
 
     private final GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort;
@@ -25,7 +25,7 @@ public class RelatorioController implements RelatorioControllerDoc {
         this.gerarRelatorioInputPort = gerarRelatorioInputPort;
     }
 
-    @GetMapping("/lancamentos-por-pessoa")
+    @GetMapping({"/lancamentos-por-pessoa", "/por-pessoa"})
     public ResponseEntity<byte[]> relatorioPorPessoa(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fim) {
