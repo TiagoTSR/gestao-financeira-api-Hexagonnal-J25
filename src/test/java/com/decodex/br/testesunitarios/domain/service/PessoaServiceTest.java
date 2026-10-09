@@ -161,4 +161,17 @@ class PessoaServiceTest {
         verify(repository, times(1)).findById(idInexistente);
         verify(repository, never()).deleteById(any());
     }
+
+    @Test
+    @DisplayName("Deve atualizar ativo da pessoa existente")
+    void atualizarAtivo_ShouldUpdateStatus() {
+        when(repository.findById(pessoaId)).thenReturn(Optional.of(pessoa));
+        when(repository.save(any(Pessoa.class))).thenReturn(pessoa);
+
+        service.atualizarAtivo(pessoaId, false);
+
+        assertThat(pessoa.getAtivo()).isFalse();
+        verify(repository, times(1)).findById(pessoaId);
+        verify(repository, times(1)).save(pessoa);
+    }
 }

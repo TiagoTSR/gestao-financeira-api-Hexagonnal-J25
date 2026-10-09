@@ -17,6 +17,8 @@ public interface PessoaInputPort {
 
     Pessoa update(UUID id, Pessoa pessoa);
 
+    void atualizarAtivo(UUID id, Boolean ativo);
+
     void delete(UUID id);
 
 }

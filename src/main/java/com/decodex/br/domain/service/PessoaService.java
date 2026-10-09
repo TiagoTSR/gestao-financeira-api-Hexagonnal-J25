@@ -42,6 +42,13 @@ public class PessoaService implements PessoaInputPort {
     }
 
     @Override
+    public void atualizarAtivo(UUID id, Boolean ativo) {
+        Pessoa existing = findById(id);
+        existing.alterarAtivo(ativo);
+        repository.save(existing);
+    }
+
+    @Override
     public void delete(UUID id) {
         findById(id);
         repository.deleteById(id);

@@ -109,6 +109,17 @@ public class PessoaController implements PessoaControllerDoc {
     }
 
     @Override
+    @PutMapping("/{id}/ativo")
+    public ResponseEntity<Void> atualizarAtivo(
+            @PathVariable java.util.UUID id,
+            @RequestBody(required = false) com.decodex.br.application.dto.pessoa.PessoaAtivoDTO dto) {
+
+        Boolean novoAtivo = (dto != null && dto.ativo() != null) ? dto.ativo() : Boolean.TRUE;
+        inputPort.atualizarAtivo(id, novoAtivo);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable java.util.UUID id) {
         inputPort.delete(id);

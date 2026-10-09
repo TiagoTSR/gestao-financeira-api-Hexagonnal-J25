@@ -56,6 +56,15 @@ public interface PessoaControllerDoc {
             @Parameter(description = "ID da pessoa a ser atualizada", required = true) UUID id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novos dados da pessoa", required = true) PessoaUpdateDTO dto);
 
+    @Operation(summary = "Atualizar status ativo da pessoa", description = "Ativa ou desativa uma pessoa existente através do seu ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Status atualizado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Pessoa não encontrada", content = @Content)
+    })
+    ResponseEntity<Void> atualizarAtivo(
+            @Parameter(description = "ID da pessoa a ter o status atualizado", required = true) UUID id,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Novo status da pessoa") com.decodex.br.application.dto.pessoa.PessoaAtivoDTO dto);
+
     @Operation(summary = "Excluir pessoa", description = "Remove uma pessoa do sistema permanentemente através do ID informado.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Pessoa excluída com sucesso"),

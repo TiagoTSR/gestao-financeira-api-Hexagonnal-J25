@@ -124,4 +124,14 @@ class PessoaControllerUnitarioTest {
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
+
+    @Test
+    @DisplayName("Deve atualizar ativo da pessoa e retornar status 204")
+    void atualizarAtivo_deveRetornar204() {
+        doNothing().when(pessoaInputPort).atualizarAtivo(idPadrao, false);
+
+        ResponseEntity<Void> response = controller.atualizarAtivo(idPadrao, new com.decodex.br.application.dto.pessoa.PessoaAtivoDTO(false));
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
 }
