@@ -199,4 +199,33 @@ class EntityEqualsHashCodeTest {
 
         assertThat(l1).isNotEqualTo(null);
     }
+
+    // ─────────────────────────────────────────
+    // RelatorioSolicitacaoEntity
+    // ─────────────────────────────────────────
+
+    @Test
+    @DisplayName("RelatorioSolicitacaoEntity - objetos com mesmo ID devem ser iguais")
+    void relatorioSolicitacaoEntity_SameId_ShouldBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity r1 = new com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity();
+        r1.setId(id1);
+        com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity r2 = new com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity();
+        r2.setId(id1);
+
+        assertThat(r1).isEqualTo(r2);
+        assertThat(r1.hashCode()).isEqualTo(r2.hashCode());
+    }
+
+    @Test
+    @DisplayName("RelatorioSolicitacaoEntity - objetos com IDs diferentes não devem ser iguais")
+    void relatorioSolicitacaoEntity_DifferentId_ShouldNotBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity r1 = new com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity();
+        r1.setId(id1);
+        com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity r2 = new com.decodex.br.adapters.out.persistence.entity.RelatorioSolicitacaoEntity();
+        r2.setId(id2);
+
+        assertThat(r1).isNotEqualTo(r2);
+        assertThat(r1).isNotEqualTo(null);
+        assertThat(r1).isEqualTo(r1);
+    }
 }
