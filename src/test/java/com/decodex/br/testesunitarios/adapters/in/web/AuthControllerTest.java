@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import com.decodex.br.adapters.in.web.AuthController;
+import com.decodex.br.adapters.in.web.AuthCookieManager;
+import com.decodex.br.adapters.in.web.TokenResponseAssembler;
 import com.decodex.br.application.dto.auth.LoginRequestDTO;
 import com.decodex.br.application.dto.auth.TokenResponseDTO;
 import com.decodex.br.config.security.TokenService;
@@ -29,6 +31,8 @@ import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Spy;
 import java.time.Instant;
 import java.util.Collections;
 
@@ -60,8 +64,25 @@ class AuthControllerTest {
     @Mock
     private com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort;
 
-    @InjectMocks
+    @Spy
+    private AuthCookieManager cookieManager = new AuthCookieManager();
+
+    private TokenResponseAssembler tokenResponseAssembler;
+
     private AuthController authController;
+
+    @BeforeEach
+    void setUp() {
+        tokenResponseAssembler = new TokenResponseAssembler(usuarioRepositoryPort);
+        authController = new AuthController(
+                authenticationManager,
+                tokenService,
+                refreshTokenInputPort,
+                userDetailsService,
+                cookieManager,
+                tokenResponseAssembler
+        );
+    }
 
     @Test
     @DisplayName("Deve autenticar com sucesso e retornar token JWT e Cookie Set-Cookie")
