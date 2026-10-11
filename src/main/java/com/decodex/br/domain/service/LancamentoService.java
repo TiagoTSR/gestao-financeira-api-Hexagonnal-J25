@@ -2,8 +2,10 @@ package com.decodex.br.domain.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
+import com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
@@ -55,56 +57,16 @@ public class LancamentoService implements LancamentoInputPort {
         Pessoa pessoa = buscarPessoa(dto.pessoaId());
         validarPessoaAtiva(pessoa);
 
-        int total = (dto.totalParcelas() != null && dto.totalParcelas() > 1) ? dto.totalParcelas() : 1;
-        if (total > 1) {
-            BigDecimal valorTotal = dto.valor();
-            BigDecimal parcelaBase = valorTotal.divide(BigDecimal.valueOf(total), 2, java.math.RoundingMode.HALF_EVEN);
-            BigDecimal diferencaCentavos = valorTotal.subtract(parcelaBase.multiply(BigDecimal.valueOf(total)));
+        List<Lancamento> lancamentos = ParcelamentoFactory.gerarLancamentos(dto, categoria, pessoa);
 
-            Lancamento primeiroLancamento = null;
-            for (int i = 1; i <= total; i++) {
-                BigDecimal valorDestaParcela = (i == 1) ? parcelaBase.add(diferencaCentavos) : parcelaBase;
-                String descricaoParcela = String.format("%s (%d/%d)", dto.descricao(), i, total);
-                LocalDate vencimentoParcela = dto.dataVencimento().plusMonths(i - 1);
-                LocalDate pagamentoParcela = (i == 1) ? dto.dataPagamento() : null;
-
-                Lancamento parcela = new Lancamento(
-                    descricaoParcela,
-                    vencimentoParcela,
-                    pagamentoParcela,
-                    valorDestaParcela,
-                    dto.observacao(),
-                    dto.tipo(),
-                    categoria,
-                    pessoa,
-                    dto.status(),
-                    pagamentoParcela != null ? valorDestaParcela : null,
-                    i,
-                    total
-                );
-                Lancamento salvo = repository.save(parcela);
-                if (i == 1) {
-                    primeiroLancamento = salvo;
-                }
+        Lancamento primeiroLancamento = null;
+        for (Lancamento lancamento : lancamentos) {
+            Lancamento salvo = repository.save(lancamento);
+            if (primeiroLancamento == null) {
+                primeiroLancamento = salvo;
             }
-            return primeiroLancamento;
         }
-
-        Lancamento lancamento = new Lancamento(
-            dto.descricao(),
-            dto.dataVencimento(),
-            dto.dataPagamento(),
-            dto.valor(),
-            dto.observacao(),
-            dto.tipo(),
-            categoria,
-            pessoa,
-            dto.status(),
-            dto.valorPago() != null ? dto.valorPago() : (dto.dataPagamento() != null ? dto.valor() : null),
-            dto.numeroParcela() != null ? dto.numeroParcela() : 1,
-            1
-        );
-        return repository.save(lancamento);
+        return primeiroLancamento;
     }
 
     @Override
@@ -146,10 +108,15 @@ public class LancamentoService implements LancamentoInputPort {
     }
 
     @Override
-    public Lancamento quitar(UUID id, com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO) {
+    public Lancamento quitar(UUID id, LancamentoBaixaDTO baixaDTO) {
         Lancamento existing = findById(id);
-        java.time.LocalDate dataPag = (baixaDTO != null && baixaDTO.dataPagamento() != null) ? baixaDTO.dataPagamento() : java.time.LocalDate.now();
-        BigDecimal valorPag = (baixaDTO != null && baixaDTO.valorPago() != null) ? baixaDTO.valorPago() : existing.getValor();
+        LocalDate dataPag = (baixaDTO != null && baixaDTO.dataPagamento() != null)
+                ? baixaDTO.dataPagamento()
+                : LocalDate.now();
+        BigDecimal valorPag = (baixaDTO != null && baixaDTO.valorPago() != null)
+                ? baixaDTO.valorPago()
+                : existing.getValor();
+
         existing.quitar(dataPag, valorPag);
         return repository.save(existing);
     }
@@ -189,5 +156,4 @@ public class LancamentoService implements LancamentoInputPort {
             throw new RegraDeNegocioException("Não é possível salvar lançamento para pessoa inativa.");
         }
     }
-
 }
