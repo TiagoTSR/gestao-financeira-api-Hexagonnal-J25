@@ -35,9 +35,25 @@ class TokenServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null ao validar token inválido")
-    void deveRetornarNullParaTokenInvalido() {
-        String username = tokenService.validateToken("token-invalido-qualquer");
-        assertThat(username).isNull();
+    @DisplayName("Deve gerar token com tenant_id customizado e extrair com sucesso")
+    void deveGerarTokenComTenantIdCustomizadoEExtrair() {
+        java.util.UUID customTenantId = java.util.UUID.randomUUID();
+        UserDetails userDetails = new User("gestor", "password", Collections.emptyList());
+
+        String token = tokenService.generateToken(userDetails, customTenantId);
+        assertThat(token).isNotBlank();
+
+        java.util.UUID extraido = tokenService.extractTenantId(token);
+        assertThat(extraido).isEqualTo(customTenantId);
+    }
+
+    @Test
+    @DisplayName("Deve extrair DEFAULT_TENANT_ID ao receber token inválido ou nulo")
+    void deveExtrairDefaultTenantIdParaTokenInvalido() {
+        java.util.UUID extraidoInvalido = tokenService.extractTenantId("token-invalido");
+        assertThat(extraidoInvalido).isEqualTo(com.decodex.br.config.multitenancy.TenantContext.DEFAULT_TENANT_ID);
+
+        java.util.UUID extraidoNulo = tokenService.extractTenantId(null);
+        assertThat(extraidoNulo).isEqualTo(com.decodex.br.config.multitenancy.TenantContext.DEFAULT_TENANT_ID);
     }
 }

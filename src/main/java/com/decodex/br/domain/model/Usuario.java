@@ -12,17 +12,23 @@ public class Usuario {
     private String username;
     private Senha password;
     private String email;
+    private UUID tenantId;
 
-    @Default
-    public Usuario(UUID id, String username, String password, String email) {
+    public Usuario(UUID id, String username, String password, String email, UUID tenantId) {
         this.id = id;
         this.username = validarUsername(username);
         this.password = new Senha(password);
         this.email = validarEmail(email);
+        this.tenantId = tenantId != null ? tenantId : UUID.fromString("00000000-0000-0000-0000-000000000001");
+    }
+
+    @Default
+    public Usuario(UUID id, String username, String password, String email) {
+        this(id, username, password, email, UUID.fromString("00000000-0000-0000-0000-000000000001"));
     }
 
     public Usuario(String username, String password, String email) {
-        this(null, username, password, email);
+        this(null, username, password, email, UUID.fromString("00000000-0000-0000-0000-000000000001"));
     }
 
     public void alterarSenha(String novoHash) {
@@ -47,6 +53,10 @@ public class Usuario {
 
     public String getEmail() {
         return email;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
     }
 
     @Override

@@ -13,6 +13,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 
+import org.hibernate.annotations.TenantId;
+
 @Entity
 @Table(name = "pessoa")
 public class PessoaEntity {
@@ -20,6 +22,10 @@ public class PessoaEntity {
 	@Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @TenantId
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
 
     @NotBlank
     @Column(length = 50)
@@ -38,6 +44,14 @@ public class PessoaEntity {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
     }
 
     public String getNome() {

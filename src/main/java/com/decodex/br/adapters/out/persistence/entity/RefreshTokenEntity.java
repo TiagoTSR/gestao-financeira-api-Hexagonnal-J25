@@ -13,6 +13,8 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 import java.util.UUID;
 
+import org.hibernate.annotations.TenantId;
+
 @Entity
 @Table(name = "refresh_token", uniqueConstraints = {
     @UniqueConstraint(name = "uk_refresh_token_token", columnNames = "token")
@@ -22,6 +24,10 @@ public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @TenantId
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
 
     @Column(nullable = false)
     private String token;
@@ -39,6 +45,14 @@ public class RefreshTokenEntity {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
     }
 
     public String getToken() {

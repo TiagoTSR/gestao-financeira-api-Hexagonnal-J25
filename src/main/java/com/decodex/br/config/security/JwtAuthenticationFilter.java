@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
+import com.decodex.br.config.multitenancy.TenantContext;
+import java.util.UUID;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -26,16 +29,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        var token = this.recoverToken(request);
-        if (token != null) {
-            var username = tokenService.validateToken(token);
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails user = userDetailsService.loadUserByUsername(username);
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            var token = this.recoverToken(request);
+            if (token != null) {
+                var username = tokenService.validateToken(token);
+                if (username != null) {
+                    UUID tenantId = tokenService.extractTenantId(token);
+                    TenantContext.setTenantId(tenantId);
+
+                    if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails user = userDetailsService.loadUserByUsername(username);
+                        var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            } else {
+                String xTenant = request.getHeader("X-Tenant-ID");
+                if (xTenant != null && !xTenant.isBlank()) {
+                    try {
+                        TenantContext.setTenantId(UUID.fromString(xTenant));
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
             }
+            filterChain.doFilter(request, response);
+        } finally {
+            TenantContext.clear();
         }
-        filterChain.doFilter(request, response);
     }
 
     private String recoverToken(HttpServletRequest request) {

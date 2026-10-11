@@ -10,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.TenantId;
+
 @Entity
 @Table(name = "usuario", uniqueConstraints = {
     @UniqueConstraint(name = "uk_usuario_username", columnNames = "username"),
@@ -20,6 +22,10 @@ public class UsuarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @TenantId
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
 
     @Column(nullable = false, length = 50)
     private String username;
@@ -36,6 +42,14 @@ public class UsuarioEntity {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
     }
 
     public String getUsername() {

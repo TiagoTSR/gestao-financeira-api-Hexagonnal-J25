@@ -20,6 +20,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import org.hibernate.annotations.TenantId;
+
 @Entity
 @Table(name = "lancamento")
 public class LancamentoEntity {
@@ -28,6 +30,10 @@ public class LancamentoEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 	
+    @TenantId
+    @Column(name = "tenant_id", nullable = false, updatable = false)
+    private UUID tenantId;
+
 	@NotBlank
     @Column(length = 80)
     private String descricao;
@@ -79,6 +85,14 @@ public class LancamentoEntity {
 	public void setId(UUID id) {
 		this.id = id;
 	}
+
+    public UUID getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(UUID tenantId) {
+        this.tenantId = tenantId;
+    }
 
 	public String getDescricao() {
 		return descricao;
