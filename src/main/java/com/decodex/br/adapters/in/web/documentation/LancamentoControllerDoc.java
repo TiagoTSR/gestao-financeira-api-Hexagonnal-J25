@@ -88,4 +88,12 @@ public interface LancamentoControllerDoc {
     })
     ResponseEntity<LancamentoResponseDTO> reabrir(
             @Parameter(description = "ID do lançamento a ser reaberto", required = true) UUID id);
+
+    @Operation(summary = "Consultar histórico de auditoria do lançamento", description = "Retorna a linha do tempo com todas as revisões, usuários e alterações realizadas no lançamento financeiro.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Histórico recuperado com sucesso"),
+        @ApiResponse(responseCode = "404", description = "Lançamento não encontrado", content = @Content)
+    })
+    ResponseEntity<java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO>> findHistorico(
+            @Parameter(description = "ID do lançamento a ser consultado", required = true) UUID id);
 }

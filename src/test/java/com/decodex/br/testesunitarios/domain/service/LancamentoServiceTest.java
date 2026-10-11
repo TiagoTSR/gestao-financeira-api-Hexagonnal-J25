@@ -353,4 +353,23 @@ class LancamentoServiceTest {
         assertThat(primeiro.getTotalParcelas()).isEqualTo(3);
         verify(repository, times(3)).save(any(Lancamento.class));
     }
+
+    @Test
+    @DisplayName("Deve buscar histórico de auditoria do lançamento existente")
+    void findHistorico_ShouldReturnList() {
+        when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
+        var itemHistorico = new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+                1L, java.time.LocalDateTime.now(), "admin", "CRIACAO", lancamentoId,
+                "Cinema", new BigDecimal("50.00"), TipoLancamento.DESPESA,
+                com.decodex.br.domain.model.StatusLancamento.PENDENTE,
+                LocalDate.of(2025, 6, 10), null, null, 1, 1
+        );
+        when(repository.findHistorico(lancamentoId)).thenReturn(List.of(itemHistorico));
+
+        var resultado = service.findHistorico(lancamentoId);
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).usuario()).isEqualTo("admin");
+        assertThat(resultado.get(0).operacao()).isEqualTo("CRIACAO");
+    }
 }

@@ -142,4 +142,12 @@ public class LancamentoController implements LancamentoControllerDoc {
         Lancamento reaberto = lancamentoInputPort.reabrir(id);
         return ResponseEntity.ok(mapper.toDTO(reaberto));
     }
+
+    @Override
+    @GetMapping("/{id}/historico")
+    public ResponseEntity<java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO>> findHistorico(
+            @PathVariable java.util.UUID id) {
+        java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO> historico = lancamentoInputPort.findHistorico(id);
+        return ResponseEntity.ok(historico);
+    }
 }

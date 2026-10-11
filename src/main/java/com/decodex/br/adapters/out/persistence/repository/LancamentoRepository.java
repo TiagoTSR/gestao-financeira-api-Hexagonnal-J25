@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 
+import org.springframework.data.repository.history.RevisionRepository;
+
 public interface LancamentoRepository extends JpaRepository<LancamentoEntity, UUID>,
-JpaSpecificationExecutor<LancamentoEntity> {
+        JpaSpecificationExecutor<LancamentoEntity>,
+        RevisionRepository<LancamentoEntity, UUID, Long> {
 }

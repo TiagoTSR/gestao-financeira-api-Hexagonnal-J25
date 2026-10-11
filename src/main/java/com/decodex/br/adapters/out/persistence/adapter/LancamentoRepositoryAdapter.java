@@ -95,6 +95,54 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
         repository.deleteById(id);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO> findHistorico(java.util.UUID id) {
+        org.springframework.data.history.Revisions<Long, LancamentoEntity> revisions = repository.findRevisions(id);
+        if (revisions.isEmpty()) {
+            return List.of();
+        }
+
+        java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO> historico = new java.util.ArrayList<>();
+        for (org.springframework.data.history.Revision<Long, LancamentoEntity> rev : revisions) {
+            LancamentoEntity entity = rev.getEntity();
+            Long revNumber = rev.getRequiredRevisionNumber();
+            java.time.Instant instant = rev.getRequiredRevisionInstant();
+            java.time.LocalDateTime dataRevisao = java.time.LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault());
+
+            String usuario = "SISTEMA";
+            Object delegate = rev.getMetadata().getDelegate();
+            if (delegate instanceof com.decodex.br.config.audit.AuditRevisionEntity auditEntity && auditEntity.getUsuario() != null) {
+                usuario = auditEntity.getUsuario();
+            }
+
+            String operacao = switch (rev.getMetadata().getRevisionType()) {
+                case INSERT -> "CRIACAO";
+                case UPDATE -> "ATUALIZACAO";
+                case DELETE -> "EXCLUSAO";
+                default -> "DESCONHECIDO";
+            };
+
+            historico.add(new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+                    revNumber,
+                    dataRevisao,
+                    usuario,
+                    operacao,
+                    entity.getId(),
+                    entity.getDescricao(),
+                    entity.getValor(),
+                    entity.getTipo(),
+                    entity.getStatus(),
+                    entity.getDataVencimento(),
+                    entity.getDataPagamento(),
+                    entity.getValorPago(),
+                    entity.getNumeroParcela(),
+                    entity.getTotalParcelas()
+            ));
+        }
+        return historico;
+    }
+
     private Sort resolverSort(PageRequest pageRequest) {
         if (pageRequest == null) {
             return Sort.by(Sort.Direction.ASC, "dataVencimento");

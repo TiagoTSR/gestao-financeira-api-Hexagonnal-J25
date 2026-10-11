@@ -21,9 +21,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import org.hibernate.annotations.TenantId;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 @Entity
 @Table(name = "lancamento")
+@Audited
 public class LancamentoEntity {
 	
 	@Id
@@ -70,10 +73,12 @@ public class LancamentoEntity {
     @Column(name = "total_parcelas")
     private Integer totalParcelas;
     
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 	@ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private CategoriaEntity categoria;
     
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
     @ManyToOne
     @JoinColumn(name = "pessoa_id", nullable = false)
     private PessoaEntity pessoa;

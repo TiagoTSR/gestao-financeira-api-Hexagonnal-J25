@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
+import com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -30,4 +31,6 @@ public interface LancamentoInputPort {
     Lancamento cancelar(UUID id);
 
     Lancamento reabrir(UUID id);
+
+    java.util.List<LancamentoHistoricoDTO> findHistorico(UUID id);
 }

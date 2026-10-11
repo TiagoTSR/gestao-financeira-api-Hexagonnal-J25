@@ -8,6 +8,7 @@ import java.util.UUID;
 import com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
+import com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
@@ -133,6 +134,12 @@ public class LancamentoService implements LancamentoInputPort {
         Lancamento existing = findById(id);
         existing.reabrir();
         return repository.save(existing);
+    }
+
+    @Override
+    public List<LancamentoHistoricoDTO> findHistorico(UUID id) {
+        findById(id);
+        return repository.findHistorico(id);
     }
 
     private Categoria buscarCategoria(UUID categoriaId) {

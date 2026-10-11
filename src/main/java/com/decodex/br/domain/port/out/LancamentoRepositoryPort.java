@@ -8,6 +8,8 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
+import com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO;
+
 public interface LancamentoRepositoryPort {
 	
 	Lancamento save(Lancamento lancamento);
@@ -20,4 +22,5 @@ public interface LancamentoRepositoryPort {
     
     void deleteById(UUID id);
 
+    java.util.List<LancamentoHistoricoDTO> findHistorico(UUID id);
 }

@@ -173,4 +173,23 @@ class LancamentoControllerUnitarioTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
     }
+
+    @Test
+    @DisplayName("Deve buscar histórico de auditoria e retornar status 200")
+    void findHistorico_deveRetornar200() {
+        var itemHistorico = new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+                1L, java.time.LocalDateTime.now(), "admin", "CRIACAO", lancamentoId,
+                "Cinema", new BigDecimal("50.00"), TipoLancamento.DESPESA,
+                com.decodex.br.domain.model.StatusLancamento.PENDENTE,
+                LocalDate.of(2025, 6, 10), null, null, 1, 1
+        );
+        when(lancamentoInputPort.findHistorico(eq(lancamentoId))).thenReturn(List.of(itemHistorico));
+
+        var response = controller.findHistorico(lancamentoId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
+        assertEquals("admin", response.getBody().get(0).usuario());
+    }
 }
