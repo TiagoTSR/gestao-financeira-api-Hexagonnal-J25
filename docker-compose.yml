@@ -19,6 +19,23 @@ services:
       timeout: 5s
       retries: 5
 
+  meu-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gestao_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
   minha-api-spring:
     image: gestao-financeira-api:latest
     container_name: spring_api
