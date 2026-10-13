@@ -8,8 +8,9 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.TenantId;
 
 import java.time.LocalDate;
@@ -40,8 +41,7 @@ public class RelatorioSolicitacaoEntity {
     @Column(nullable = false, length = 20)
     private StatusRelatorio status = StatusRelatorio.PENDENTE;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     @Column(name = "conteudo")
     private byte[] conteudo;
 

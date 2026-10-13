@@ -1,0 +1,42 @@
+
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <title>Relatório do Teste de Sobrecarga - 1.000 Usuários</title>
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; }
+            .container { max-width: 900px; margin: 0 auto; background: #1e293b; border-radius: 12px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+            h1 { color: #38bdf8; margin-bottom: 0.5rem; }
+            .badge { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 9999px; font-weight: bold; background: #334155; color: #38bdf8; margin-bottom: 1.5rem; }
+            table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+            th, td { text-align: left; padding: 0.75rem 1rem; border-bottom: 1px solid #334155; }
+            th { background: #0b1120; color: #94a3b8; }
+            tr:hover { background: #334155; }
+            .metric-val { font-family: monospace; font-weight: bold; color: #34d399; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 Relatório de Teste de Sobrecarga (k6)</h1>
+            <div class="badge">Simulação de 1.000 Usuários Simultâneos</div>
+            <p>API: <strong>http://localhost:8080</strong> | Cenário: Autenticação JWT + Leitura + Escrita/Auditoria + RabbitMQ Assíncrono</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Valor Registrado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Total de Requisições HTTP</td><td class="metric-val">14315</td></tr>
+                    <tr><td>Throughput Médio (RPS)</td><td class="metric-val">55.69 req/s</td></tr>
+                    <tr><td>Latência Média Geral</td><td class="metric-val">11121.75 ms</td></tr>
+                    <tr><td>Latência p(95)</td><td class="metric-val">29023.50 ms</td></tr>
+                    <tr><td>Taxa de Falha HTTP</td><td class="metric-val">0.29%</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
+    

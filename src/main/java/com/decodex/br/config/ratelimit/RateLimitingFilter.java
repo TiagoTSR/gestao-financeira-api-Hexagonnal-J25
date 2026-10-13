@@ -10,6 +10,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
@@ -20,22 +21,35 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class RateLimitingFilter implements Filter {
 
+    private final boolean enabled;
     private final int capacity;
     private final int durationInMinutes;
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
+    @Autowired
     public RateLimitingFilter(
-            @Value("${api.rate-limit.capacity}") int capacity,
-            @Value("${api.rate-limit.duration-in-minutes}") int durationInMinutes
+            @Value("${api.rate-limit.enabled:true}") boolean enabled,
+            @Value("${api.rate-limit.capacity:100000}") int capacity,
+            @Value("${api.rate-limit.duration-in-minutes:1}") int durationInMinutes
     ) {
+        this.enabled = enabled;
         this.capacity = capacity;
         this.durationInMinutes = durationInMinutes;
+    }
+
+    public RateLimitingFilter(int capacity, int durationInMinutes) {
+        this(true, capacity, durationInMinutes);
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         
+        if (!enabled) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (!(request instanceof HttpServletRequest httpServletRequest) || 
             !(response instanceof HttpServletResponse httpServletResponse)) {
             chain.doFilter(request, response);

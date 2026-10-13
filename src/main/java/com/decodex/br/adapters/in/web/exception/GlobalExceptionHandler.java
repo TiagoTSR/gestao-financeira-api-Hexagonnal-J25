@@ -19,9 +19,13 @@ import com.decodex.br.domain.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(RegraDeNegocioException.class)
     public ResponseEntity<ErrorResponse> handleRegraDeNegocio(
@@ -99,6 +103,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneric(
             Exception ex,
             HttpServletRequest request) {
+        log.error("Erro inesperado no endpoint {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
                 "Erro inesperado", request);
     }
