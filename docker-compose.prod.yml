@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  gestao-postgres:
+    image: postgres:16-alpine
+    container_name: gestao_db_prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gestao_financeira}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_seguro_prod_2026}
+    command: >
+      postgres -c max_connections=200
+               -c shared_buffers=2GB
+               -c effective_cache_size=6GB
+               -c work_mem=16MB
+               -c maintenance_work_mem=512MB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-gestao_financeira}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gestao_network
+
+  gestao-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gestao_rabbitmq_prod
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-gestao_admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-gestao_rabbit_prod_2026}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_prod_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gestao_network
+
+  gestao-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gestao_api_prod
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      DB_URL2: jdbc:postgresql://gestao-postgres:5432/${POSTGRES_DB:-gestao_financeira}
+      DB_USER1: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD1: ${POSTGRES_PASSWORD:-postgres_seguro_prod_2026}
+      DB_POOL_MAX: 120
+      DB_POOL_MIN: 30
+      RABBITMQ_HOST: gestao-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: ${RABBITMQ_USER:-gestao_admin}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASS:-gestao_rabbit_prod_2026}
+      JWT_SECRET: ${JWT_SECRET:-chave-super-secreta-producao-hexagonal-j25-oracle-cloud-2026}
+      JAVA_TOOL_OPTIONS: "-Xms2g -Xmx6g -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+    depends_on:
+      gestao-postgres:
+        condition: service_healthy
+      gestao-rabbitmq:
+        condition: service_healthy
+    networks:
+      - gestao_network
+
+volumes:
+  postgres_prod_data:
+    name: gestao_prod_postgres_data
+  rabbitmq_prod_data:
+    name: gestao_prod_rabbitmq_data
+
+networks:
+  gestao_network:
+    name: gestao_prod_network
+    driver: bridge
