@@ -93,6 +93,7 @@ export default function (data) {
                     'Content-Type': 'application/json',
                     'X-Forwarded-For': clientIp
                 },
+                timeout: '90s',
                 tags: { name: 'POST /auth/login' }
             });
 
@@ -137,7 +138,8 @@ export default function (data) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
             'X-Forwarded-For': clientIp
-        }
+        },
+        timeout: '90s'
     };
 
     // ─────────────────────────────────────────────────────────────
@@ -161,7 +163,7 @@ export default function (data) {
         errorRate.add(!listOk);
     });
 
-    sleep(Math.random() * 1.0 + 0.8);
+    sleep(Math.random() * 1.5 + 1.2);
 
     // ─────────────────────────────────────────────────────────────
     // 3. ETAPA DE ESCRITA CONCORRENTE COM AUDITORIA (Envers)
@@ -194,7 +196,7 @@ export default function (data) {
             errorRate.add(!writeOk);
         });
 
-        sleep(Math.random() * 1.0 + 0.8);
+        sleep(Math.random() * 1.5 + 1.2);
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -243,6 +245,8 @@ export default function (data) {
                 } catch (e) {}
 
                 if (protocolo) {
+                    sleep(Math.random() * 0.5 + 0.3);
+
                     // Consulta não-bloqueante de status
                     const resStatus = http.get(`${url}/api/relatorios/${protocolo}/status`, {
                         ...authHeaders,
@@ -257,8 +261,8 @@ export default function (data) {
         });
     }
 
-    // Think time realista entre ciclos do usuário (1.5 a 3.5 segundos)
-    sleep(Math.random() * 2.0 + 1.5);
+    // Think time realista entre ciclos do usuário (2.5 a 4.5 segundos)
+    sleep(Math.random() * 2.0 + 2.5);
 }
 
 // Geração de relatório visual HTML e resumo detalhado no console
