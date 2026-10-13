@@ -47,4 +47,14 @@ public interface AuthControllerDoc {
         jakarta.servlet.http.HttpServletRequest request,
         jakarta.servlet.http.HttpServletResponse response
     );
+
+    @Operation(summary = "Cadastrar novo usuário", description = "Registra um novo usuário no sistema com senha criptografada em BCrypt.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuário cadastrado com sucesso",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.decodex.br.application.dto.auth.UsuarioResponseDTO.class))),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos ou usuário/e-mail já cadastrado", content = @Content)
+    })
+    ResponseEntity<com.decodex.br.application.dto.auth.UsuarioResponseDTO> register(
+        @RequestBody @Valid com.decodex.br.application.dto.auth.RegisterRequestDTO request
+    );
 }

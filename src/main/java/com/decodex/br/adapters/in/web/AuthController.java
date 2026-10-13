@@ -23,6 +23,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.decodex.br.application.dto.auth.RegisterRequestDTO;
+import com.decodex.br.application.dto.auth.UsuarioResponseDTO;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
+import com.decodex.br.domain.model.Usuario;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 @RestController
 public class AuthController implements AuthControllerDoc {
 
@@ -32,6 +38,8 @@ public class AuthController implements AuthControllerDoc {
     private final UserDetailsService userDetailsService;
     private final AuthCookieManager cookieManager;
     private final TokenResponseAssembler tokenResponseAssembler;
+    private final UsuarioRepositoryPort usuarioRepositoryPort;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public AuthController(
@@ -40,13 +48,17 @@ public class AuthController implements AuthControllerDoc {
             RefreshTokenInputPort refreshTokenInputPort,
             @Lazy UserDetailsService userDetailsService,
             AuthCookieManager cookieManager,
-            TokenResponseAssembler tokenResponseAssembler) {
+            TokenResponseAssembler tokenResponseAssembler,
+            @Lazy UsuarioRepositoryPort usuarioRepositoryPort,
+            @Lazy PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
         this.refreshTokenInputPort = refreshTokenInputPort;
         this.userDetailsService = userDetailsService;
         this.cookieManager = cookieManager;
         this.tokenResponseAssembler = tokenResponseAssembler;
+        this.usuarioRepositoryPort = usuarioRepositoryPort;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthController(
@@ -54,9 +66,11 @@ public class AuthController implements AuthControllerDoc {
             TokenService tokenService,
             RefreshTokenInputPort refreshTokenInputPort,
             @Lazy UserDetailsService userDetailsService,
-            @Lazy UsuarioRepositoryPort usuarioRepositoryPort) {
+            @Lazy UsuarioRepositoryPort usuarioRepositoryPort,
+            @Lazy PasswordEncoder passwordEncoder) {
         this(authenticationManager, tokenService, refreshTokenInputPort, userDetailsService,
-                new AuthCookieManager(), new TokenResponseAssembler(usuarioRepositoryPort));
+                new AuthCookieManager(), new TokenResponseAssembler(usuarioRepositoryPort),
+                usuarioRepositoryPort, passwordEncoder);
     }
 
     @Override
@@ -122,6 +136,30 @@ public class AuthController implements AuthControllerDoc {
         cookieManager.clearAuthCookies(response);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping(value = {"/auth/register", "/auth/cadastrar"})
+    public ResponseEntity<UsuarioResponseDTO> register(
+            @RequestBody @Valid RegisterRequestDTO request) {
+
+        if (usuarioRepositoryPort.findByUsername(request.username()).isPresent()) {
+            throw new RegraDeNegocioException("Já existe um usuário cadastrado com o username: " + request.username());
+        }
+        if (usuarioRepositoryPort.findByUsernameOrEmail(request.email(), request.email()).isPresent()) {
+            throw new RegraDeNegocioException("Já existe um usuário cadastrado com o e-mail: " + request.email());
+        }
+
+        Usuario usuario = new Usuario(
+                request.username().trim(),
+                passwordEncoder.encode(request.password().trim()),
+                request.email().trim().toLowerCase()
+        );
+
+        Usuario salvo = usuarioRepositoryPort.save(usuario);
+
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(new UsuarioResponseDTO(salvo.getId(), salvo.getUsername(), salvo.getEmail()));
     }
 }
 
