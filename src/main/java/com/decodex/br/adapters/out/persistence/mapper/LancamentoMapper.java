@@ -19,5 +19,6 @@ public interface LancamentoMapper {
 
     Lancamento toDomain(LancamentoEntity entity);
 
+    @org.mapstruct.Mapping(target = "tenantId", ignore = true)
     LancamentoEntity toEntity(Lancamento lancamento);
 }

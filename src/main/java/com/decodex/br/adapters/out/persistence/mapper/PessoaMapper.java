@@ -16,6 +16,7 @@ public interface PessoaMapper {
 
     Pessoa toDomain(PessoaEntity entity);
 
+    @org.mapstruct.Mapping(target = "tenantId", ignore = true)
     PessoaEntity toEntity(Pessoa pessoa);
 
     Endereco toDomain(EnderecoEmbeddable entity);

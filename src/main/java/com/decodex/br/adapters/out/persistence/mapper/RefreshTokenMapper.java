@@ -19,5 +19,6 @@ public interface RefreshTokenMapper {
 
     RefreshToken toDomain(RefreshTokenEntity entity);
 
+    @org.mapstruct.Mapping(target = "tenantId", ignore = true)
     RefreshTokenEntity toEntity(RefreshToken domain);
 }

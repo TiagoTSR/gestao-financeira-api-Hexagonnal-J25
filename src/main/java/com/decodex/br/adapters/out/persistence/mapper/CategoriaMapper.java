@@ -14,5 +14,6 @@ public interface CategoriaMapper {
 
     Categoria toDomain(CategoriaEntity entity);
 
+    @org.mapstruct.Mapping(target = "tenantId", ignore = true)
     CategoriaEntity toEntity(Categoria categoria);
 }
