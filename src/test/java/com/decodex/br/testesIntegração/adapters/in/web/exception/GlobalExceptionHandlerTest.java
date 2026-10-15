@@ -78,13 +78,28 @@ class GlobalExceptionHandlerTest {
     void handleDataIntegrityViolation() throws Exception {
         UUID id = UUID.randomUUID();
         when(categoriaInputPort.findById(id))
-            .thenThrow(new org.springframework.dao.DataIntegrityViolationException("Unique constraint: uk_categoria_nome violated"));
+            .thenThrow(new org.springframework.dao.DataIntegrityViolationException("Unique constraint: uk_categoria_tenant_nome violated"));
 
         mockMvc.perform(get("/categorias/" + id))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message").value("Já existe uma categoria cadastrada com este nome."))
+            .andExpect(jsonPath("$.path").value("/categorias/" + id));
+    }
+
+    @Test
+    @DisplayName("Deve retornar 400 com mensagem amigável ao tentar excluir categoria vinculada a lançamento")
+    void handleDataIntegrityViolation_CategoriaVinculadaALancamento() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(categoriaInputPort.findById(id))
+            .thenThrow(new org.springframework.dao.DataIntegrityViolationException("violates foreign key constraint fk_lancamento_categoria"));
+
+        mockMvc.perform(get("/categorias/" + id))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").value("Não é possível excluir esta categoria pois existem lançamentos financeiros vinculados a ela."))
             .andExpect(jsonPath("$.path").value("/categorias/" + id));
     }
 

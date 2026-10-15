@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         String mensagem = "Operação não permitida: violação de integridade de dados.";
         String causa = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
-        if (causa.contains("uk_categoria_nome") || causa.contains("categoria_nome_key")) {
+        if (causa.contains("uk_categoria_tenant_nome") || causa.contains("uk_categoria_nome") || causa.contains("categoria_nome_key")) {
             mensagem = "Já existe uma categoria cadastrada com este nome.";
         } else if (causa.contains("uk_usuario_email") || causa.contains("usuario_email_key")) {
             mensagem = "Já existe um usuário cadastrado com este e-mail.";
@@ -48,6 +48,8 @@ public class GlobalExceptionHandler {
             mensagem = "Já existe um usuário cadastrado com este nome de usuário.";
         } else if (causa.contains("fk_lancamento_pessoa") || causa.contains("lancamento_pessoa_id")) {
             mensagem = "Não é possível excluir esta pessoa pois existem lançamentos financeiros vinculados a ela.";
+        } else if (causa.contains("fk_lancamento_categoria") || causa.contains("lancamento_categoria_id")) {
+            mensagem = "Não é possível excluir esta categoria pois existem lançamentos financeiros vinculados a ela.";
         }
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", mensagem, request);
     }
