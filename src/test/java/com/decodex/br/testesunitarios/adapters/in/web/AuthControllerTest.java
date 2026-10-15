@@ -33,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Spy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Instant;
 import java.util.Collections;
 
@@ -64,6 +65,9 @@ class AuthControllerTest {
     @Mock
     private com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort;
 
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
     @Spy
     private AuthCookieManager cookieManager = new AuthCookieManager();
 
@@ -80,7 +84,9 @@ class AuthControllerTest {
                 refreshTokenInputPort,
                 userDetailsService,
                 cookieManager,
-                tokenResponseAssembler
+                tokenResponseAssembler,
+                usuarioRepositoryPort,
+                passwordEncoder
         );
     }
 
