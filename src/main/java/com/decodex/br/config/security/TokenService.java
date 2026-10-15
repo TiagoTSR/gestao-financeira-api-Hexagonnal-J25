@@ -4,12 +4,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 
 import com.decodex.br.config.multitenancy.TenantContext;
 import java.util.UUID;
@@ -20,10 +20,15 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    public record TokenPayload(String username, UUID tenantId) {}
+
     public String generateToken(UserDetails userDetails, UUID tenantId) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             UUID tenant = tenantId != null ? tenantId : TenantContext.getTenantId();
+            if (tenant == null) {
+                tenant = TenantContext.DEFAULT_TENANT_ID;
+            }
             return JWT.create()
                     .withIssuer("gestao-financeira-api")
                     .withSubject(userDetails.getUsername())
@@ -52,15 +57,34 @@ public class TokenService {
         }
     }
 
-    public UUID extractTenantId(String token) {
+    public TokenPayload validateAndExtract(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String tenantStr = JWT.require(algorithm)
+            DecodedJWT decoded = JWT.require(algorithm)
                     .withIssuer("gestao-financeira-api")
                     .build()
-                    .verify(token)
-                    .getClaim("tenant_id")
-                    .asString();
+                    .verify(token);
+
+            String username = decoded.getSubject();
+            String tenantStr = decoded.getClaim("tenant_id").asString();
+            UUID tenantId = tenantStr != null ? UUID.fromString(tenantStr) : TenantContext.DEFAULT_TENANT_ID;
+
+            return new TokenPayload(username, tenantId);
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
+    public UUID extractTenantId(String token) {
+        if (token == null || token.isBlank()) {
+            return TenantContext.DEFAULT_TENANT_ID;
+        }
+        try {
+            DecodedJWT decoded = JWT.decode(token);
+            String tenantStr = decoded.getClaim("tenant_id").asString();
             return tenantStr != null ? UUID.fromString(tenantStr) : TenantContext.DEFAULT_TENANT_ID;
         } catch (Exception exception) {
             return TenantContext.DEFAULT_TENANT_ID;
@@ -68,6 +92,6 @@ public class TokenService {
     }
 
     private Instant genExpirationDate() {
-        return LocalDateTime.now().plusMinutes(15).toInstant(ZoneOffset.of("-03:00"));
+        return Instant.now().plus(15, ChronoUnit.MINUTES);
     }
 }

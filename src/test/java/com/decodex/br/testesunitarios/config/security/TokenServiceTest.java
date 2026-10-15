@@ -56,4 +56,26 @@ class TokenServiceTest {
         java.util.UUID extraidoNulo = tokenService.extractTenantId(null);
         assertThat(extraidoNulo).isEqualTo(com.decodex.br.config.multitenancy.TenantContext.DEFAULT_TENANT_ID);
     }
+
+    @Test
+    @DisplayName("Deve validar e extrair payload completo em uma única operação")
+    void deveValidarEExtrairPayloadCompleto() {
+        java.util.UUID customTenantId = java.util.UUID.randomUUID();
+        UserDetails userDetails = new User("admin", "password", Collections.emptyList());
+
+        String token = tokenService.generateToken(userDetails, customTenantId);
+        TokenService.TokenPayload payload = tokenService.validateAndExtract(token);
+
+        assertThat(payload).isNotNull();
+        assertThat(payload.username()).isEqualTo("admin");
+        assertThat(payload.tenantId()).isEqualTo(customTenantId);
+    }
+
+    @Test
+    @DisplayName("Deve retornar null ao validar payload com token inválido ou nulo")
+    void deveRetornarNullParaPayloadInvalido() {
+        assertThat(tokenService.validateAndExtract(null)).isNull();
+        assertThat(tokenService.validateAndExtract("")).isNull();
+        assertThat(tokenService.validateAndExtract("token-falso")).isNull();
+    }
 }
