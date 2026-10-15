@@ -86,7 +86,7 @@ class CategoriaServiceTest {
 
         assertThatThrownBy(() -> service.findById(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Categoria não encontrado: " + idInexistente);
+                .hasMessage("Categoria não encontrada: " + idInexistente);
         verify(repository, times(1)).findById(idInexistente);
     }
 
@@ -139,7 +139,7 @@ class CategoriaServiceTest {
 
         assertThatThrownBy(() -> service.delete(idInexistente))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Categoria não encontrado: " + idInexistente);
+                .hasMessage("Categoria não encontrada: " + idInexistente);
 
         verify(repository, times(1)).findById(idInexistente);
         verify(repository, never()).deleteById(any());

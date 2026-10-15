@@ -105,7 +105,7 @@ public class RelatorioAsyncService implements RelatorioAsyncInputPort {
         RelatorioSolicitacaoEntity entity = relatorioRepository.findById(protocolo)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitação de relatório não encontrada para o protocolo: " + protocolo));
 
-        if (entity.getStatus() == StatusRelatorio.PENDENTE || entity.getStatus() == StatusRelatorio.PROCESSANDO) {
+        if (entity.getStatus() != null && entity.getStatus().isEmAndamento()) {
             throw new RegraDeNegocioException("O relatório ainda está em processamento. Consulte novamente em instantes.");
         }
 

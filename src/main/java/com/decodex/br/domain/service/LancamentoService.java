@@ -159,7 +159,7 @@ public class LancamentoService implements LancamentoInputPort {
     }
 
     private void validarPessoaAtiva(Pessoa pessoa) {
-        if (Boolean.FALSE.equals(pessoa.getAtivo())) {
+        if (pessoa != null && !pessoa.isAtivo()) {
             throw new RegraDeNegocioException("Não é possível salvar lançamento para pessoa inativa.");
         }
     }

@@ -25,7 +25,7 @@ public class CategoriaService implements CategoriaInputPort {
     @Override
     public Categoria findById(UUID id) {
         return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrado: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada: " + id));
     }
 
     @Override
