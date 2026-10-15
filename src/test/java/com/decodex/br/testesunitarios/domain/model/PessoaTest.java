@@ -145,4 +145,19 @@ class PessoaTest {
         assertThat(pessoa.getEndereco()).isEqualTo(novoEndereco);
         assertThat(pessoa.getAtivo()).isFalse();
     }
+
+    @Test
+    @DisplayName("Deve ativar e desativar pessoa de forma expressiva e refletir em isAtivo")
+    void deveAtivarEDesativarExpressivamente() {
+        Pessoa pessoa = new Pessoa(ID, NOME, ENDERECO, true);
+        assertThat(pessoa.isAtivo()).isTrue();
+
+        pessoa.desativar();
+        assertThat(pessoa.isAtivo()).isFalse();
+        assertThat(pessoa.getAtivo()).isFalse();
+
+        pessoa.ativar();
+        assertThat(pessoa.isAtivo()).isTrue();
+        assertThat(pessoa.getAtivo()).isTrue();
+    }
 }

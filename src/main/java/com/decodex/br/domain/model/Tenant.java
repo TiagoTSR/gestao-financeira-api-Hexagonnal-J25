@@ -42,4 +42,16 @@ public class Tenant {
     public LocalDateTime getDataCriacao() {
         return dataCriacao;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tenant other)) return false;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

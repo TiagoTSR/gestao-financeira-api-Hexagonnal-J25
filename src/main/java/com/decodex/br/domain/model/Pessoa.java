@@ -49,6 +49,14 @@ public class Pessoa {
 		this.ativo = validarAtivo(alteracaoAtivo);
 	}
 
+	public void ativar() {
+		this.ativo = true;
+	}
+
+	public void desativar() {
+		this.ativo = false;
+	}
+
 	public void atualizar(String novoNome, Endereco novoEndereco, Boolean novoAtivo) {
 		String nomeValidado = validarNome(novoNome, "Nome");
 		Endereco enderecoValidado = validarEndereco(novoEndereco);
@@ -79,6 +87,10 @@ public class Pessoa {
 
 	public Boolean getAtivo() {
 		return ativo;
+	}
+
+	public boolean isAtivo() {
+		return Boolean.TRUE.equals(this.ativo);
 	}
 
 	@Override
