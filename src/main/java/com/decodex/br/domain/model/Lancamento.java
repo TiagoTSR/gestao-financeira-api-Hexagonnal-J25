@@ -267,6 +267,18 @@ public class Lancamento {
         return totalParcelas;
     }
 
+    public boolean isQuitado() {
+        return this.status != null && this.status.isQuitado();
+    }
+
+    public boolean isPendente() {
+        return this.status != null && this.status.isPendente();
+    }
+
+    public boolean isCancelado() {
+        return this.status != null && this.status.isCancelado();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)

@@ -74,4 +74,42 @@ class DashboardServiceTest {
         assertEquals(BigDecimal.valueOf(1500.00), resumo.despesasPorCategoria().get(0).total());
         assertEquals(6, resumo.fluxoMensal().size());
     }
+
+    @Test
+    @DisplayName("Deve ignorar lançamentos cancelados no cálculo de receitas, despesas, vencidos e pendências")
+    void deveIgnorarLancamentosCanceladosNoCalculoDoDashboard() {
+        LocalDate mesRef = LocalDate.of(2026, 10, 15);
+        Categoria cat = new Categoria(UUID.randomUUID(), "Lazer");
+        Pessoa pessoa = new Pessoa(UUID.randomUUID(), "Cliente", new Endereco("Rua", "1", null, "B", "00000", "C", "SP"), true);
+
+        Lancamento despesaAtiva = new Lancamento(
+                UUID.randomUUID(), "Cinema", LocalDate.now().plusDays(5), null,
+                BigDecimal.valueOf(100.00), null, TipoLancamento.DESPESA, cat, pessoa
+        );
+
+        Lancamento despesaCancelada = new Lancamento(
+                UUID.randomUUID(), "Viagem Cancelada", LocalDate.now().minusDays(10), null,
+                BigDecimal.valueOf(5000.00), null, TipoLancamento.DESPESA, cat, pessoa
+        );
+        despesaCancelada.cancelar();
+
+        Lancamento receitaCancelada = new Lancamento(
+                UUID.randomUUID(), "Bônus Cancelado", LocalDate.now().minusDays(5), null,
+                BigDecimal.valueOf(10000.00), null, TipoLancamento.RECEITA, cat, pessoa
+        );
+        receitaCancelada.cancelar();
+
+        when(lancamentoRepositoryPort.findAll()).thenReturn(List.of(despesaAtiva, despesaCancelada, receitaCancelada));
+
+        DashboardResumo resumo = dashboardService.obterDashboard(LocalDate.now());
+
+        assertNotNull(resumo);
+        assertEquals(BigDecimal.ZERO, resumo.totalReceitas());
+        assertEquals(BigDecimal.valueOf(100.00), resumo.totalDespesas());
+        assertEquals(BigDecimal.valueOf(-100.00), resumo.saldoMes());
+        assertEquals(BigDecimal.valueOf(100.00), resumo.totalPendente());
+        assertEquals(0, resumo.quantidadeVencidos());
+        assertEquals(BigDecimal.ZERO, resumo.totalVencido());
+        assertEquals(1, resumo.ultimosLancamentos().size());
+    }
 }

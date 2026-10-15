@@ -38,9 +38,12 @@ public class DashboardService implements DashboardInputPort {
         LocalDate hoje = LocalDate.now();
 
         List<Lancamento> todos = lancamentoRepositoryPort.findAll();
+        List<Lancamento> todosAtivos = todos.stream()
+                .filter(l -> !l.isCancelado())
+                .toList();
 
-        // 1. Lançamentos do mês de referência
-        List<Lancamento> doMes = todos.stream()
+        // 1. Lançamentos do mês de referência (somente ativos)
+        List<Lancamento> doMes = todosAtivos.stream()
                 .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(anoMesRef))
                 .toList();
 
@@ -56,28 +59,28 @@ public class DashboardService implements DashboardInputPort {
 
         BigDecimal saldoMes = totalReceitas.subtract(totalDespesas);
 
-        // 2. Saldo Consolidado Histórico (efetivamente pago/recebido)
-        BigDecimal totalReceitasPagasHistorico = todos.stream()
-                .filter(l -> l.getTipo() != null && l.getTipo().isReceita() && l.getDataPagamento() != null)
+        // 2. Saldo Consolidado Histórico (efetivamente pago/recebido e não cancelado)
+        BigDecimal totalReceitasPagasHistorico = todosAtivos.stream()
+                .filter(l -> l.getTipo() != null && l.getTipo().isReceita() && l.isQuitado())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalDespesasPagasHistorico = todos.stream()
-                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa() && l.getDataPagamento() != null)
+        BigDecimal totalDespesasPagasHistorico = todosAtivos.stream()
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa() && l.isQuitado())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal saldoConsolidado = totalReceitasPagasHistorico.subtract(totalDespesasPagasHistorico);
 
-        // 3. Pendentes no mês de referência
+        // 3. Pendentes no mês de referência (somente não cancelados)
         BigDecimal totalPendente = doMes.stream()
-                .filter(l -> l.getDataPagamento() == null)
+                .filter(Lancamento::isPendente)
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // 4. Vencidos em aberto (geral até a data de hoje)
-        List<Lancamento> vencidosAbertos = todos.stream()
-                .filter(l -> l.getDataPagamento() == null && l.getDataVencimento() != null && l.getDataVencimento().isBefore(hoje))
+        // 4. Vencidos em aberto (geral até a data de hoje, somente pendentes e não cancelados)
+        List<Lancamento> vencidosAbertos = todosAtivos.stream()
+                .filter(l -> l.isPendente() && l.getDataVencimento() != null && l.getDataVencimento().isBefore(hoje))
                 .toList();
 
         BigDecimal totalVencido = vencidosAbertos.stream()
@@ -113,12 +116,12 @@ public class DashboardService implements DashboardInputPort {
         List<MesFluxo> fluxo = new ArrayList<>();
         for (int i = 5; i >= 0; i--) {
             YearMonth ym = anoMesRef.minusMonths(i);
-            BigDecimal rec = todos.stream()
+            BigDecimal rec = todosAtivos.stream()
                     .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() != null && l.getTipo().isReceita())
                     .map(Lancamento::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal desp = todos.stream()
+            BigDecimal desp = todosAtivos.stream()
                     .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() != null && l.getTipo().isDespesa())
                     .map(Lancamento::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -127,8 +130,8 @@ public class DashboardService implements DashboardInputPort {
             fluxo.add(new MesFluxo(ym.toString(), mesNome, rec, desp, rec.subtract(desp)));
         }
 
-        // 7. Últimos 5 lançamentos
-        List<Lancamento> ultimos = todos.stream()
+        // 7. Últimos 5 lançamentos (somente ativos)
+        List<Lancamento> ultimos = todosAtivos.stream()
                 .sorted(Comparator.comparing(Lancamento::getDataVencimento, Comparator.nullsLast(Comparator.reverseOrder())))
                 .limit(5)
                 .toList();
