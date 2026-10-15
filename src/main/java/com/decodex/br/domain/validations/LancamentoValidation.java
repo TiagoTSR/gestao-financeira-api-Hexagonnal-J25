@@ -54,4 +54,17 @@ public final class LancamentoValidation {
         }
         return pessoa;
     }
+
+    public static com.decodex.br.domain.model.StatusLancamento validarStatus(
+            com.decodex.br.domain.model.StatusLancamento status, TipoLancamento tipo) {
+        if (status == null) {
+            return com.decodex.br.domain.model.StatusLancamento.PENDENTE;
+        }
+        if (tipo != null && !tipo.isCompativelCom(status)) {
+            throw new RegraDeNegocioException(
+                String.format("Status '%s' não é compatível com o tipo de lançamento '%s'", status.getDescricao(), tipo.getDescricao())
+            );
+        }
+        return status;
+    }
 }

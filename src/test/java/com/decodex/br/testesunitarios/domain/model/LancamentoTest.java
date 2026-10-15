@@ -212,4 +212,61 @@ class LancamentoTest {
         assertThat(lancamento.getCategoria()).isEqualTo(novaCategoria);
         assertThat(lancamento.getPessoa()).isEqualTo(novaPessoa);
     }
+
+    @Test
+    @DisplayName("Deve lançar exceção quando status for incompatível com o tipo na criação ou alteração")
+    void deveLancarExcecaoQuandoStatusIncompativelComTipo() {
+        assertThatThrownBy(() -> new Lancamento(
+                ID, DESCRICAO, DATA_VENCIMENTO, null, VALOR, OBSERVACAO,
+                TipoLancamento.DESPESA, CATEGORIA, PESSOA,
+                com.decodex.br.domain.model.StatusLancamento.RECEBIDO, null, 1, 1
+        ))
+        .isInstanceOf(RegraDeNegocioException.class)
+        .hasMessageContaining("não é compatível com o tipo de lançamento");
+
+        assertThatThrownBy(() -> new Lancamento(
+                ID, DESCRICAO, DATA_VENCIMENTO, null, VALOR, OBSERVACAO,
+                TipoLancamento.RECEITA, CATEGORIA, PESSOA,
+                com.decodex.br.domain.model.StatusLancamento.PAGO, null, 1, 1
+        ))
+        .isInstanceOf(RegraDeNegocioException.class)
+        .hasMessageContaining("não é compatível com o tipo de lançamento");
+    }
+
+    @Test
+    @DisplayName("Deve quitar receita com status RECEBIDO e despesa com status PAGO")
+    void deveQuitarReceitaEDespesa() {
+        Lancamento receita = new Lancamento(ID, "Salário", DATA_VENCIMENTO, null, VALOR, null, TipoLancamento.RECEITA, CATEGORIA, PESSOA);
+        receita.quitar(LocalDate.of(2025, 5, 10), VALOR);
+        assertThat(receita.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.RECEBIDO);
+        assertThat(receita.getStatus().isQuitado()).isTrue();
+
+        Lancamento despesa = new Lancamento(ID, "Conta de Luz", DATA_VENCIMENTO, null, VALOR, null, TipoLancamento.DESPESA, CATEGORIA, PESSOA);
+        despesa.quitar(LocalDate.of(2025, 5, 10), VALOR);
+        assertThat(despesa.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.PAGO);
+        assertThat(despesa.getStatus().isQuitado()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve cancelar e reabrir lançamento corretamente")
+    void deveCancelarEReabrirLancamento() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, null, VALOR, null, TipoLancamento.DESPESA, CATEGORIA, PESSOA);
+        lancamento.cancelar();
+        assertThat(lancamento.getStatus().isCancelado()).isTrue();
+
+        lancamento.reabrir();
+        assertThat(lancamento.getStatus().isPendente()).isTrue();
+        assertThat(lancamento.getDataPagamento()).isNull();
+        assertThat(lancamento.getValorPago()).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve sincronizar status de quitação ao alterar tipo de lançamento")
+    void deveSincronizarStatusAoAlterarTipo() {
+        Lancamento lancamento = new Lancamento(ID, DESCRICAO, DATA_VENCIMENTO, DATA_PAGAMENTO, VALOR, null, TipoLancamento.DESPESA, CATEGORIA, PESSOA);
+        assertThat(lancamento.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.PAGO);
+
+        lancamento.alterarTipo(TipoLancamento.RECEITA);
+        assertThat(lancamento.getStatus()).isEqualTo(com.decodex.br.domain.model.StatusLancamento.RECEBIDO);
+    }
 }

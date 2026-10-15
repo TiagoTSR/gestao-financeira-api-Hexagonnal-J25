@@ -4,6 +4,7 @@ import static com.decodex.br.domain.validations.LancamentoValidation.validarCate
 import static com.decodex.br.domain.validations.LancamentoValidation.validarDataVencimento;
 import static com.decodex.br.domain.validations.LancamentoValidation.validarDescricao;
 import static com.decodex.br.domain.validations.LancamentoValidation.validarPessoa;
+import static com.decodex.br.domain.validations.LancamentoValidation.validarStatus;
 import static com.decodex.br.domain.validations.LancamentoValidation.validarTipo;
 import static com.decodex.br.domain.validations.LancamentoValidation.validarValor;
 
@@ -44,7 +45,7 @@ public class Lancamento {
     public Lancamento(UUID id, String descricao, LocalDate dataVencimento, LocalDate dataPagamento, BigDecimal valor,
             String observacao, TipoLancamento tipo, Categoria categoria, Pessoa pessoa) {
         this(id, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa,
-             (dataPagamento != null) ? (tipo == TipoLancamento.RECEITA ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO) : StatusLancamento.PENDENTE,
+             (dataPagamento != null && tipo != null) ? tipo.getStatusQuitado() : StatusLancamento.PENDENTE,
              (dataPagamento != null) ? valor : null, 1, 1);
     }
 
@@ -61,7 +62,8 @@ public class Lancamento {
         this.tipo = validarTipo(tipo);
         this.categoria = validarCategoria(categoria);
         this.pessoa = validarPessoa(pessoa);
-        this.status = status != null ? status : ((dataPagamento != null) ? (tipo == TipoLancamento.RECEITA ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO) : StatusLancamento.PENDENTE);
+        StatusLancamento statusInicial = status != null ? status : ((dataPagamento != null) ? this.tipo.getStatusQuitado() : StatusLancamento.PENDENTE);
+        this.status = validarStatus(statusInicial, this.tipo);
         this.valorPago = valorPago;
         this.numeroParcela = numeroParcela != null ? numeroParcela : 1;
         this.totalParcelas = totalParcelas != null ? totalParcelas : 1;
@@ -88,12 +90,12 @@ public class Lancamento {
 
     public void alterarDataPagamento(LocalDate novaDataPagamento) {
         this.dataPagamento = novaDataPagamento;
-        if (novaDataPagamento != null && this.status == StatusLancamento.PENDENTE) {
-            this.status = (this.tipo == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+        if (novaDataPagamento != null && this.status.isPendente()) {
+            this.status = this.tipo.getStatusQuitado();
             if (this.valorPago == null) {
                 this.valorPago = this.valor;
             }
-        } else if (novaDataPagamento == null && (this.status == StatusLancamento.PAGO || this.status == StatusLancamento.RECEBIDO)) {
+        } else if (novaDataPagamento == null && this.status.isQuitado()) {
             this.status = StatusLancamento.PENDENTE;
             this.valorPago = null;
         }
@@ -109,6 +111,9 @@ public class Lancamento {
 
     public void alterarTipo(TipoLancamento novoTipo) {
         this.tipo = validarTipo(novoTipo);
+        if (this.status != null && this.status.isQuitado()) {
+            this.status = this.tipo.getStatusQuitado();
+        }
     }
 
     public void alterarCategoria(Categoria novaCategoria) {
@@ -122,7 +127,7 @@ public class Lancamento {
     public void quitar(LocalDate dataPagamento, BigDecimal valorPago) {
         this.dataPagamento = dataPagamento != null ? dataPagamento : LocalDate.now();
         this.valorPago = valorPago != null ? validarValor(valorPago) : this.valor;
-        this.status = (this.tipo == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+        this.status = this.tipo.getStatusQuitado();
     }
 
     public void cancelar() {
@@ -136,7 +141,7 @@ public class Lancamento {
     }
 
     public void alterarStatus(StatusLancamento novoStatus) {
-        this.status = novoStatus != null ? novoStatus : StatusLancamento.PENDENTE;
+        this.status = validarStatus(novoStatus != null ? novoStatus : StatusLancamento.PENDENTE, this.tipo);
     }
 
     public void alterarValorPago(BigDecimal novoValorPago) {
@@ -170,14 +175,16 @@ public class Lancamento {
         this.categoria = categoriaValidada;
         this.pessoa = pessoaValidada;
 
-        if (novaDataPagamento != null && this.status == StatusLancamento.PENDENTE) {
-            this.status = (tipoValidado == TipoLancamento.RECEITA) ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO;
+        if (novaDataPagamento != null && this.status.isPendente()) {
+            this.status = tipoValidado.getStatusQuitado();
             if (this.valorPago == null) {
                 this.valorPago = valorValidado;
             }
-        } else if (novaDataPagamento == null && (this.status == StatusLancamento.PAGO || this.status == StatusLancamento.RECEBIDO)) {
+        } else if (novaDataPagamento == null && this.status.isQuitado()) {
             this.status = StatusLancamento.PENDENTE;
             this.valorPago = null;
+        } else if (this.status.isQuitado()) {
+            this.status = tipoValidado.getStatusQuitado();
         }
     }
 
@@ -194,7 +201,7 @@ public class Lancamento {
                 novosDados.pessoa
             );
             if (novosDados.status != null) {
-                this.status = novosDados.status;
+                this.status = validarStatus(novosDados.status, this.tipo);
             }
             if (novosDados.valorPago != null) {
                 this.valorPago = novosDados.valorPago;
