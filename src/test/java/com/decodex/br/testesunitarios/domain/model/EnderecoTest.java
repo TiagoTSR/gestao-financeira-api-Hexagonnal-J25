@@ -83,4 +83,25 @@ class EnderecoTest {
         assertThat(endereco.getComplemento()).isNull();
         assertThat(endereco.getLogradouro()).isEqualTo(LOGRADOURO);
     }
+
+    @Test
+    @DisplayName("Deve comparar endereços por igualdade de valores (Value Object)")
+    void deveCompararPorIgualdadeDeValores() {
+        Endereco e1 = new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, ESTADO);
+        Endereco e2 = new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, ESTADO);
+        Endereco e3 = new Endereco("Outra Rua", NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, ESTADO);
+
+        assertThat(e1).isEqualTo(e2);
+        assertThat(e1.hashCode()).isEqualTo(e2.hashCode());
+        assertThat(e1).isNotEqualTo(e3);
+        assertThat(e1).isNotEqualTo(null);
+        assertThat(e1).isEqualTo(e1);
+    }
+
+    @Test
+    @DisplayName("Deve formatar endereço legível no toString")
+    void deveFormatarToString() {
+        Endereco endereco = new Endereco(LOGRADOURO, NUMERO, COMPLEMENTO, BAIRRO, CEP, CIDADE, ESTADO);
+        assertThat(endereco.toString()).contains(LOGRADOURO).contains(CIDADE).contains(ESTADO);
+    }
 }
