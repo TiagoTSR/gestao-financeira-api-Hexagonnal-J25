@@ -228,4 +228,70 @@ class EntityEqualsHashCodeTest {
         assertThat(r1).isNotEqualTo(null);
         assertThat(r1).isEqualTo(r1);
     }
+
+    // ─────────────────────────────────────────
+    // UsuarioEntity
+    // ─────────────────────────────────────────
+
+    @Test
+    @DisplayName("UsuarioEntity - objetos com mesmo ID devem ser iguais")
+    void usuarioEntity_SameId_ShouldBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.UsuarioEntity u1 = new com.decodex.br.adapters.out.persistence.entity.UsuarioEntity();
+        u1.setId(id1);
+        u1.setUsername("user1");
+
+        com.decodex.br.adapters.out.persistence.entity.UsuarioEntity u2 = new com.decodex.br.adapters.out.persistence.entity.UsuarioEntity();
+        u2.setId(id1);
+        u2.setUsername("user2");
+
+        assertThat(u1).isEqualTo(u2);
+        assertThat(u1.hashCode()).isEqualTo(u2.hashCode());
+    }
+
+    @Test
+    @DisplayName("UsuarioEntity - objetos com IDs diferentes não devem ser iguais")
+    void usuarioEntity_DifferentId_ShouldNotBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.UsuarioEntity u1 = new com.decodex.br.adapters.out.persistence.entity.UsuarioEntity();
+        u1.setId(id1);
+
+        com.decodex.br.adapters.out.persistence.entity.UsuarioEntity u2 = new com.decodex.br.adapters.out.persistence.entity.UsuarioEntity();
+        u2.setId(id2);
+
+        assertThat(u1).isNotEqualTo(u2);
+        assertThat(u1).isNotEqualTo(null);
+        assertThat(u1).isEqualTo(u1);
+    }
+
+    // ─────────────────────────────────────────
+    // RefreshTokenEntity
+    // ─────────────────────────────────────────
+
+    @Test
+    @DisplayName("RefreshTokenEntity - objetos com mesmo ID devem ser iguais")
+    void refreshTokenEntity_SameId_ShouldBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity t1 = new com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity();
+        t1.setId(id1);
+        t1.setToken("token-a");
+
+        com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity t2 = new com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity();
+        t2.setId(id1);
+        t2.setToken("token-b");
+
+        assertThat(t1).isEqualTo(t2);
+        assertThat(t1.hashCode()).isEqualTo(t2.hashCode());
+    }
+
+    @Test
+    @DisplayName("RefreshTokenEntity - objetos com IDs diferentes não devem ser iguais")
+    void refreshTokenEntity_DifferentId_ShouldNotBeEqual() {
+        com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity t1 = new com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity();
+        t1.setId(id1);
+
+        com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity t2 = new com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity();
+        t2.setId(id2);
+
+        assertThat(t1).isNotEqualTo(t2);
+        assertThat(t1).isNotEqualTo(null);
+        assertThat(t1).isEqualTo(t1);
+    }
 }
