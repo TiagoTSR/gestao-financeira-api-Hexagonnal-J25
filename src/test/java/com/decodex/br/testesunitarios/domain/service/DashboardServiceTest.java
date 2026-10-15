@@ -78,7 +78,6 @@ class DashboardServiceTest {
     @Test
     @DisplayName("Deve ignorar lançamentos cancelados no cálculo de receitas, despesas, vencidos e pendências")
     void deveIgnorarLancamentosCanceladosNoCalculoDoDashboard() {
-        LocalDate mesRef = LocalDate.of(2026, 10, 15);
         Categoria cat = new Categoria(UUID.randomUUID(), "Lazer");
         Pessoa pessoa = new Pessoa(UUID.randomUUID(), "Cliente", new Endereco("Rua", "1", null, "B", "00000", "C", "SP"), true);
 

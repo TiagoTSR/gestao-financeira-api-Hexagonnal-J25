@@ -18,7 +18,6 @@ import com.decodex.br.domain.model.DashboardResumo;
 import com.decodex.br.domain.model.DashboardResumo.CategoriaEstatistica;
 import com.decodex.br.domain.model.DashboardResumo.MesFluxo;
 import com.decodex.br.domain.model.Lancamento;
-import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.port.in.DashboardInputPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 

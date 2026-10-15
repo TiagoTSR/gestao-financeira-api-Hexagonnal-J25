@@ -2,7 +2,6 @@ package com.decodex.br.adapters.out.excel.writer;
 
 import com.decodex.br.adapters.out.excel.style.ExcelStyleFactory.ExcelStyles;
 import com.decodex.br.domain.model.Lancamento;
-import com.decodex.br.domain.model.TipoLancamento;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
