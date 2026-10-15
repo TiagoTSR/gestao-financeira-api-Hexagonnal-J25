@@ -68,7 +68,7 @@ public final class ResumoPessoaSheetWriter {
             boolean zebra = (rowNum % 2 == 0);
 
             configurarCelula(r, 0, est.getPessoa() != null ? est.getPessoa().getNome() : "-", zebra ? estilos.textoZebra : estilos.textoPadrao);
-            configurarCelula(r, 1, est.getTipo() != null ? est.getTipo().getDescricao() : "-", est.getTipo() == TipoLancamento.RECEITA ? estilos.tipoReceita : estilos.tipoDespesa);
+            configurarCelula(r, 1, est.getTipo() != null ? est.getTipo().getDescricao() : "-", est.getTipo() != null && est.getTipo().isReceita() ? estilos.tipoReceita : estilos.tipoDespesa);
             configurarCelula(r, 2, est.getTotal() != null ? est.getTotal().doubleValue() : 0.0, zebra ? estilos.moedaZebra : estilos.moedaPadrao);
         }
 

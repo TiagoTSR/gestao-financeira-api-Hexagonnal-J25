@@ -36,7 +36,7 @@ public record LancamentoResponseDTO(
             CategoriaResponseDTO categoria,
             PessoaResumoDTO pessoa) {
         this(id, descricao, dataVencimento, dataPagamento, valor, observacao, tipo, categoria, pessoa,
-             (dataPagamento != null) ? (tipo == TipoLancamento.RECEITA ? StatusLancamento.RECEBIDO : StatusLancamento.PAGO) : StatusLancamento.PENDENTE,
+             (dataPagamento != null && tipo != null) ? tipo.getStatusQuitado() : StatusLancamento.PENDENTE,
              dataPagamento != null ? valor : null, 1, 1);
     }
 

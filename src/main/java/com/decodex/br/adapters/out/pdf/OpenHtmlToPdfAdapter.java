@@ -41,12 +41,12 @@ public class OpenHtmlToPdfAdapter implements RelatorioPdfPort {
             LocalDate fim) {
 
         BigDecimal totalReceitas = lancamentos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.RECEITA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isReceita())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalDespesas = lancamentos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.DESPESA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

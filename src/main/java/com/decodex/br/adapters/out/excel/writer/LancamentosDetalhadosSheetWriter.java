@@ -90,12 +90,12 @@ public final class LancamentosDetalhadosSheetWriter {
 
     private static int preencherCardsKpi(XSSFSheet sheet, ExcelStyles estilos, List<Lancamento> lancamentos, int rowNum) {
         BigDecimal totalReceitas = lancamentos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.RECEITA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isReceita())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalDespesas = lancamentos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.DESPESA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -136,11 +136,11 @@ public final class LancamentosDetalhadosSheetWriter {
                 : "Única";
         configurarCelula(r, 5, parcela, zebra ? estilos.centroZebra : estilos.centroPadrao);
 
-        configurarCelula(r, 6, l.getTipo() != null ? l.getTipo().getDescricao() : "-", l.getTipo() == TipoLancamento.RECEITA ? estilos.tipoReceita : estilos.tipoDespesa);
+        configurarCelula(r, 6, l.getTipo() != null ? l.getTipo().getDescricao() : "-", l.getTipo() != null && l.getTipo().isReceita() ? estilos.tipoReceita : estilos.tipoDespesa);
         configurarCelula(r, 7, l.getStatus() != null ? l.getStatus().getDescricao() : "Pendente", zebra ? estilos.centroZebra : estilos.centroPadrao);
 
         double valor = l.getValor() != null ? l.getValor().doubleValue() : 0.0;
-        configurarCelula(r, 8, valor, l.getTipo() == TipoLancamento.RECEITA
+        configurarCelula(r, 8, valor, l.getTipo() != null && l.getTipo().isReceita()
                 ? (zebra ? estilos.moedaReceitaZebra : estilos.moedaReceita)
                 : (zebra ? estilos.moedaDespesaZebra : estilos.moedaDespesa));
 

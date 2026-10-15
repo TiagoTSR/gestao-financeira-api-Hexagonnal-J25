@@ -45,12 +45,12 @@ public class DashboardService implements DashboardInputPort {
                 .toList();
 
         BigDecimal totalReceitas = doMes.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.RECEITA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isReceita())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalDespesas = doMes.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.DESPESA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa())
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -58,12 +58,12 @@ public class DashboardService implements DashboardInputPort {
 
         // 2. Saldo Consolidado Histórico (efetivamente pago/recebido)
         BigDecimal totalReceitasPagasHistorico = todos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.RECEITA && l.getDataPagamento() != null)
+                .filter(l -> l.getTipo() != null && l.getTipo().isReceita() && l.getDataPagamento() != null)
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalDespesasPagasHistorico = todos.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.DESPESA && l.getDataPagamento() != null)
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa() && l.getDataPagamento() != null)
                 .map(Lancamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -88,7 +88,7 @@ public class DashboardService implements DashboardInputPort {
 
         // 5. Despesas por Categoria no mês
         List<Lancamento> despesasMes = doMes.stream()
-                .filter(l -> l.getTipo() == TipoLancamento.DESPESA)
+                .filter(l -> l.getTipo() != null && l.getTipo().isDespesa())
                 .toList();
 
         Map<String, BigDecimal> totalPorCat = despesasMes.stream()
@@ -114,12 +114,12 @@ public class DashboardService implements DashboardInputPort {
         for (int i = 5; i >= 0; i--) {
             YearMonth ym = anoMesRef.minusMonths(i);
             BigDecimal rec = todos.stream()
-                    .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() == TipoLancamento.RECEITA)
+                    .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() != null && l.getTipo().isReceita())
                     .map(Lancamento::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             BigDecimal desp = todos.stream()
-                    .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() == TipoLancamento.DESPESA)
+                    .filter(l -> l.getDataVencimento() != null && YearMonth.from(l.getDataVencimento()).equals(ym) && l.getTipo() != null && l.getTipo().isDespesa())
                     .map(Lancamento::getValor)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
