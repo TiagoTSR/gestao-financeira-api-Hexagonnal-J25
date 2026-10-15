@@ -4,5 +4,17 @@ public enum StatusRelatorio {
     PENDENTE,
     PROCESSANDO,
     CONCLUIDO,
-    ERRO
+    ERRO;
+
+    public boolean isTerminal() {
+        return this == CONCLUIDO || this == ERRO;
+    }
+
+    public boolean isEmAndamento() {
+        return this == PENDENTE || this == PROCESSANDO;
+    }
+
+    public boolean isSucesso() {
+        return this == CONCLUIDO;
+    }
 }
