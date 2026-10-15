@@ -114,6 +114,7 @@ class ParcelamentoFactoryTest {
         assertThat(p1.getDataPagamento()).isEqualTo(vencimento);
         assertThat(p1.getValor()).isEqualByComparingTo("33.34");
         assertThat(p1.getValorPago()).isEqualByComparingTo("33.34");
+        assertThat(p1.getStatus()).isEqualTo(StatusLancamento.PAGO);
         assertThat(p1.getNumeroParcela()).isEqualTo(1);
         assertThat(p1.getTotalParcelas()).isEqualTo(3);
 
@@ -124,6 +125,7 @@ class ParcelamentoFactoryTest {
         assertThat(p2.getDataPagamento()).isNull();
         assertThat(p2.getValor()).isEqualByComparingTo("33.33");
         assertThat(p2.getValorPago()).isNull();
+        assertThat(p2.getStatus()).isEqualTo(StatusLancamento.PENDENTE);
         assertThat(p2.getNumeroParcela()).isEqualTo(2);
         assertThat(p2.getTotalParcelas()).isEqualTo(3);
 
@@ -134,6 +136,7 @@ class ParcelamentoFactoryTest {
         assertThat(p3.getDataPagamento()).isNull();
         assertThat(p3.getValor()).isEqualByComparingTo("33.33");
         assertThat(p3.getValorPago()).isNull();
+        assertThat(p3.getStatus()).isEqualTo(StatusLancamento.PENDENTE);
         assertThat(p3.getNumeroParcela()).isEqualTo(3);
         assertThat(p3.getTotalParcelas()).isEqualTo(3);
 

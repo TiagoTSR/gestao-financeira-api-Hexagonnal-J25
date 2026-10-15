@@ -4,6 +4,7 @@ import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
+import com.decodex.br.domain.model.StatusLancamento;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -64,6 +65,7 @@ public final class ParcelamentoFactory {
             LocalDate vencimentoParcela = dto.dataVencimento().plusMonths(i - 1);
             LocalDate pagamentoParcela = (i == 1) ? dto.dataPagamento() : null;
             BigDecimal valorPago = (pagamentoParcela != null) ? valorDestaParcela : null;
+            StatusLancamento statusParcela = (i == 1) ? dto.status() : StatusLancamento.PENDENTE;
 
             Lancamento parcela = new Lancamento(
                     descricaoParcela,
@@ -74,7 +76,7 @@ public final class ParcelamentoFactory {
                     dto.tipo(),
                     categoria,
                     pessoa,
-                    dto.status(),
+                    statusParcela,
                     valorPago,
                     i,
                     total
