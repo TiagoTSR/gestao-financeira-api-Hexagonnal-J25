@@ -114,7 +114,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
         log.error("Erro inesperado no endpoint {}: {}", request.getRequestURI(), ex.getMessage(), ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
-                "Erro inesperado", request);
+                ((ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Erro inesperado"), request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(
