@@ -45,6 +45,21 @@ public class GestaoFinanceiraApiHexagonalJ25Application {
 			System.setProperty("DB_PASSWORD1", pgPassword);
 		}
 
+		// Proteção contra loop de conexão do RabbitMQ quando não houver host na nuvem
+		String rabbitHost = System.getenv("RABBITMQ_HOST");
+		if (rabbitHost == null || rabbitHost.isBlank()) {
+			String railwayRabbit = System.getenv("RABBITMQHOST");
+			if (railwayRabbit != null && !railwayRabbit.isBlank()) {
+				System.setProperty("spring.rabbitmq.host", railwayRabbit.trim());
+			} else {
+				System.setProperty("spring.rabbitmq.host", "localhost");
+				// Em ambiente de nuvem sem RabbitMQ configurado, desativa o listener para evitar loop
+				if (System.getenv("RAILWAY_ENVIRONMENT") != null || System.getenv("PORT") != null) {
+					System.setProperty("spring.rabbitmq.listener.simple.auto-startup", "false");
+				}
+			}
+		}
+
 		SpringApplication.run(GestaoFinanceiraApiHexagonalJ25Application.class, args);
 	}
 
