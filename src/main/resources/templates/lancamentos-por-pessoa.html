@@ -3,21 +3,21 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Relat&oacute;rio Executivo de Lan&ccedil;amentos</title>
+    <title>Relatório Executivo de Lançamentos</title>
     <style>
         @page {
             size: A4 portrait;
             margin: 12mm 10mm 16mm 10mm;
 
             @bottom-left {
-                content: "Gest&atilde;o Financeira &bull; Relat&oacute;rio Anal&iacute;tico Confidencial";
+                content: "Gestão Financeira • Relatório Analítico Confidencial";
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 7.5pt;
                 color: #64748B;
             }
 
             @bottom-right {
-                content: "P&aacute;gina " counter(page) " de " counter(pages);
+                content: "Página " counter(page) " de " counter(pages);
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 7.5pt;
                 font-weight: bold;
@@ -333,17 +333,17 @@
                 <div class="logo-box">GF</div>
             </td>
             <td style="padding-left: 10px;">
-                <div class="brand-title">Gest&atilde;o Financeira</div>
-                <div class="brand-subtitle">Relat&oacute;rio Anal&iacute;tico e Detalhado de Lan&ccedil;amentos</div>
+                <div class="brand-title">Gestão Financeira</div>
+                <div class="brand-subtitle">Relatório Analítico e Detalhado de Lançamentos</div>
             </td>
             <td style="text-align: right;">
                 <div class="meta-card">
-                    <div class="meta-periodo-label">Per&iacute;odo de Refer&ecirc;ncia</div>
+                    <div class="meta-periodo-label">Período de Referência</div>
                     <div class="meta-periodo-valor">
-                        <span th:text="${dataInicio}">01/01/2026</span> &nbsp;at&eacute;&nbsp; <span th:text="${dataFim}">31/01/2026</span>
+                        <span th:text="${dataInicio}">01/01/2026</span> &#160;até&#160; <span th:text="${dataFim}">31/01/2026</span>
                     </div>
                     <div class="meta-emissao">
-                        Gerado em: <span th:text="${dataGeracao}">01/01/2026 &agrave;s 00:00:00</span>
+                        Gerado em: <span th:text="${dataGeracao}">01/01/2026 às 00:00:00</span>
                     </div>
                 </div>
             </td>
@@ -360,28 +360,28 @@
                 <div class="kpi-card kpi-receitas">
                     <div class="kpi-label">Receitas Totais</div>
                     <div class="kpi-value" th:text="${#numbers.formatCurrency(totalReceitas != null ? totalReceitas : 0)}">R$ 0,00</div>
-                    <div class="kpi-subtext">Entradas no per&iacute;odo</div>
+                    <div class="kpi-subtext">Entradas no período</div>
                 </div>
             </td>
             <td style="width: 25%;">
                 <div class="kpi-card kpi-despesas">
                     <div class="kpi-label">Despesas Totais</div>
                     <div class="kpi-value" th:text="${#numbers.formatCurrency(totalDespesas != null ? totalDespesas : 0)}">R$ 0,00</div>
-                    <div class="kpi-subtext">Sa&iacute;das e obriga&ccedil;&otilde;es</div>
+                    <div class="kpi-subtext">Saídas e obrigações</div>
                 </div>
             </td>
             <td style="width: 25%;">
                 <div class="kpi-card kpi-saldo">
-                    <div class="kpi-label">Saldo L&iacute;quido</div>
+                    <div class="kpi-label">Saldo Líquido</div>
                     <div class="kpi-value" th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</div>
-                    <div class="kpi-subtext">Resultado do exerc&iacute;cio</div>
+                    <div class="kpi-subtext">Resultado do exercício</div>
                 </div>
             </td>
             <td style="width: 25%;">
                 <div class="kpi-card kpi-registros">
-                    <div class="kpi-label">Lan&ccedil;amentos</div>
+                    <div class="kpi-label">Lançamentos</div>
                     <div class="kpi-value" th:text="${totalRegistros != null ? totalRegistros : 0}">0</div>
-                    <div class="kpi-subtext">Opera&ccedil;&otilde;es processadas</div>
+                    <div class="kpi-subtext">Operações processadas</div>
                 </div>
             </td>
         </tr>
@@ -390,7 +390,7 @@
     <!-- SECAO 1: TABELA DETALHADA -->
     <table class="section-header" th:if="${not #lists.isEmpty(lancamentos)}">
         <tr>
-            <td class="section-title">Lan&ccedil;amentos Detalhados do Per&iacute;odo</td>
+            <td class="section-title">Lançamentos Detalhados do Período</td>
             <td class="section-counter" th:text="${totalRegistros} + ' registros localizados'">0 registros</td>
         </tr>
     </table>
@@ -402,9 +402,9 @@
                 <th style="width: 10%;">Pagamento</th>
                 <th style="width: 21%;" class="text-left">Pessoa</th>
                 <th style="width: 14%;" class="text-left">Categoria</th>
-                <th style="width: 21%;" class="text-left">Descri&ccedil;&atilde;o</th>
+                <th style="width: 21%;" class="text-left">Descrição</th>
                 <th style="width: 7%;">Natureza</th>
-                <th style="width: 7%;">Situa&ccedil;&atilde;o</th>
+                <th style="width: 7%;">Situação</th>
                 <th style="width: 10%;" class="text-right">Valor</th>
             </tr>
         </thead>
@@ -415,7 +415,7 @@
                 <td class="text-left" th:text="${lancamento.pessoa != null ? lancamento.pessoa.nome : '-'}">Pessoa</td>
                 <td class="text-left" th:text="${lancamento.categoria != null ? lancamento.categoria.nome : '-'}">Categoria</td>
                 <td class="text-left">
-                    <span th:text="${lancamento.descricao}">Descri&ccedil;&atilde;o</span>
+                    <span th:text="${lancamento.descricao}">Descrição</span>
                     <span th:if="${lancamento.totalParcelas != null and lancamento.totalParcelas > 1}" class="badge-parcela">
                         <span th:text="${lancamento.numeroParcela != null ? lancamento.numeroParcela : 1}">1</span>/<span th:text="${lancamento.totalParcelas}">3</span>
                     </span>
@@ -435,7 +435,7 @@
                     th:text="${#numbers.formatCurrency(lancamento.valor)}">R$ 0,00</td>
             </tr>
             <tr class="total-row">
-                <td colspan="7" class="text-right" style="padding-right: 8px;">RESULTADO L&Iacute;QUIDO CONSOLIDADO:</td>
+                <td colspan="7" class="text-right" style="padding-right: 8px;">RESULTADO LÍQUIDO CONSOLIDADO:</td>
                 <td class="text-right" 
                     th:classappend="${saldoPeriodo != null and saldoPeriodo >= 0 ? 'val-receita' : 'val-despesa'}"
                     th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</td>
@@ -446,7 +446,7 @@
     <!-- SECAO 2: CONSOLIDACAO POR PESSOA -->
     <table class="section-header">
         <tr>
-            <td class="section-title">Consolida&ccedil;&atilde;o de Valores por Pessoa</td>
+            <td class="section-title">Consolidação de Valores por Pessoa</td>
             <td class="section-counter">Resumo de Credores e Devedores</td>
         </tr>
     </table>
@@ -472,7 +472,7 @@
                     th:text="${#numbers.formatCurrency(estatistica.total)}">R$ 0,00</td>
             </tr>
             <tr th:if="${#lists.isEmpty(estatisticas)}">
-                <td colspan="3" class="empty-state">Nenhum registro encontrado para o per&iacute;odo selecionado.</td>
+                <td colspan="3" class="empty-state">Nenhum registro encontrado para o período selecionado.</td>
             </tr>
         </tbody>
     </table>
