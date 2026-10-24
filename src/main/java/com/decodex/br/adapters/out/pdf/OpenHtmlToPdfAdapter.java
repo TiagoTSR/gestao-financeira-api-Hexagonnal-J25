@@ -60,14 +60,14 @@ public class OpenHtmlToPdfAdapter implements RelatorioPdfPort {
         context.setVariable("totalRegistros", lancamentos.size());
         context.setVariable("dataInicio", inicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         context.setVariable("dataFim", fim.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        context.setVariable("dataGeracao", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy 'às' HH:mm:ss")));
+        context.setVariable("dataGeracao", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy '\u00e0s' HH:mm:ss")));
 
         String htmlContent;
         try {
             htmlContent = templateEngine.process(TEMPLATE_NAME, context);
         } catch (Exception e) {
             throw new RelatorioPdfException(
-                    "Template não encontrado em: templates/" + TEMPLATE_NAME + ".html", e);
+                    "Template n\u00e3o encontrado em: templates/" + TEMPLATE_NAME + ".html", e);
         }
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {

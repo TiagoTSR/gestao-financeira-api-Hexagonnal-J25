@@ -3,163 +3,263 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Relatório Detalhado de Lançamentos</title>
+    <title>Relat&oacute;rio Executivo de Lan&ccedil;amentos</title>
     <style>
         @page {
             size: A4 portrait;
-            margin: 15mm 12mm 20mm 12mm;
+            margin: 12mm 10mm 16mm 10mm;
 
             @bottom-left {
-                content: "Gestão Financeira • Relatório Analítico • Gerado em " th:attr="data-geracao=${dataGeracao}";
+                content: "Gest&atilde;o Financeira &bull; Relat&oacute;rio Anal&iacute;tico Confidencial";
                 font-family: Arial, Helvetica, sans-serif;
-                font-size: 8px;
+                font-size: 7.5pt;
                 color: #64748B;
             }
 
             @bottom-right {
-                content: "Página " counter(page);
+                content: "P&aacute;gina " counter(page) " de " counter(pages);
                 font-family: Arial, Helvetica, sans-serif;
-                font-size: 8px;
-                color: #64748B;
+                font-size: 7.5pt;
+                font-weight: bold;
+                color: #334155;
             }
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             font-family: Arial, Helvetica, sans-serif;
             color: #1E293B;
-            line-height: 1.3;
+            line-height: 1.35;
             margin: 0;
             padding: 0;
-            font-size: 11px;
+            font-size: 9pt;
+            background-color: #FFFFFF;
         }
 
-        .header {
-            border-bottom: 2px solid #2563EB;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-        }
-
-        .header table {
+        /* ===== CABECALHO CORPORATIVO ===== */
+        .header-table {
             width: 100%;
             border-collapse: collapse;
-            border: none;
+            margin-bottom: 0;
         }
 
-        .header td {
-            border: none;
-            padding: 0;
+        .header-table td {
             vertical-align: middle;
+            padding: 0;
+            border: none;
         }
 
-        .title {
-            font-size: 20px;
+        .logo-box {
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            background-color: #0F172A;
+            color: #10B981;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid #1E293B;
+            display: inline-block;
+        }
+
+        .brand-title {
+            font-size: 18px;
             font-weight: bold;
             color: #0F172A;
             margin: 0;
+            letter-spacing: -0.3px;
         }
 
-        .subtitle {
-            font-size: 11px;
+        .brand-subtitle {
+            font-size: 9.5px;
             color: #64748B;
-            margin-top: 4px;
+            margin-top: 2px;
+            font-weight: normal;
         }
 
-        .badge-periodo {
-            background-color: #EFF6FF;
-            border: 1px solid #BFDBFE;
-            color: #1E40AF;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: bold;
-            text-align: right;
-        }
-
-        /* Resumo Executivo / Cards */
-        .summary-grid {
-            width: 100%;
-            margin-bottom: 18px;
-            border-collapse: separate;
-            border-spacing: 8px 0;
-        }
-
-        .summary-card {
-            padding: 10px;
-            border-radius: 6px;
-            text-align: center;
-            border: 1px solid #E2E8F0;
-        }
-
-        .card-receitas {
-            background-color: #F0FDF4;
-            border-color: #BBF7D0;
-        }
-
-        .card-despesas {
-            background-color: #FEF2F2;
-            border-color: #FECACA;
-        }
-
-        .card-saldo {
+        .meta-card {
             background-color: #F8FAFC;
-            border-color: #CBD5E1;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 6px 12px;
+            text-align: right;
+            display: inline-block;
         }
 
-        .card-label {
-            font-size: 9px;
+        .meta-periodo-label {
+            font-size: 7.5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #64748B;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-periodo-valor {
+            font-size: 10px;
+            font-weight: bold;
+            color: #0F172A;
+            margin-top: 1px;
+        }
+
+        .meta-emissao {
+            font-size: 7.5px;
+            color: #94A3B8;
+            margin-top: 2px;
+        }
+
+        .header-divider {
+            height: 3px;
+            background-color: #0F172A;
+            border-bottom: 2px solid #10B981;
+            margin-top: 10px;
+            margin-bottom: 14px;
+        }
+
+        /* ===== CARDS DE RESUMO EXECUTIVO (KPIS) ===== */
+        .kpi-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px 0;
+            margin-bottom: 14px;
+        }
+
+        .kpi-table td {
+            vertical-align: top;
+            padding: 0;
+            border: none;
+        }
+
+        .kpi-card {
+            border-radius: 6px;
+            padding: 8px 10px;
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            page-break-inside: avoid;
+        }
+
+        .kpi-receitas {
+            background-color: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-left: 4px solid #10B981;
+        }
+
+        .kpi-despesas {
+            background-color: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-left: 4px solid #EF4444;
+        }
+
+        .kpi-saldo {
+            background-color: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-left: 4px solid #2563EB;
+        }
+
+        .kpi-registros {
+            background-color: #F8FAFC;
+            border: 1px solid #CBD5E1;
+            border-left: 4px solid #64748B;
+        }
+
+        .kpi-label {
+            font-size: 7.5px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
 
-        .text-receita { color: #16A34A; }
-        .text-despesa { color: #DC2626; }
-        .text-saldo { color: #2563EB; }
+        .kpi-receitas .kpi-label { color: #065F46; }
+        .kpi-despesas .kpi-label { color: #991B1B; }
+        .kpi-saldo .kpi-label { color: #1E3A8A; }
+        .kpi-registros .kpi-label { color: #475569; }
 
-        .card-value {
-            font-size: 15px;
-            font-weight: bold;
-        }
-
-        /* Tabelas */
-        h2 {
+        .kpi-value {
             font-size: 13px;
             font-weight: bold;
-            color: #334155;
-            margin-top: 18px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-left: 3px solid #2563EB;
-            padding-left: 8px;
+            line-height: 1.1;
         }
 
+        .kpi-receitas .kpi-value { color: #047857; }
+        .kpi-despesas .kpi-value { color: #B91C1C; }
+        .kpi-saldo .kpi-value { color: #1E40AF; }
+        .kpi-registros .kpi-value { color: #0F172A; }
+
+        .kpi-subtext {
+            font-size: 7px;
+            color: #64748B;
+            margin-top: 3px;
+        }
+
+        /* ===== TITULOS DE SECAO ===== */
+        .section-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+
+        .section-header td {
+            vertical-align: bottom;
+            padding: 0 0 4px 0;
+            border-bottom: 1.5px solid #CBD5E1;
+        }
+
+        .section-title {
+            font-size: 10.5px;
+            font-weight: bold;
+            color: #0F172A;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .section-counter {
+            text-align: right;
+            font-size: 8px;
+            font-weight: 600;
+            color: #64748B;
+        }
+
+        /* ===== TABELAS DE DADOS ===== */
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            page-break-inside: auto;
+        }
+
+        table.data-table thead {
+            display: table-header-group;
+        }
+
+        table.data-table tr {
+            page-break-inside: avoid;
         }
 
         table.data-table th {
-            background-color: #F1F5F9;
-            color: #1E293B;
+            background-color: #1E293B;
+            color: #F8FAFC;
             font-weight: bold;
-            font-size: 9px;
+            font-size: 7.5pt;
             padding: 6px 5px;
-            border: 1px solid #CBD5E1;
+            border: 1px solid #1E293B;
             text-align: center;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         table.data-table td {
-            padding: 5px;
-            font-size: 9px;
+            padding: 5px 5px;
+            font-size: 7.5pt;
             border: 1px solid #E2E8F0;
             vertical-align: middle;
         }
 
-        table.data-table tr:nth-child(even) {
+        table.data-table tr:nth-child(even) td {
             background-color: #F8FAFC;
         }
 
@@ -167,79 +267,144 @@
         .text-center { text-align: center; }
         .text-right { text-align: right; }
 
-        .tag-status {
+        .val-receita { color: #047857; font-weight: bold; }
+        .val-despesa { color: #B91C1C; font-weight: bold; }
+
+        /* ===== BADGES ===== */
+        .badge {
             display: inline-block;
             padding: 2px 5px;
             border-radius: 3px;
-            font-size: 8px;
+            font-size: 6.5pt;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
         }
 
-        .status-pago { background-color: #DCFCE7; color: #15803D; }
-        .status-recebido { background-color: #DCFCE7; color: #15803D; }
-        .status-pendente { background-color: #FEF3C7; color: #B45309; }
-        .status-cancelado { background-color: #FEE2E2; color: #B91C1C; }
+        .badge-receita { background-color: #DCFCE7; color: #15803D; border: 1px solid #BBF7D0; }
+        .badge-despesa { background-color: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
 
-        .total-row {
+        .status-pago { background-color: #DCFCE7; color: #15803D; border: 1px solid #BBF7D0; }
+        .status-recebido { background-color: #DCFCE7; color: #15803D; border: 1px solid #BBF7D0; }
+        .status-pendente { background-color: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+        .status-cancelado { background-color: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+
+        .badge-parcela {
+            background-color: #EFF6FF;
+            color: #1D4ED8;
+            border: 1px solid #BFDBFE;
+            border-radius: 3px;
+            padding: 1px 4px;
+            font-size: 6.5pt;
+            font-weight: bold;
+            margin-left: 3px;
+            display: inline-block;
+        }
+
+        /* ===== LINHA DE TOTAIS ===== */
+        .total-row td {
             background-color: #F1F5F9 !important;
             font-weight: bold;
+            color: #0F172A;
+            border-top: 2px solid #0F172A !important;
+            border-bottom: 2px solid #0F172A !important;
+            padding: 6px 5px !important;
+            font-size: 8pt !important;
+        }
+
+        .empty-state {
+            padding: 18px;
+            text-align: center;
+            color: #64748B;
+            font-size: 8pt;
+            font-style: italic;
+            background-color: #F8FAFC;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Header -->
-    <div class="header">
-        <table>
-            <tr>
-                <td style="width: 60%;">
-                    <div class="title">Gestão Financeira</div>
-                    <div class="subtitle">Relatório Analítico e Detalhado de Lançamentos</div>
-                </td>
-                <td style="width: 40%; text-align: right;">
-                    <div class="badge-periodo">
-                        Período: <span th:text="${dataInicio}">01/01/2026</span> até <span th:text="${dataFim}">31/01/2026</span>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Cards Resumo Executivo -->
-    <table class="summary-grid">
+    <!-- CABECALHO CORPORATIVO -->
+    <table class="header-table">
         <tr>
-            <td class="summary-card card-receitas" style="width: 25%;">
-                <div class="card-label text-receita">Receitas Totais</div>
-                <div class="card-value text-receita" th:text="${#numbers.formatCurrency(totalReceitas != null ? totalReceitas : 0)}">R$ 0,00</div>
+            <td style="width: 50px;">
+                <div class="logo-box">GF</div>
             </td>
-            <td class="summary-card card-despesas" style="width: 25%;">
-                <div class="card-label text-despesa">Despesas Totais</div>
-                <div class="card-value text-despesa" th:text="${#numbers.formatCurrency(totalDespesas != null ? totalDespesas : 0)}">R$ 0,00</div>
+            <td style="padding-left: 10px;">
+                <div class="brand-title">Gest&atilde;o Financeira</div>
+                <div class="brand-subtitle">Relat&oacute;rio Anal&iacute;tico e Detalhado de Lan&ccedil;amentos</div>
             </td>
-            <td class="summary-card card-saldo" style="width: 25%;">
-                <div class="card-label text-saldo">Saldo Líquido</div>
-                <div class="card-value text-saldo" th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</div>
-            </td>
-            <td class="summary-card card-saldo" style="width: 25%;">
-                <div class="card-label" style="color: #475569;">Lançamentos</div>
-                <div class="card-value" style="color: #0F172A;" th:text="${totalRegistros != null ? totalRegistros : 0}">0</div>
+            <td style="text-align: right;">
+                <div class="meta-card">
+                    <div class="meta-periodo-label">Per&iacute;odo de Refer&ecirc;ncia</div>
+                    <div class="meta-periodo-valor">
+                        <span th:text="${dataInicio}">01/01/2026</span> &nbsp;at&eacute;&nbsp; <span th:text="${dataFim}">31/01/2026</span>
+                    </div>
+                    <div class="meta-emissao">
+                        Gerado em: <span th:text="${dataGeracao}">01/01/2026 &agrave;s 00:00:00</span>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>
 
-    <!-- Tabela 1: Lançamentos Detalhados -->
-    <h2 th:if="${not #lists.isEmpty(lancamentos)}">Lançamentos Detalhados do Período</h2>
+    <!-- BARRA DE DESTAQUE EXECUTIVA -->
+    <div class="header-divider"></div>
+
+    <!-- CARDS DE RESUMO EXECUTIVO (KPIS) -->
+    <table class="kpi-table">
+        <tr>
+            <td style="width: 25%;">
+                <div class="kpi-card kpi-receitas">
+                    <div class="kpi-label">Receitas Totais</div>
+                    <div class="kpi-value" th:text="${#numbers.formatCurrency(totalReceitas != null ? totalReceitas : 0)}">R$ 0,00</div>
+                    <div class="kpi-subtext">Entradas no per&iacute;odo</div>
+                </div>
+            </td>
+            <td style="width: 25%;">
+                <div class="kpi-card kpi-despesas">
+                    <div class="kpi-label">Despesas Totais</div>
+                    <div class="kpi-value" th:text="${#numbers.formatCurrency(totalDespesas != null ? totalDespesas : 0)}">R$ 0,00</div>
+                    <div class="kpi-subtext">Sa&iacute;das e obriga&ccedil;&otilde;es</div>
+                </div>
+            </td>
+            <td style="width: 25%;">
+                <div class="kpi-card kpi-saldo">
+                    <div class="kpi-label">Saldo L&iacute;quido</div>
+                    <div class="kpi-value" th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</div>
+                    <div class="kpi-subtext">Resultado do exerc&iacute;cio</div>
+                </div>
+            </td>
+            <td style="width: 25%;">
+                <div class="kpi-card kpi-registros">
+                    <div class="kpi-label">Lan&ccedil;amentos</div>
+                    <div class="kpi-value" th:text="${totalRegistros != null ? totalRegistros : 0}">0</div>
+                    <div class="kpi-subtext">Opera&ccedil;&otilde;es processadas</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- SECAO 1: TABELA DETALHADA -->
+    <table class="section-header" th:if="${not #lists.isEmpty(lancamentos)}">
+        <tr>
+            <td class="section-title">Lan&ccedil;amentos Detalhados do Per&iacute;odo</td>
+            <td class="section-counter" th:text="${totalRegistros} + ' registros localizados'">0 registros</td>
+        </tr>
+    </table>
+
     <table class="data-table" th:if="${not #lists.isEmpty(lancamentos)}">
         <thead>
             <tr>
                 <th style="width: 10%;">Vencimento</th>
                 <th style="width: 10%;">Pagamento</th>
-                <th style="width: 22%;" class="text-left">Pessoa</th>
-                <th style="width: 15%;" class="text-left">Categoria</th>
-                <th style="width: 20%;" class="text-left">Descrição</th>
-                <th style="width: 6%;">Tipo</th>
-                <th style="width: 7%;">Status</th>
+                <th style="width: 21%;" class="text-left">Pessoa</th>
+                <th style="width: 14%;" class="text-left">Categoria</th>
+                <th style="width: 21%;" class="text-left">Descri&ccedil;&atilde;o</th>
+                <th style="width: 7%;">Natureza</th>
+                <th style="width: 7%;">Situa&ccedil;&atilde;o</th>
                 <th style="width: 10%;" class="text-right">Valor</th>
             </tr>
         </thead>
@@ -250,54 +415,64 @@
                 <td class="text-left" th:text="${lancamento.pessoa != null ? lancamento.pessoa.nome : '-'}">Pessoa</td>
                 <td class="text-left" th:text="${lancamento.categoria != null ? lancamento.categoria.nome : '-'}">Categoria</td>
                 <td class="text-left">
-                    <span th:text="${lancamento.descricao}">Descrição</span>
-                    <span th:if="${lancamento.totalParcelas != null and lancamento.totalParcelas > 1}" style="font-size: 7px; color: #2563EB;">
-                        (<span th:text="${lancamento.numeroParcela != null ? lancamento.numeroParcela : 1}">1</span>/<span th:text="${lancamento.totalParcelas}">3</span>)
+                    <span th:text="${lancamento.descricao}">Descri&ccedil;&atilde;o</span>
+                    <span th:if="${lancamento.totalParcelas != null and lancamento.totalParcelas > 1}" class="badge-parcela">
+                        <span th:text="${lancamento.numeroParcela != null ? lancamento.numeroParcela : 1}">1</span>/<span th:text="${lancamento.totalParcelas}">3</span>
                     </span>
                 </td>
                 <td class="text-center">
-                    <span th:text="${lancamento.tipo != null ? lancamento.tipo.descricao : '-'}" 
-                          th:classappend="${lancamento.tipo != null and lancamento.tipo.name() == 'RECEITA' ? 'text-receita' : 'text-despesa'}">Tipo</span>
+                    <span class="badge"
+                          th:classappend="${lancamento.tipo != null and lancamento.tipo.name() == 'RECEITA' ? 'badge-receita' : 'badge-despesa'}"
+                          th:text="${lancamento.tipo != null ? lancamento.tipo.descricao : '-'}">Tipo</span>
                 </td>
                 <td class="text-center">
-                    <span class="tag-status" 
+                    <span class="badge" 
                           th:classappend="${lancamento.status != null and (lancamento.status.name() == 'PAGO' or lancamento.status.name() == 'RECEBIDO') ? 'status-pago' : (lancamento.status != null and lancamento.status.name() == 'CANCELADO' ? 'status-cancelado' : 'status-pendente')}"
                           th:text="${lancamento.status != null ? lancamento.status.descricao : 'Pendente'}">Pendente</span>
                 </td>
-                <td class="text-right font-bold" 
-                    th:classappend="${lancamento.tipo != null and lancamento.tipo.name() == 'RECEITA' ? 'text-receita' : 'text-despesa'}"
+                <td class="text-right" 
+                    th:classappend="${lancamento.tipo != null and lancamento.tipo.name() == 'RECEITA' ? 'val-receita' : 'val-despesa'}"
                     th:text="${#numbers.formatCurrency(lancamento.valor)}">R$ 0,00</td>
             </tr>
             <tr class="total-row">
-                <td colspan="7" class="text-right" style="padding-right: 8px;">TOTAL DO PERÍODO:</td>
-                <td class="text-right" th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</td>
+                <td colspan="7" class="text-right" style="padding-right: 8px;">RESULTADO L&Iacute;QUIDO CONSOLIDADO:</td>
+                <td class="text-right" 
+                    th:classappend="${saldoPeriodo != null and saldoPeriodo >= 0 ? 'val-receita' : 'val-despesa'}"
+                    th:text="${#numbers.formatCurrency(saldoPeriodo != null ? saldoPeriodo : 0)}">R$ 0,00</td>
             </tr>
         </tbody>
     </table>
 
-    <!-- Tabela 2: Resumo Consolidado por Pessoa -->
-    <h2>Consolidação por Pessoa</h2>
+    <!-- SECAO 2: CONSOLIDACAO POR PESSOA -->
+    <table class="section-header">
+        <tr>
+            <td class="section-title">Consolida&ccedil;&atilde;o de Valores por Pessoa</td>
+            <td class="section-counter">Resumo de Credores e Devedores</td>
+        </tr>
+    </table>
+
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 20%;">Tipo</th>
-                <th style="width: 55%;" class="text-left">Pessoa</th>
+                <th style="width: 55%;" class="text-left">Pessoa / Favorecido</th>
+                <th style="width: 20%;">Natureza</th>
                 <th style="width: 25%;" class="text-right">Total Consolidado</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="estatistica : ${estatisticas}">
+                <td class="text-left" style="font-weight: 500;" th:text="${estatistica.pessoa.nome}">Nome da Pessoa</td>
                 <td class="text-center">
-                    <span th:text="${estatistica.tipo.descricao}"
-                          th:classappend="${estatistica.tipo.name() == 'RECEITA' ? 'text-receita' : 'text-despesa'}">RECEITA</span>
+                    <span class="badge"
+                          th:classappend="${estatistica.tipo.name() == 'RECEITA' ? 'badge-receita' : 'badge-despesa'}"
+                          th:text="${estatistica.tipo.descricao}">RECEITA</span>
                 </td>
-                <td class="text-left" th:text="${estatistica.pessoa.nome}">Nome da Pessoa</td>
                 <td class="text-right font-bold" 
-                    th:classappend="${estatistica.tipo.name() == 'RECEITA' ? 'text-receita' : 'text-despesa'}"
+                    th:classappend="${estatistica.tipo.name() == 'RECEITA' ? 'val-receita' : 'val-despesa'}"
                     th:text="${#numbers.formatCurrency(estatistica.total)}">R$ 0,00</td>
             </tr>
             <tr th:if="${#lists.isEmpty(estatisticas)}">
-                <td colspan="3" class="text-center" style="padding: 12px; color: #64748B;">Nenhum registro encontrado para o período selecionado.</td>
+                <td colspan="3" class="empty-state">Nenhum registro encontrado para o per&iacute;odo selecionado.</td>
             </tr>
         </tbody>
     </table>
