@@ -1,0 +1,6 @@
+name: "CodeQL Custom Config"
+
+# Exclude false positives for stateless REST API
+query-filters:
+  - exclude:
+      id: java/spring-disabled-csrf-protection
