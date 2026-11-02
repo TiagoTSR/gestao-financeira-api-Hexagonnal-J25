@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.out.persistence.adapter;
+package com.decodex.br.features.pessoa.infrastructure.persistence;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +20,10 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
+import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 
 @Component
-public class PessoaRepositoryAdapter implements PessoaRepositoryPort {
+public class PessoaRepositoryAdapter implements PessoaRepositoryPort, PessoaQueryPort {
 
     private static final Set<String> CAMPOS_ORDENAVEIS = Set.of("id", "nome", "ativo");
 

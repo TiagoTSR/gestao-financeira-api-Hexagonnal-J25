@@ -23,7 +23,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.decodex.br.adapters.in.web.PessoaController;
+import com.decodex.br.features.pessoa.api.PessoaController;
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaResponseDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
@@ -32,13 +32,13 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaInputPort;
+import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
 
 @ExtendWith(MockitoExtension.class)
 class PessoaControllerUnitarioTest {
 
     @Mock
-    private PessoaInputPort pessoaInputPort;
+    private PessoaUseCase pessoaInputPort;
 
     @InjectMocks
     private PessoaController controller;

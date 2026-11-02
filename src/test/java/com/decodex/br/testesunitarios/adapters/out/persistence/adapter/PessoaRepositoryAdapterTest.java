@@ -25,7 +25,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.decodex.br.adapters.out.persistence.adapter.PessoaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;
@@ -35,6 +34,7 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.features.pessoa.infrastructure.persistence.PessoaRepositoryAdapter;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários - PessoaRepositoryAdapter")

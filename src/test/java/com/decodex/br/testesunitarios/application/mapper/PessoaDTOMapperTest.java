@@ -58,7 +58,7 @@ class PessoaDTOMapperTest {
 
     @Test
     void update_ShouldAtualizarPessoa_QuandoToDomainEAtualizarCamposCombinados() {
-        // Simula exatamente o que o PessoaService.update() faz
+        // Simula exatamente o que o PessoaApplicationService.update() faz
         UUID id = UUID.randomUUID();
         Pessoa existing = new Pessoa(id, "Nome Antigo", endereco, false);
         PessoaUpdateDTO dto = new PessoaUpdateDTO(

@@ -4,16 +4,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.decodex.br.domain.port.in.LancamentoInputPort;
-import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.domain.service.LancamentoService;
-import com.decodex.br.domain.service.PessoaService;
 import com.decodex.br.features.categoria.application.CategoriaApplicationService;
 import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
+import com.decodex.br.features.pessoa.application.PessoaApplicationService;
+import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
+import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 
 @Configuration
 public class BeanConfig {
@@ -26,8 +27,10 @@ public class BeanConfig {
     }
 
     @Bean
-    public PessoaInputPort pessoaInputPort(PessoaRepositoryPort pessoaRepositoryPort) {
-        return new PessoaService(pessoaRepositoryPort);
+    public PessoaUseCase pessoaUseCase(
+            PessoaRepositoryPort pessoaRepositoryPort,
+            PessoaQueryPort pessoaQueryPort) {
+        return new PessoaApplicationService(pessoaRepositoryPort, pessoaQueryPort);
     }
 
     @Bean

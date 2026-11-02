@@ -1,26 +1,29 @@
-package com.decodex.br.domain.service;
+package com.decodex.br.features.pessoa.application;
 
 import java.util.UUID;
 
-import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.application.dto.pessoa.PessoaFilter;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaInputPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
+import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
+import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 
-public class PessoaService implements PessoaInputPort {
-    
+public class PessoaApplicationService implements PessoaUseCase {
+
     private final PessoaRepositoryPort repository;
+    private final PessoaQueryPort query;
 
-    public PessoaService(PessoaRepositoryPort repository) {
+    public PessoaApplicationService(PessoaRepositoryPort repository, PessoaQueryPort query) {
         this.repository = repository;
+        this.query = query;
     }
 
     @Override
     public PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest pageRequest) {
-        return repository.findAll(filter, pageRequest);
+        return query.findAll(filter, pageRequest);
     }
 
     @Override

@@ -120,7 +120,11 @@ src/main/java/com/decodex/br/
 │       ├── excel/            # Geração de planilhas via Apache POI
 │       └── messaging/        # Produtor RabbitMQ
 ├── features/
-│   └── categoria/            # Primeiro slice migrado
+│   ├── categoria/            # Slice migrado
+│   │   ├── api/              # Controller REST e documentação OpenAPI
+│   │   ├── application/      # Caso de uso e portas da funcionalidade
+│   │   └── infrastructure/   # Adapter de persistência da funcionalidade
+│   └── pessoa/               # Slice migrado
 │       ├── api/              # Controller REST e documentação OpenAPI
 │       ├── application/      # Caso de uso e portas da funcionalidade
 │       └── infrastructure/   # Adapter de persistência da funcionalidade

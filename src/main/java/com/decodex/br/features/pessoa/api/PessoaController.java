@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.in.web;
+package com.decodex.br.features.pessoa.api;
 
 import java.net.URI;
 
@@ -21,8 +21,7 @@ import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaInputPort;
-import com.decodex.br.adapters.in.web.documentation.PessoaControllerDoc;
+import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
 
 import jakarta.validation.Valid;
 
@@ -30,9 +29,9 @@ import jakarta.validation.Valid;
 @RequestMapping("/pessoas")
 public class PessoaController implements PessoaControllerDoc {
 
-    private final PessoaInputPort inputPort;
+    private final PessoaUseCase inputPort;
 
-    public PessoaController(PessoaInputPort inputPort) {
+    public PessoaController(PessoaUseCase inputPort) {
         this.inputPort = inputPort;
     }
 

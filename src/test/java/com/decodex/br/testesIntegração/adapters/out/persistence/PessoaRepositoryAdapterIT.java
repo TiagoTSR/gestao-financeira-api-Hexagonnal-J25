@@ -11,7 +11,7 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.decodex.br.adapters.out.persistence.adapter.PessoaRepositoryAdapter;
+import com.decodex.br.features.pessoa.infrastructure.persistence.PessoaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.EnderecoEmbeddable;
 import com.decodex.br.adapters.out.persistence.entity.PessoaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.PessoaMapper;

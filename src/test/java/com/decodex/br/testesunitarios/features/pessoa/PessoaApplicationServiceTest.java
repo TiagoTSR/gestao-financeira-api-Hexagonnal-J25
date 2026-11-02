@@ -1,4 +1,4 @@
-package com.decodex.br.testesunitarios.domain.service;
+package com.decodex.br.testesunitarios.features.pessoa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,17 +29,21 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
-import com.decodex.br.domain.service.PessoaService;
+import com.decodex.br.features.pessoa.application.PessoaApplicationService;
+import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes unitários para PessoaService")
-class PessoaServiceTest {
+@DisplayName("Testes unitários para PessoaApplicationService")
+class PessoaApplicationServiceTest {
 
     @Mock
     private PessoaRepositoryPort repository;
 
+    @Mock
+    private PessoaQueryPort query;
+
     @InjectMocks
-    private PessoaService service;
+    private PessoaApplicationService service;
 
     private final UUID pessoaId = UUID.randomUUID();
     private final UUID idInexistente = UUID.randomUUID();
@@ -63,14 +67,14 @@ class PessoaServiceTest {
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
-        when(repository.findAll(any(PessoaFilter.class), eq(pageRequest))).thenReturn(pageResult);
+        when(query.findAll(any(PessoaFilter.class), eq(pageRequest))).thenReturn(pageResult);
 
         PageResult<Pessoa> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(pessoa);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(any(PessoaFilter.class), eq(pageRequest));
+        verify(query, times(1)).findAll(any(PessoaFilter.class), eq(pageRequest));
     }
 
     @Test

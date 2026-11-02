@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.decodex.br.adapters.in.web.PessoaController;
+import com.decodex.br.features.pessoa.api.PessoaController;
 import com.decodex.br.application.dto.pessoa.PessoaCreateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaUpdateDTO;
 import com.decodex.br.application.dto.pessoa.PessoaFilter;
@@ -31,7 +31,7 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.PessoaInputPort;
+import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +49,7 @@ class PessoaControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private PessoaInputPort pessoaInputPort;
+    private PessoaUseCase pessoaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
