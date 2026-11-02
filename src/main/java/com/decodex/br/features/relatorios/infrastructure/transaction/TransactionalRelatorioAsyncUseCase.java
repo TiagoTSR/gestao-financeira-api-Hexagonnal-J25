@@ -2,6 +2,7 @@ package com.decodex.br.features.relatorios.infrastructure.transaction;
 
 import java.util.UUID;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCo
 import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
 
 @Component
+@Primary
 public class TransactionalRelatorioAsyncUseCase implements RelatorioAsyncUseCase {
 
     private final RelatorioAsyncApplicationService applicationService;
