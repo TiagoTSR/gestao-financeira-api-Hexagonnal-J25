@@ -34,6 +34,7 @@ import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.features.pessoa.application.model.PessoaFilterQuery;
 import com.decodex.br.features.pessoa.infrastructure.persistence.PessoaRepositoryAdapter;
 
 @ExtendWith(MockitoExtension.class)
@@ -129,7 +130,7 @@ class PessoaRepositoryAdapterTest {
 	@Test
     @DisplayName("Deve listar pessoas com paginação e filtro")
     void findAll_ShouldReturnPageResult() {
-        PessoaFilter filter = new PessoaFilter();
+        PessoaFilterQuery filter = new PessoaFilterQuery(null, null, null, null, null, null);
         PageRequest pageRequest = new PageRequest(0, 10);
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "nome")
@@ -157,7 +158,7 @@ class PessoaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve resolver ordenação com resolverSort respeitando campos permitidos e direção descendente")
     void findAll_ComOrdenacaoDescendente_DeveResolverSortCorretamente() {
-        PessoaFilter filter = new PessoaFilter();
+        PessoaFilterQuery filter = new PessoaFilterQuery(null, null, null, null, null, null);
         PageRequest pageRequest = PageRequest.of(0, 10, "ativo", "desc");
         Pageable pageableEsperado = org.springframework.data.domain.PageRequest.of(
                 0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "ativo")

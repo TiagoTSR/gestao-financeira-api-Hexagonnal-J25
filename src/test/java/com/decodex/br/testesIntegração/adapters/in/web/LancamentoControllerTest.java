@@ -37,6 +37,9 @@ import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoUpdateCommand;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -97,7 +100,7 @@ class LancamentoControllerTest {
             "Referente a maio", TipoLancamento.RECEITA, categoria, pessoa
         );
 
-        when(lancamentoInputPort.create(any(LancamentoCreateDTO.class))).thenReturn(lancamentoSalvo);
+        when(lancamentoInputPort.create(any(LancamentoCreateCommand.class))).thenReturn(lancamentoSalvo);
 
         mockMvc.perform(post("/lancamentos")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -160,7 +163,7 @@ class LancamentoControllerTest {
                 List.of(lancamento), 0, 10, 1L, 1
             );
 
-            when(lancamentoInputPort.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+            when(lancamentoInputPort.findAll(any(LancamentoFilterQuery.class), any(PageRequest.class)))
                 .thenReturn(pageResult);
 
             mockMvc.perform(get("/lancamentos")
@@ -191,7 +194,7 @@ class LancamentoControllerTest {
             null, TipoLancamento.DESPESA, categoria, pessoa
         );
 
-        when(lancamentoInputPort.update(eq(lancId), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoAtualizado);
+        when(lancamentoInputPort.update(eq(lancId), any(LancamentoUpdateCommand.class))).thenReturn(lancamentoAtualizado);
 
         mockMvc.perform(put("/lancamentos/{id}", lancId)
                 .contentType(MediaType.APPLICATION_JSON)

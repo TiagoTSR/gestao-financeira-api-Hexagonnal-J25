@@ -22,6 +22,7 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
+import com.decodex.br.features.pessoa.application.model.PessoaFilterQuery;
 
 import jakarta.validation.Valid;
 
@@ -53,7 +54,16 @@ public class PessoaController implements PessoaControllerDoc {
         String resolvedDir = direction != null ? direction : direcao;
 
         PageRequest pageRequest = PageRequest.of(resolvedPage, resolvedSize, resolvedSort, resolvedDir);
-        return ResponseEntity.ok(inputPort.findAll(filter, pageRequest)
+        PessoaFilterQuery query = filter == null
+                ? new PessoaFilterQuery(null, null, null, null, null, null)
+                : new PessoaFilterQuery(
+                        filter.getNome(),
+                        filter.getAtivo(),
+                        filter.getCidade(),
+                        filter.getEstado(),
+                        filter.getBairro(),
+                        filter.getCep());
+        return ResponseEntity.ok(inputPort.findAll(query, pageRequest)
                 .map(PessoaResponseDTO::from));
     }
 

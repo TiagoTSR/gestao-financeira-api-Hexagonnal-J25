@@ -10,6 +10,9 @@ import com.decodex.br.features.relatorios.application.model.RelatorioRequester;
 import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
 import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioRequesterContextPort;
+import com.decodex.br.features.relatorios.application.model.RelatorioFile;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestResult;
+import com.decodex.br.features.relatorios.application.model.RelatorioStatusView;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -86,21 +89,28 @@ public class RelatorioController implements RelatorioControllerDoc {
                 request.fim(),
                 requester.tenantId(),
                 requester.usuario());
-        RelatorioProtocoloResponseDTO response = relatorioAsyncUseCase.solicitar(command);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+        RelatorioRequestResult result = relatorioAsyncUseCase.solicitar(command);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new RelatorioProtocoloResponseDTO(
+                result.protocolo(), result.status(), result.mensagem()));
     }
 
     @Override
     @GetMapping("/{protocolo}/status")
     public ResponseEntity<RelatorioStatusResponseDTO> consultarStatus(@PathVariable UUID protocolo) {
-        RelatorioStatusResponseDTO response = relatorioAsyncUseCase.consultarStatus(protocolo);
-        return ResponseEntity.ok(response);
+        RelatorioStatusView status = relatorioAsyncUseCase.consultarStatus(protocolo);
+        return ResponseEntity.ok(new RelatorioStatusResponseDTO(
+                status.protocolo(),
+                status.tipoFormato(),
+                status.status(),
+                status.mensagemErro(),
+                status.dataSolicitacao(),
+                status.dataConclusao()));
     }
 
     @Override
     @GetMapping("/{protocolo}/download")
     public ResponseEntity<byte[]> baixarRelatorio(@PathVariable UUID protocolo) {
-        RelatorioDownloadDTO download = relatorioAsyncUseCase.baixar(protocolo);
+        RelatorioFile download = relatorioAsyncUseCase.baixar(protocolo);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, download.contentType())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + download.nomeArquivo() + "\"")

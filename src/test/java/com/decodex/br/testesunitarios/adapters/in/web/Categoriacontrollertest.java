@@ -36,6 +36,7 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 
 @ExtendWith(MockitoExtension.class)
 class CategoriaControllerUnitarioTest {
@@ -61,7 +62,7 @@ class CategoriaControllerUnitarioTest {
             List.of(new Categoria(idPadrao, "Lazer")), 0, 10, 1L, 1
         );
 
-        when(categoriaInputPort.findAll(any(CategoriaFilter.class), any(PageRequest.class)))
+        when(categoriaInputPort.findAll(any(CategoriaFilterQuery.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         CategoriaFilter filter = new CategoriaFilter();

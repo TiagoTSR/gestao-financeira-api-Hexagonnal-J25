@@ -22,6 +22,7 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 
 import jakarta.validation.Valid;
 
@@ -53,7 +54,10 @@ public class CategoriaController implements CategoriaControllerDoc {
         String resolvedDir = direction != null ? direction : direcao;
 
         PageRequest pageRequest = PageRequest.of(resolvedPage, resolvedSize, resolvedSort, resolvedDir);
-        return ResponseEntity.ok(inputPort.findAll(filter, pageRequest)
+        CategoriaFilterQuery query = filter == null
+                ? new CategoriaFilterQuery(null, null)
+                : new CategoriaFilterQuery(filter.getId(), filter.getNome());
+        return ResponseEntity.ok(inputPort.findAll(query, pageRequest)
                 .map(CategoriaResponseDTO::from));
     }
 

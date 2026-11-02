@@ -25,7 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Lancamento;
@@ -33,20 +32,23 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
-import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.features.lancamentos.application.LancamentoApplicationService;
+import com.decodex.br.features.lancamentos.application.model.LancamentoBaixaCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoHistoryItem;
+import com.decodex.br.features.lancamentos.application.model.LancamentoUpdateCommand;
+import com.decodex.br.features.lancamentos.application.port.out.LancamentoStore;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários para LancamentoApplicationService")
 class LancamentoApplicationServiceTest {
 
     @Mock
-    private LancamentoRepositoryPort repository;
+    private LancamentoStore repository;
 
     @Mock
     private CategoriaRepositoryPort categoriaRepository;
@@ -78,19 +80,20 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve listar lançamentos paginados")
     void findAll_ShouldReturnPageResult() {
-        LancamentoFilter filter = new LancamentoFilter();
+        LancamentoFilterQuery filter = new LancamentoFilterQuery(
+                null, null, null, null, null, null, null, null, null, null, null, null, null);
         PageRequest pageRequest = new PageRequest(0, 10);
         PageResult<Lancamento> pageResult = new PageResult<>(
             List.of(lancamento), 0, 10, 1L, 1
         );
-        when(repository.findAll(any(LancamentoFilter.class), eq(pageRequest))).thenReturn(pageResult);
+        when(repository.findAll(any(LancamentoFilterQuery.class), eq(pageRequest))).thenReturn(pageResult);
 
         PageResult<Lancamento> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(lancamento);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(any(LancamentoFilter.class), eq(pageRequest));
+        verify(repository, times(1)).findAll(any(LancamentoFilterQuery.class), eq(pageRequest));
     }
 
     @Test
@@ -190,7 +193,7 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve criar lançamento a partir de DTO buscando categoria e pessoa")
     void create_WithDTO_ShouldFindDependenciesAndSave() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
             null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
@@ -209,7 +212,7 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar com DTO quando categoria não for encontrada")
     void create_WithDTO_WhenCategoriaNotFound_ShouldThrowException() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
             null, TipoLancamento.RECEITA, idInexistente, pessoaId
         );
@@ -223,7 +226,7 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao criar com DTO quando pessoa não for encontrada")
     void create_WithDTO_WhenPessoaNotFound_ShouldThrowException() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
             null, TipoLancamento.RECEITA, categoriaId, idInexistente
         );
@@ -239,7 +242,7 @@ class LancamentoApplicationServiceTest {
     @DisplayName("Deve lançar RegraDeNegocioException ao criar com DTO para pessoa inativa")
     void create_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
         Pessoa inativa = new Pessoa(pessoaId, "Inativa", pessoa.getEndereco(), false);
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
             "Salário", LocalDate.of(2025, 6, 10), null, new BigDecimal("5000.00"),
             null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
@@ -254,7 +257,7 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve atualizar lançamento a partir de DTO buscando categoria e pessoa")
     void update_WithDTO_ShouldFindDependenciesAndUpdate() {
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+        LancamentoUpdateCommand dto = new LancamentoUpdateCommand(
             "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
             "Com pipoca", TipoLancamento.DESPESA, categoriaId, pessoaId
         );
@@ -276,7 +279,7 @@ class LancamentoApplicationServiceTest {
     @DisplayName("Deve lançar exceção ao atualizar com DTO quando pessoa for inativa")
     void update_WithDTO_WhenPessoaInactive_ShouldThrowRegraDeNegocioException() {
         Pessoa inativa = new Pessoa(pessoaId, "Inativa", pessoa.getEndereco(), false);
-        LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
+        LancamentoUpdateCommand dto = new LancamentoUpdateCommand(
             "Novo Cinema", LocalDate.of(2025, 6, 15), null, new BigDecimal("60.00"),
             "Com pipoca", TipoLancamento.DESPESA, categoriaId, pessoaId
         );
@@ -295,8 +298,8 @@ class LancamentoApplicationServiceTest {
         when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
         when(repository.save(any(Lancamento.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO =
-            new com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO(LocalDate.of(2025, 6, 12), new BigDecimal("50.00"));
+        LancamentoBaixaCommand baixaDTO =
+            new LancamentoBaixaCommand(LocalDate.of(2025, 6, 12), new BigDecimal("50.00"));
 
         Lancamento result = service.quitar(lancamentoId, baixaDTO);
 
@@ -336,7 +339,7 @@ class LancamentoApplicationServiceTest {
     @Test
     @DisplayName("Deve gerar múltiplas parcelas ao criar com totalParcelas > 1")
     void create_WhenTotalParcelasGreaterThanOne_ShouldGenerateInstallments() {
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
             "Curso", LocalDate.of(2025, 1, 10), null, new BigDecimal("300.00"),
             "Parcelado", TipoLancamento.DESPESA, categoriaId, pessoaId,
             null, null, 1, 3
@@ -358,13 +361,13 @@ class LancamentoApplicationServiceTest {
     @DisplayName("Deve buscar histórico de auditoria do lançamento existente")
     void findHistorico_ShouldReturnList() {
         when(repository.findById(lancamentoId)).thenReturn(Optional.of(lancamento));
-        var itemHistorico = new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+        var itemHistorico = new LancamentoHistoryItem(
                 1L, java.time.LocalDateTime.now(), "admin", "CRIACAO", lancamentoId,
                 "Cinema", new BigDecimal("50.00"), TipoLancamento.DESPESA,
                 com.decodex.br.domain.model.StatusLancamento.PENDENTE,
                 LocalDate.of(2025, 6, 10), null, null, 1, 1
         );
-        when(repository.findHistorico(lancamentoId)).thenReturn(List.of(itemHistorico));
+        when(repository.findHistory(lancamentoId)).thenReturn(List.of(itemHistorico));
 
         var resultado = service.findHistorico(lancamentoId);
 

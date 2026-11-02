@@ -122,15 +122,15 @@ src/main/java/com/decodex/br/
 ├── features/
 │   ├── categoria/            # Slice migrado
 │   │   ├── api/              # Controller REST e documentação OpenAPI
-│   │   ├── application/      # Caso de uso e portas da funcionalidade
+│   │   ├── application/      # Caso de uso, modelos e portas da funcionalidade
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
 │   ├── pessoa/               # Slice migrado
 │   │   ├── api/              # Controller REST e documentação OpenAPI
-│   │   ├── application/      # Caso de uso e portas da funcionalidade
+│   │   ├── application/      # Caso de uso, modelos e portas da funcionalidade
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
 │   ├── lancamentos/          # Slice migrado
 │   │   ├── api/              # Controller REST e documentação OpenAPI
-│   │   ├── application/      # Caso de uso e parcelamento
+│   │   ├── application/      # Caso de uso, comandos, consultas e parcelamento
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
 │   ├── autenticacao/         # Cadastro e ciclo de vida do refresh token
 │   │   ├── application/      # Casos de uso e portas
@@ -142,6 +142,8 @@ src/main/java/com/decodex/br/
 ```
 
 A migração está sendo feita de forma incremental. Os modelos de domínio e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados. O listener RabbitMQ compartilhado delega o processamento de relatórios ao respectivo slice.
+
+Nos slices migrados, os contratos internos da aplicação (comandos, consultas e resultados) pertencem à própria feature. Controllers convertem os DTOs HTTP nesses modelos, e adapters de infraestrutura fazem a tradução necessária para componentes compartilhados ainda não migrados. A regra arquitetural automatizada impede que a camada de aplicação dependa diretamente de DTOs compartilhados, APIs ou infraestrutura.
 
 ---
 

@@ -8,6 +8,9 @@ import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.domain.model.StatusRelatorio;
 import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
 import com.decodex.br.features.relatorios.application.model.RelatorioRequester;
+import com.decodex.br.features.relatorios.application.model.RelatorioFile;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestResult;
+import com.decodex.br.features.relatorios.application.model.RelatorioStatusView;
 import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
 import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioRequesterContextPort;
@@ -84,7 +87,7 @@ class RelatorioControllerTest {
     void deveSolicitarRelatorioAssincrono() {
         UUID protocolo = UUID.randomUUID();
         RelatorioSolicitacaoRequestDTO request = new RelatorioSolicitacaoRequestDTO("PDF", LocalDate.now(), LocalDate.now());
-        RelatorioProtocoloResponseDTO dto = new RelatorioProtocoloResponseDTO(protocolo, StatusRelatorio.PENDENTE, "Solicitado com sucesso");
+        RelatorioRequestResult dto = new RelatorioRequestResult(protocolo, StatusRelatorio.PENDENTE, "Solicitado com sucesso");
 
         UUID tenantId = UUID.randomUUID();
         when(requesterContext.currentRequester()).thenReturn(new RelatorioRequester(tenantId, "usuario"));
@@ -104,7 +107,7 @@ class RelatorioControllerTest {
     @DisplayName("Deve consultar status do relatório por protocolo")
     void deveConsultarStatusDoRelatorio() {
         UUID protocolo = UUID.randomUUID();
-        RelatorioStatusResponseDTO statusDTO = new RelatorioStatusResponseDTO(
+        RelatorioStatusView statusDTO = new RelatorioStatusView(
                 protocolo, "PDF", StatusRelatorio.CONCLUIDO, null, LocalDateTime.now(), LocalDateTime.now()
         );
 
@@ -122,7 +125,7 @@ class RelatorioControllerTest {
     void deveBaixarRelatorioPorProtocolo() {
         UUID protocolo = UUID.randomUUID();
         byte[] bytes = new byte[]{10, 20, 30};
-        RelatorioDownloadDTO downloadDTO = new RelatorioDownloadDTO(bytes, "relatorio.pdf", "application/pdf");
+        RelatorioFile downloadDTO = new RelatorioFile(bytes, "relatorio.pdf", "application/pdf");
 
         when(relatorioAsyncUseCase.baixar(protocolo)).thenReturn(downloadDTO);
 

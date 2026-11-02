@@ -23,6 +23,7 @@ import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 
 @Component
 public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort, CategoriaQueryPort {
@@ -62,7 +63,7 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort, Cate
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest request) {
+    public PageResult<Categoria> findAll(CategoriaFilterQuery filter, PageRequest request) {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
@@ -70,7 +71,12 @@ public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort, Cate
                 resolverSort(request)
         );
 
-        Specification<CategoriaEntity> spec = CategoriaSpecification.fromFilter(filter);
+        CategoriaFilter legacyFilter = new CategoriaFilter();
+        if (filter != null) {
+            legacyFilter.setId(filter.id());
+            legacyFilter.setNome(filter.nome());
+        }
+        Specification<CategoriaEntity> spec = CategoriaSpecification.fromFilter(legacyFilter);
 
         Page<CategoriaEntity> page = repository.findAll(spec, pageable);
 

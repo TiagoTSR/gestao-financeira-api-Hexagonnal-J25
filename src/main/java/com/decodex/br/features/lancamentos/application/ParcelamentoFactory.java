@@ -1,10 +1,10 @@
 package com.decodex.br.features.lancamentos.application;
 
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.StatusLancamento;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -17,7 +17,7 @@ public final class ParcelamentoFactory {
     private ParcelamentoFactory() {
     }
 
-    public static List<Lancamento> gerarLancamentos(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa) {
+    public static List<Lancamento> gerarLancamentos(LancamentoCreateCommand dto, Categoria categoria, Pessoa pessoa) {
         int total = (dto.totalParcelas() != null && dto.totalParcelas() > 1) ? dto.totalParcelas() : 1;
 
         if (total <= 1) {
@@ -27,7 +27,7 @@ public final class ParcelamentoFactory {
         return criarLancamentosParcelados(dto, categoria, pessoa, total);
     }
 
-    private static Lancamento criarLancamentoUnico(LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa) {
+    private static Lancamento criarLancamentoUnico(LancamentoCreateCommand dto, Categoria categoria, Pessoa pessoa) {
         BigDecimal valorPago = (dto.valorPago() != null)
                 ? dto.valorPago()
                 : (dto.dataPagamento() != null ? dto.valor() : null);
@@ -51,7 +51,7 @@ public final class ParcelamentoFactory {
     }
 
     private static List<Lancamento> criarLancamentosParcelados(
-            LancamentoCreateDTO dto, Categoria categoria, Pessoa pessoa, int total) {
+            LancamentoCreateCommand dto, Categoria categoria, Pessoa pessoa, int total) {
 
         BigDecimal valorTotal = dto.valor();
         BigDecimal parcelaBase = valorTotal.divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_EVEN);

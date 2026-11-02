@@ -4,33 +4,33 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.decodex.br.application.dto.relatorio.RelatorioDownloadDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioProtocoloResponseDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioSolicitacaoMsg;
-import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.StatusRelatorio;
-import com.decodex.br.domain.port.out.RelatorioProducerPort;
+import com.decodex.br.features.relatorios.application.model.RelatorioFile;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestMessage;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestResult;
+import com.decodex.br.features.relatorios.application.model.RelatorioStatusView;
 import com.decodex.br.features.relatorios.application.model.RelatorioSolicitacao;
 import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
 import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioSolicitacaoStore;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioRequestPublisher;
 
 public class RelatorioAsyncApplicationService implements RelatorioAsyncUseCase {
 
     private final RelatorioSolicitacaoStore relatorioStore;
-    private final RelatorioProducerPort relatorioProducerPort;
+    private final RelatorioRequestPublisher relatorioRequestPublisher;
 
     public RelatorioAsyncApplicationService(
             RelatorioSolicitacaoStore relatorioStore,
-            RelatorioProducerPort relatorioProducerPort) {
+            RelatorioRequestPublisher relatorioRequestPublisher) {
         this.relatorioStore = relatorioStore;
-        this.relatorioProducerPort = relatorioProducerPort;
+        this.relatorioRequestPublisher = relatorioRequestPublisher;
     }
 
     @Override
-    public RelatorioProtocoloResponseDTO solicitar(SolicitarRelatorioCommand command) {
+    public RelatorioRequestResult solicitar(SolicitarRelatorioCommand command) {
         LocalDate hoje = LocalDate.now();
         LocalDate inicio = command.inicio() != null ? command.inicio() : hoje.withDayOfMonth(1);
         LocalDate fim = command.fim() != null ? command.fim() : hoje;
@@ -60,25 +60,25 @@ public class RelatorioAsyncApplicationService implements RelatorioAsyncUseCase {
                 null);
         relatorioStore.save(solicitacao);
 
-        RelatorioSolicitacaoMsg mensagem = new RelatorioSolicitacaoMsg(
+        RelatorioRequestMessage mensagem = new RelatorioRequestMessage(
                 protocolo,
                 command.tenantId(),
                 formato,
                 inicio,
                 fim,
                 command.usuario());
-        relatorioProducerPort.publicarSolicitacao(mensagem);
+        relatorioRequestPublisher.publicar(mensagem);
 
-        return new RelatorioProtocoloResponseDTO(
+        return new RelatorioRequestResult(
                 protocolo,
                 StatusRelatorio.PENDENTE,
                 "Relatório solicitado com sucesso. Acompanhe o processamento utilizando o protocolo fornecido.");
     }
 
     @Override
-    public RelatorioStatusResponseDTO consultarStatus(UUID protocolo) {
+    public RelatorioStatusView consultarStatus(UUID protocolo) {
         RelatorioSolicitacao solicitacao = buscarSolicitacao(protocolo);
-        return new RelatorioStatusResponseDTO(
+        return new RelatorioStatusView(
                 solicitacao.protocolo(),
                 solicitacao.tipoFormato(),
                 solicitacao.status(),
@@ -88,7 +88,7 @@ public class RelatorioAsyncApplicationService implements RelatorioAsyncUseCase {
     }
 
     @Override
-    public RelatorioDownloadDTO baixar(UUID protocolo) {
+    public RelatorioFile baixar(UUID protocolo) {
         RelatorioSolicitacao solicitacao = buscarSolicitacao(protocolo);
 
         if (solicitacao.status() != null && solicitacao.status().isEmAndamento()) {
@@ -106,7 +106,7 @@ public class RelatorioAsyncApplicationService implements RelatorioAsyncUseCase {
             throw new RegraDeNegocioException("Arquivo de relatório não encontrado para download.");
         }
 
-        return new RelatorioDownloadDTO(
+        return new RelatorioFile(
                 solicitacao.conteudo(),
                 solicitacao.nomeArquivo(),
                 solicitacao.contentType());

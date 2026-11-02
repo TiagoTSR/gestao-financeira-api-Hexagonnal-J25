@@ -21,6 +21,7 @@ import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
+import com.decodex.br.features.pessoa.application.model.PessoaFilterQuery;
 
 @Component
 public class PessoaRepositoryAdapter implements PessoaRepositoryPort, PessoaQueryPort {
@@ -54,7 +55,7 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort, PessoaQuer
 
     @Override
     @Transactional(readOnly = true)
-    public PageResult<Pessoa> findAll(PessoaFilter filter, PageRequest request) {
+    public PageResult<Pessoa> findAll(PessoaFilterQuery filter, PageRequest request) {
 
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 request.page(),
@@ -62,7 +63,16 @@ public class PessoaRepositoryAdapter implements PessoaRepositoryPort, PessoaQuer
                 resolverSort(request)
         );
 
-        Specification<PessoaEntity> spec = PessoaSpecification.fromFilter(filter);
+        PessoaFilter legacyFilter = new PessoaFilter();
+        if (filter != null) {
+            legacyFilter.setNome(filter.nome());
+            legacyFilter.setAtivo(filter.ativo());
+            legacyFilter.setCidade(filter.cidade());
+            legacyFilter.setEstado(filter.estado());
+            legacyFilter.setBairro(filter.bairro());
+            legacyFilter.setCep(filter.cep());
+        }
+        Specification<PessoaEntity> spec = PessoaSpecification.fromFilter(legacyFilter);
 
         Page<PessoaEntity> page = repository.findAll(spec, pageable);
 

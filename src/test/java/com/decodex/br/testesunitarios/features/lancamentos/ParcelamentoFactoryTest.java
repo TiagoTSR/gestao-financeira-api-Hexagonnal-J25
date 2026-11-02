@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
@@ -31,7 +31,7 @@ class ParcelamentoFactoryTest {
     @Test
     @DisplayName("Deve gerar lançamento único quando totalParcelas for nulo ou menor igual a 1")
     void deveGerarLancamentoUnicoQuandoTotalParcelasForNuloOuMenorIgualAUm() {
-        LancamentoCreateDTO dtoNulo = new LancamentoCreateDTO(
+        LancamentoCreateCommand dtoNulo = new LancamentoCreateCommand(
                 "Supermercado",
                 LocalDate.of(2026, 10, 15),
                 null,
@@ -61,7 +61,7 @@ class ParcelamentoFactoryTest {
     @DisplayName("Deve inferir valorPago no lançamento único quando dataPagamento for informada mas valorPago for nulo")
     void deveInferirValorPagoNoLancamentoUnicoQuandoDataPagamentoInformada() {
         LocalDate hoje = LocalDate.of(2026, 10, 11);
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
                 "Conta de Luz",
                 hoje,
                 hoje,
@@ -87,7 +87,7 @@ class ParcelamentoFactoryTest {
     void deveDividirParcelasEAlocarDiferencaCentavosNaPrimeiraParcela() {
         // R$ 100,00 dividido em 3 parcelas: 33.33 * 3 = 99.99 -> Primeira parcela deve ser 33.34
         LocalDate vencimento = LocalDate.of(2026, 1, 10);
-        LancamentoCreateDTO dto = new LancamentoCreateDTO(
+        LancamentoCreateCommand dto = new LancamentoCreateCommand(
                 "Curso Online",
                 vencimento,
                 vencimento, // pago hoje

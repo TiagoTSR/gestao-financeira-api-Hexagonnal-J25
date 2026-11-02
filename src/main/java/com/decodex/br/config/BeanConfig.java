@@ -4,7 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
-import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.domain.port.out.RefreshTokenRepositoryPort;
 import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
@@ -21,11 +20,12 @@ import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
 import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 import com.decodex.br.features.lancamentos.application.LancamentoApplicationService;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
-import com.decodex.br.domain.port.out.RelatorioProducerPort;
+import com.decodex.br.features.lancamentos.application.port.out.LancamentoStore;
 import com.decodex.br.features.relatorios.application.RelatorioAsyncApplicationService;
 import com.decodex.br.features.relatorios.application.RelatorioProcessingApplicationService;
 import com.decodex.br.features.relatorios.application.port.in.ProcessarRelatorioUseCase;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioFileGenerator;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioRequestPublisher;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioSolicitacaoStore;
 
 @Configuration
@@ -47,11 +47,11 @@ public class BeanConfig {
 
     @Bean
     public LancamentoUseCase lancamentoUseCase(
-            LancamentoRepositoryPort lancamentoRepositoryPort,
+            LancamentoStore lancamentoStore,
             CategoriaRepositoryPort categoriaRepositoryPort,
             PessoaRepositoryPort pessoaRepositoryPort) {
         return new LancamentoApplicationService(
-                lancamentoRepositoryPort,
+                lancamentoStore,
                 categoriaRepositoryPort,
                 pessoaRepositoryPort);
     }
@@ -59,8 +59,8 @@ public class BeanConfig {
     @Bean
     public RelatorioAsyncApplicationService relatorioAsyncApplicationService(
             RelatorioSolicitacaoStore relatorioSolicitacaoStore,
-            RelatorioProducerPort relatorioProducerPort) {
-        return new RelatorioAsyncApplicationService(relatorioSolicitacaoStore, relatorioProducerPort);
+            RelatorioRequestPublisher relatorioRequestPublisher) {
+        return new RelatorioAsyncApplicationService(relatorioSolicitacaoStore, relatorioRequestPublisher);
     }
 
     @Bean

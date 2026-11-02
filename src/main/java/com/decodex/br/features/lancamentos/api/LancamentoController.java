@@ -23,6 +23,10 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
+import com.decodex.br.features.lancamentos.application.model.LancamentoBaixaCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoUpdateCommand;
 
 import jakarta.validation.Valid;
 
@@ -58,7 +62,23 @@ public class LancamentoController implements LancamentoControllerDoc {
         String resolvedDir = direction != null ? direction : direcao;
 
         PageRequest pageRequest = PageRequest.of(resolvedPage, resolvedSize, resolvedSort, resolvedDir);
-        return ResponseEntity.ok(lancamentoInputPort.findAll(filter, pageRequest)
+        LancamentoFilterQuery query = filter == null
+                ? null
+                : new LancamentoFilterQuery(
+                        filter.getDescricao(),
+                        filter.getDataVencimento(),
+                        filter.getDataVencimentoDe(),
+                        filter.getDataVencimentoAte(),
+                        filter.getDataPagamento(),
+                        filter.getValor(),
+                        filter.getObservacao(),
+                        filter.getTipo(),
+                        filter.getStatus(),
+                        filter.getNomeCategoria(),
+                        filter.getNomePessoa(),
+                        filter.getCategoriaId(),
+                        filter.getPessoaId());
+        return ResponseEntity.ok(lancamentoInputPort.findAll(query, pageRequest)
                 .map(mapper::toDTO));
     }
 
@@ -90,7 +110,7 @@ public class LancamentoController implements LancamentoControllerDoc {
     @Override
     @PostMapping
     public ResponseEntity<LancamentoResponseDTO> create(@RequestBody @Valid LancamentoCreateDTO dto) {
-        Lancamento lancamento = lancamentoInputPort.create(dto);
+        Lancamento lancamento = lancamentoInputPort.create(toCommand(dto));
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -107,7 +127,15 @@ public class LancamentoController implements LancamentoControllerDoc {
             @PathVariable java.util.UUID id,
             @RequestBody @Valid LancamentoUpdateDTO dto) {
 
-        Lancamento atualizado = lancamentoInputPort.update(id, dto);
+        Lancamento atualizado = lancamentoInputPort.update(id, new LancamentoUpdateCommand(
+                dto.descricao(),
+                dto.dataVencimento(),
+                dto.dataPagamento(),
+                dto.valor(),
+                dto.observacao(),
+                dto.tipo(),
+                dto.categoriaId(),
+                dto.pessoaId()));
 
         return ResponseEntity.ok(mapper.toDTO(atualizado));
     }
@@ -124,7 +152,10 @@ public class LancamentoController implements LancamentoControllerDoc {
     public ResponseEntity<LancamentoResponseDTO> quitar(
             @PathVariable java.util.UUID id,
             @RequestBody(required = false) com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO baixaDTO) {
-        Lancamento quitado = lancamentoInputPort.quitar(id, baixaDTO);
+        LancamentoBaixaCommand command = baixaDTO == null
+                ? null
+                : new LancamentoBaixaCommand(baixaDTO.dataPagamento(), baixaDTO.valorPago());
+        Lancamento quitado = lancamentoInputPort.quitar(id, command);
         return ResponseEntity.ok(mapper.toDTO(quitado));
     }
 
@@ -146,7 +177,40 @@ public class LancamentoController implements LancamentoControllerDoc {
     @GetMapping("/{id}/historico")
     public ResponseEntity<java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO>> findHistorico(
             @PathVariable java.util.UUID id) {
-        java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO> historico = lancamentoInputPort.findHistorico(id);
+        java.util.List<com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO> historico =
+                lancamentoInputPort.findHistorico(id).stream()
+                        .map(item -> new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+                                item.revisao(),
+                                item.dataRevisao(),
+                                item.usuario(),
+                                item.operacao(),
+                                item.id(),
+                                item.descricao(),
+                                item.valor(),
+                                item.tipo(),
+                                item.status(),
+                                item.dataVencimento(),
+                                item.dataPagamento(),
+                                item.valorPago(),
+                                item.numeroParcela(),
+                                item.totalParcelas()))
+                        .toList();
         return ResponseEntity.ok(historico);
+    }
+
+    private LancamentoCreateCommand toCommand(LancamentoCreateDTO dto) {
+        return new LancamentoCreateCommand(
+                dto.descricao(),
+                dto.dataVencimento(),
+                dto.dataPagamento(),
+                dto.valor(),
+                dto.observacao(),
+                dto.tipo(),
+                dto.categoriaId(),
+                dto.pessoaId(),
+                dto.status(),
+                dto.valorPago(),
+                dto.numeroParcela(),
+                dto.totalParcelas());
     }
 }

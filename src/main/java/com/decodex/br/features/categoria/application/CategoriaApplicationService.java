@@ -2,7 +2,6 @@ package com.decodex.br.features.categoria.application;
 
 import java.util.UUID;
 
-import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -10,6 +9,7 @@ import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 
 public class CategoriaApplicationService implements CategoriaUseCase {
 
@@ -22,7 +22,7 @@ public class CategoriaApplicationService implements CategoriaUseCase {
     }
 
     @Override
-    public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest) {
+    public PageResult<Categoria> findAll(CategoriaFilterQuery filter, PageRequest pageRequest) {
         return query.findAll(filter, pageRequest);
     }
 

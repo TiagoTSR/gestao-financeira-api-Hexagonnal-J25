@@ -5,11 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import com.decodex.br.application.dto.lancamento.LancamentoBaixaDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoFilter;
-import com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO;
-import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
@@ -18,18 +13,23 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
-import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
+import com.decodex.br.features.lancamentos.application.model.LancamentoBaixaCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoHistoryItem;
+import com.decodex.br.features.lancamentos.application.model.LancamentoUpdateCommand;
+import com.decodex.br.features.lancamentos.application.port.out.LancamentoStore;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 
 public class LancamentoApplicationService implements LancamentoUseCase {
 	
-	private final LancamentoRepositoryPort repository;
+	private final LancamentoStore repository;
     private final CategoriaRepositoryPort categoriaRepository;
     private final PessoaRepositoryPort pessoaRepository;
 
     public LancamentoApplicationService(
-            LancamentoRepositoryPort repository,
+            LancamentoStore repository,
             CategoriaRepositoryPort categoriaRepository,
             PessoaRepositoryPort pessoaRepository) {
         this.repository = repository;
@@ -37,12 +37,8 @@ public class LancamentoApplicationService implements LancamentoUseCase {
         this.pessoaRepository = pessoaRepository;
     }
 
-    public LancamentoApplicationService(LancamentoRepositoryPort repository) {
-        this(repository, null, null);
-    }
-
     @Override
-    public PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest pageRequest) {
+    public PageResult<Lancamento> findAll(LancamentoFilterQuery filter, PageRequest pageRequest) {
         return repository.findAll(filter, pageRequest);
     }
 
@@ -53,7 +49,7 @@ public class LancamentoApplicationService implements LancamentoUseCase {
     }
 
     @Override
-    public Lancamento create(LancamentoCreateDTO dto) {
+    public Lancamento create(LancamentoCreateCommand dto) {
         Categoria categoria = buscarCategoria(dto.categoriaId());
         Pessoa pessoa = buscarPessoa(dto.pessoaId());
         validarPessoaAtiva(pessoa);
@@ -76,7 +72,7 @@ public class LancamentoApplicationService implements LancamentoUseCase {
     }
 
     @Override
-    public Lancamento update(UUID id, LancamentoUpdateDTO dto) {
+    public Lancamento update(UUID id, LancamentoUpdateCommand dto) {
         Lancamento existing = findById(id);
         Categoria categoria = buscarCategoria(dto.categoriaId());
         Pessoa pessoa = buscarPessoa(dto.pessoaId());
@@ -109,7 +105,7 @@ public class LancamentoApplicationService implements LancamentoUseCase {
     }
 
     @Override
-    public Lancamento quitar(UUID id, LancamentoBaixaDTO baixaDTO) {
+    public Lancamento quitar(UUID id, LancamentoBaixaCommand baixaDTO) {
         Lancamento existing = findById(id);
         LocalDate dataPag = (baixaDTO != null && baixaDTO.dataPagamento() != null)
                 ? baixaDTO.dataPagamento()
@@ -137,23 +133,17 @@ public class LancamentoApplicationService implements LancamentoUseCase {
     }
 
     @Override
-    public List<LancamentoHistoricoDTO> findHistorico(UUID id) {
+    public List<LancamentoHistoryItem> findHistorico(UUID id) {
         findById(id);
-        return repository.findHistorico(id);
+        return repository.findHistory(id);
     }
 
     private Categoria buscarCategoria(UUID categoriaId) {
-        if (categoriaRepository == null) {
-            throw new IllegalStateException("CategoriaRepositoryPort não foi configurado em LancamentoService");
-        }
         return categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada: " + categoriaId));
     }
 
     private Pessoa buscarPessoa(UUID pessoaId) {
-        if (pessoaRepository == null) {
-            throw new IllegalStateException("PessoaRepositoryPort não foi configurado em LancamentoService");
-        }
         return pessoaRepository.findById(pessoaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada: " + pessoaId));
     }

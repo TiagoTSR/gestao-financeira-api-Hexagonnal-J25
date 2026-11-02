@@ -1,16 +1,16 @@
 package com.decodex.br.testesunitarios.features.relatorios;
 
-import com.decodex.br.application.dto.relatorio.RelatorioDownloadDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioProtocoloResponseDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioSolicitacaoMsg;
-import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.StatusRelatorio;
-import com.decodex.br.domain.port.out.RelatorioProducerPort;
 import com.decodex.br.features.relatorios.application.RelatorioAsyncApplicationService;
+import com.decodex.br.features.relatorios.application.model.RelatorioFile;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestMessage;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestResult;
 import com.decodex.br.features.relatorios.application.model.RelatorioSolicitacao;
+import com.decodex.br.features.relatorios.application.model.RelatorioStatusView;
 import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioRequestPublisher;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioSolicitacaoStore;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class RelatorioAsyncApplicationServiceTest {
     private RelatorioSolicitacaoStore relatorioStore;
 
     @Mock
-    private RelatorioProducerPort relatorioProducerPort;
+    private RelatorioRequestPublisher relatorioRequestPublisher;
 
     @InjectMocks
     private RelatorioAsyncApplicationService service;
@@ -50,7 +50,7 @@ class RelatorioAsyncApplicationServiceTest {
         LocalDate inicio = LocalDate.of(2026, 1, 1);
         LocalDate fim = LocalDate.of(2026, 1, 31);
 
-        RelatorioProtocoloResponseDTO response = service.solicitar(
+        RelatorioRequestResult response = service.solicitar(
                 new SolicitarRelatorioCommand("PDF", inicio, fim, tenantId, "admin@teste.com"));
 
         assertNotNull(response.protocolo());
@@ -66,9 +66,9 @@ class RelatorioAsyncApplicationServiceTest {
         assertEquals(fim, saved.dataFim());
         assertEquals(StatusRelatorio.PENDENTE, saved.status());
 
-        ArgumentCaptor<RelatorioSolicitacaoMsg> mensagemCaptor = ArgumentCaptor.forClass(RelatorioSolicitacaoMsg.class);
-        verify(relatorioProducerPort).publicarSolicitacao(mensagemCaptor.capture());
-        RelatorioSolicitacaoMsg mensagem = mensagemCaptor.getValue();
+        ArgumentCaptor<RelatorioRequestMessage> mensagemCaptor = ArgumentCaptor.forClass(RelatorioRequestMessage.class);
+        verify(relatorioRequestPublisher).publicar(mensagemCaptor.capture());
+        RelatorioRequestMessage mensagem = mensagemCaptor.getValue();
         assertEquals(response.protocolo(), mensagem.protocolo());
         assertEquals(tenantId, mensagem.tenantId());
         assertEquals("PDF", mensagem.tipoFormato());
@@ -78,13 +78,13 @@ class RelatorioAsyncApplicationServiceTest {
     @Test
     @DisplayName("Deve normalizar formatos XLSX e EXCEL para EXCEL")
     void deveNormalizarFormatoExcel() {
-        RelatorioProtocoloResponseDTO response = service.solicitar(
+        RelatorioRequestResult response = service.solicitar(
                 new SolicitarRelatorioCommand("XLSX", LocalDate.now(), LocalDate.now(), tenantId, "usuario"));
 
         ArgumentCaptor<RelatorioSolicitacao> captor = ArgumentCaptor.forClass(RelatorioSolicitacao.class);
         verify(relatorioStore).save(captor.capture());
         assertEquals("EXCEL", captor.getValue().tipoFormato());
-        verify(relatorioProducerPort).publicarSolicitacao(argThat(msg ->
+        verify(relatorioRequestPublisher).publicar(argThat(msg ->
                 msg.protocolo().equals(response.protocolo()) && msg.tipoFormato().equals("EXCEL")));
     }
 
@@ -109,7 +109,7 @@ class RelatorioAsyncApplicationServiceTest {
         SolicitarRelatorioCommand command = new SolicitarRelatorioCommand("PDF", inicio, fim, tenantId, "usuario");
 
         assertThrows(RegraDeNegocioException.class, () -> service.solicitar(command));
-        verifyNoInteractions(relatorioStore, relatorioProducerPort);
+        verifyNoInteractions(relatorioStore, relatorioRequestPublisher);
     }
 
     @Test
@@ -119,7 +119,7 @@ class RelatorioAsyncApplicationServiceTest {
         when(relatorioStore.findById(protocolo)).thenReturn(Optional.of(solicitacao(
                 protocolo, StatusRelatorio.PROCESSANDO, null, null, null, null)));
 
-        RelatorioStatusResponseDTO status = service.consultarStatus(protocolo);
+        RelatorioStatusView status = service.consultarStatus(protocolo);
 
         assertEquals(protocolo, status.protocolo());
         assertEquals(StatusRelatorio.PROCESSANDO, status.status());
@@ -143,7 +143,7 @@ class RelatorioAsyncApplicationServiceTest {
         when(relatorioStore.findById(protocolo)).thenReturn(Optional.of(solicitacao(
                 protocolo, StatusRelatorio.CONCLUIDO, conteudo, "relatorio.pdf", "application/pdf", null)));
 
-        RelatorioDownloadDTO download = service.baixar(protocolo);
+        RelatorioFile download = service.baixar(protocolo);
 
         assertArrayEquals(conteudo, download.conteudo());
         assertEquals("relatorio.pdf", download.nomeArquivo());

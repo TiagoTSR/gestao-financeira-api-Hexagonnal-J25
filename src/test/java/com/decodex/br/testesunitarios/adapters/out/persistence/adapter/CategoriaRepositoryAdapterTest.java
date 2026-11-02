@@ -32,6 +32,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 import com.decodex.br.features.categoria.infrastructure.persistence.CategoriaRepositoryAdapter;
 
 @ExtendWith(MockitoExtension.class)
@@ -122,7 +123,7 @@ class CategoriaRepositoryAdapterTest {
 	@Test
     @DisplayName("Deve listar categorias com paginação e filtro")
     void findAll_ShouldReturnPageResult() {
-        CategoriaFilter filter = new CategoriaFilter();
+        CategoriaFilterQuery filter = new CategoriaFilterQuery(null, null);
         PageRequest pageRequest = new PageRequest(0, 10);
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.ASC, "nome")
@@ -149,7 +150,7 @@ class CategoriaRepositoryAdapterTest {
     @Test
     @DisplayName("Deve resolver ordenação com resolverSort respeitando campos permitidos e direção descendente")
     void findAll_ComOrdenacaoDescendente_DeveResolverSortCorretamente() {
-        CategoriaFilter filter = new CategoriaFilter();
+        CategoriaFilterQuery filter = new CategoriaFilterQuery(null, null);
         PageRequest pageRequest = PageRequest.of(0, 10, "id", "desc");
         Pageable pageableEsperado = org.springframework.data.domain.PageRequest.of(
                 0, 10, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "id")

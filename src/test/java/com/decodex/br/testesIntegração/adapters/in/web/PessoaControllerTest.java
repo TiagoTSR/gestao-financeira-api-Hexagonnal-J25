@@ -32,6 +32,7 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
+import com.decodex.br.features.pessoa.application.model.PessoaFilterQuery;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -128,7 +129,7 @@ class PessoaControllerTest {
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
-        when(pessoaInputPort.findAll(any(PessoaFilter.class), any(PageRequest.class)))
+        when(pessoaInputPort.findAll(any(PessoaFilterQuery.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         mockMvc.perform(get("/pessoas")

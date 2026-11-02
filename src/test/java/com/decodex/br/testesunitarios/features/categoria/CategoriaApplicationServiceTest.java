@@ -23,13 +23,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.features.categoria.application.CategoriaApplicationService;
 import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
+import com.decodex.br.features.categoria.application.model.CategoriaFilterQuery;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários para CategoriaApplicationService")
@@ -58,18 +58,18 @@ class CategoriaApplicationServiceTest {
     @Test
     @DisplayName("Deve listar categorias paginadas")
     void findAll_ShouldReturnPageResult() {
-        CategoriaFilter filter = new CategoriaFilter();
+        CategoriaFilterQuery filter = new CategoriaFilterQuery(null, null);
         PageResult<Categoria> pageResult = new PageResult<>(
             List.of(categoria), 0, 10, 1L, 1
         );
-        when(query.findAll(any(CategoriaFilter.class), eq(pageRequest))).thenReturn(pageResult);
+        when(query.findAll(any(CategoriaFilterQuery.class), eq(pageRequest))).thenReturn(pageResult);
 
         PageResult<Categoria> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(categoria);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(query, times(1)).findAll(any(CategoriaFilter.class), eq(pageRequest));
+        verify(query, times(1)).findAll(any(CategoriaFilterQuery.class), eq(pageRequest));
     }
 
     @Test

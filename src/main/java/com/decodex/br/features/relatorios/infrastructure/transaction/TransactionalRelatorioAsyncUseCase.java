@@ -5,10 +5,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.decodex.br.application.dto.relatorio.RelatorioDownloadDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioProtocoloResponseDTO;
-import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.features.relatorios.application.RelatorioAsyncApplicationService;
+import com.decodex.br.features.relatorios.application.model.RelatorioFile;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequestResult;
+import com.decodex.br.features.relatorios.application.model.RelatorioStatusView;
 import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
 import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
 
@@ -23,19 +23,19 @@ public class TransactionalRelatorioAsyncUseCase implements RelatorioAsyncUseCase
 
     @Override
     @Transactional
-    public RelatorioProtocoloResponseDTO solicitar(SolicitarRelatorioCommand command) {
+    public RelatorioRequestResult solicitar(SolicitarRelatorioCommand command) {
         return applicationService.solicitar(command);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RelatorioStatusResponseDTO consultarStatus(UUID protocolo) {
+    public RelatorioStatusView consultarStatus(UUID protocolo) {
         return applicationService.consultarStatus(protocolo);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public RelatorioDownloadDTO baixar(UUID protocolo) {
+    public RelatorioFile baixar(UUID protocolo) {
         return applicationService.baixar(protocolo);
     }
 }

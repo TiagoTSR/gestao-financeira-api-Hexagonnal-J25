@@ -23,7 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.decodex.br.application.dto.pessoa.PessoaFilter;
 import com.decodex.br.domain.model.Endereco;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
@@ -31,6 +30,7 @@ import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
 import com.decodex.br.features.pessoa.application.PessoaApplicationService;
 import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
+import com.decodex.br.features.pessoa.application.model.PessoaFilterQuery;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários para PessoaApplicationService")
@@ -63,18 +63,18 @@ class PessoaApplicationServiceTest {
     @Test
     @DisplayName("Deve listar pessoas paginadas")
     void findAll_ShouldReturnPageResult() {
-        PessoaFilter filter = new PessoaFilter();
+        PessoaFilterQuery filter = new PessoaFilterQuery(null, null, null, null, null, null);
         PageResult<Pessoa> pageResult = new PageResult<>(
             List.of(pessoa), 0, 10, 1L, 1
         );
-        when(query.findAll(any(PessoaFilter.class), eq(pageRequest))).thenReturn(pageResult);
+        when(query.findAll(any(PessoaFilterQuery.class), eq(pageRequest))).thenReturn(pageResult);
 
         PageResult<Pessoa> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(pessoa);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(query, times(1)).findAll(any(PessoaFilter.class), eq(pageRequest));
+        verify(query, times(1)).findAll(any(PessoaFilterQuery.class), eq(pageRequest));
     }
 
     @Test

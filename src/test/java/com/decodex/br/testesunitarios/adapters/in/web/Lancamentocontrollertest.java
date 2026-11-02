@@ -40,6 +40,10 @@ import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoCreateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoUpdateCommand;
+import com.decodex.br.features.lancamentos.application.model.LancamentoHistoryItem;
 
 @ExtendWith(MockitoExtension.class)
 class LancamentoControllerUnitarioTest {
@@ -78,7 +82,7 @@ class LancamentoControllerUnitarioTest {
         PageResult<Lancamento> pageResult = new PageResult<>(
             List.of(lancamentoFake()), 0, 10, 1L, 1
         );
-        when(lancamentoInputPort.findAll(any(LancamentoFilter.class), any(PageRequest.class)))
+        when(lancamentoInputPort.findAll(any(LancamentoFilterQuery.class), any(PageRequest.class)))
             .thenReturn(pageResult);
 
         LancamentoFilter filter = new LancamentoFilter();
@@ -110,7 +114,7 @@ class LancamentoControllerUnitarioTest {
         LancamentoCreateDTO dto = new LancamentoCreateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
-        when(lancamentoInputPort.create(any(LancamentoCreateDTO.class))).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.create(any(LancamentoCreateCommand.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.create(dto);
 
@@ -124,7 +128,7 @@ class LancamentoControllerUnitarioTest {
         LancamentoUpdateDTO dto = new LancamentoUpdateDTO(
             "Salário", LocalDate.now(), null, BigDecimal.TEN, null, TipoLancamento.RECEITA, categoriaId, pessoaId
         );
-        when(lancamentoInputPort.update(eq(lancamentoId), any(LancamentoUpdateDTO.class))).thenReturn(lancamentoFake());
+        when(lancamentoInputPort.update(eq(lancamentoId), any(LancamentoUpdateCommand.class))).thenReturn(lancamentoFake());
 
         ResponseEntity<LancamentoResponseDTO> response = controller.update(lancamentoId, dto);
 
@@ -177,7 +181,7 @@ class LancamentoControllerUnitarioTest {
     @Test
     @DisplayName("Deve buscar histórico de auditoria e retornar status 200")
     void findHistorico_deveRetornar200() {
-        var itemHistorico = new com.decodex.br.application.dto.lancamento.LancamentoHistoricoDTO(
+        var itemHistorico = new LancamentoHistoryItem(
                 1L, java.time.LocalDateTime.now(), "admin", "CRIACAO", lancamentoId,
                 "Cinema", new BigDecimal("50.00"), TipoLancamento.DESPESA,
                 com.decodex.br.domain.model.StatusLancamento.PENDENTE,

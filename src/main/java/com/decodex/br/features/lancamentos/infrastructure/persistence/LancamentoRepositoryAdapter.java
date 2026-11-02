@@ -20,9 +20,12 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
+import com.decodex.br.features.lancamentos.application.model.LancamentoFilterQuery;
+import com.decodex.br.features.lancamentos.application.model.LancamentoHistoryItem;
+import com.decodex.br.features.lancamentos.application.port.out.LancamentoStore;
 
 @Component
-public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
+public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort, LancamentoStore {
 
     private static final Set<String> CAMPOS_ORDENAVEIS = Set.of(
             "id", "descricao", "dataVencimento", "dataPagamento", "valor", "tipo"
@@ -79,6 +82,28 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
                 page.getTotalElements(),
                 page.getTotalPages()
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResult<Lancamento> findAll(LancamentoFilterQuery filter, PageRequest request) {
+        LancamentoFilter legacyFilter = new LancamentoFilter();
+        if (filter != null) {
+            legacyFilter.setDescricao(filter.descricao());
+            legacyFilter.setDataVencimento(filter.dataVencimento());
+            legacyFilter.setDataVencimentoDe(filter.dataVencimentoDe());
+            legacyFilter.setDataVencimentoAte(filter.dataVencimentoAte());
+            legacyFilter.setDataPagamento(filter.dataPagamento());
+            legacyFilter.setValor(filter.valor());
+            legacyFilter.setObservacao(filter.observacao());
+            legacyFilter.setTipo(filter.tipo());
+            legacyFilter.setStatus(filter.status());
+            legacyFilter.setNomeCategoria(filter.nomeCategoria());
+            legacyFilter.setNomePessoa(filter.nomePessoa());
+            legacyFilter.setCategoriaId(filter.categoriaId());
+            legacyFilter.setPessoaId(filter.pessoaId());
+        }
+        return findAll(legacyFilter, request);
     }
 
     @Override
@@ -141,6 +166,28 @@ public class LancamentoRepositoryAdapter implements LancamentoRepositoryPort {
             ));
         }
         return historico;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<LancamentoHistoryItem> findHistory(java.util.UUID id) {
+        return findHistorico(id).stream()
+                .map(item -> new LancamentoHistoryItem(
+                        item.revisao(),
+                        item.dataRevisao(),
+                        item.usuario(),
+                        item.operacao(),
+                        item.id(),
+                        item.descricao(),
+                        item.valor(),
+                        item.tipo(),
+                        item.status(),
+                        item.dataVencimento(),
+                        item.dataPagamento(),
+                        item.valorPago(),
+                        item.numeroParcela(),
+                        item.totalParcelas()))
+                .toList();
     }
 
     private Sort resolverSort(PageRequest pageRequest) {
