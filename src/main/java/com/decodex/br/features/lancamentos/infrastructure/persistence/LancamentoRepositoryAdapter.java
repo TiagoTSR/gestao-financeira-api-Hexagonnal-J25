@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.out.persistence.adapter;
+package com.decodex.br.features.lancamentos.infrastructure.persistence;
 
 import java.util.List;
 import java.util.Optional;

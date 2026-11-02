@@ -1,4 +1,4 @@
-package com.decodex.br.testesunitarios.domain.service;
+package com.decodex.br.testesunitarios.features.lancamentos;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +17,7 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.StatusLancamento;
 import com.decodex.br.domain.model.TipoLancamento;
-import com.decodex.br.domain.service.ParcelamentoFactory;
+import com.decodex.br.features.lancamentos.application.ParcelamentoFactory;
 
 import com.decodex.br.domain.model.Endereco;
 

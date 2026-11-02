@@ -1,4 +1,4 @@
-package com.decodex.br.domain.service;
+package com.decodex.br.features.lancamentos.application;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,18 +17,18 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.LancamentoInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
+import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 
-public class LancamentoService implements LancamentoInputPort {
+public class LancamentoApplicationService implements LancamentoUseCase {
 	
 	private final LancamentoRepositoryPort repository;
     private final CategoriaRepositoryPort categoriaRepository;
     private final PessoaRepositoryPort pessoaRepository;
 
-    public LancamentoService(
+    public LancamentoApplicationService(
             LancamentoRepositoryPort repository,
             CategoriaRepositoryPort categoriaRepository,
             PessoaRepositoryPort pessoaRepository) {
@@ -37,7 +37,7 @@ public class LancamentoService implements LancamentoInputPort {
         this.pessoaRepository = pessoaRepository;
     }
 
-    public LancamentoService(LancamentoRepositoryPort repository) {
+    public LancamentoApplicationService(LancamentoRepositoryPort repository) {
         this(repository, null, null);
     }
 

@@ -1,4 +1,4 @@
-package com.decodex.br.testesunitarios.domain.service;
+package com.decodex.br.testesunitarios.features.lancamentos;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,11 +39,11 @@ import com.decodex.br.domain.exception.RegraDeNegocioException;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
-import com.decodex.br.domain.service.LancamentoService;
+import com.decodex.br.features.lancamentos.application.LancamentoApplicationService;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes unitários para LancamentoService")
-class LancamentoServiceTest {
+@DisplayName("Testes unitários para LancamentoApplicationService")
+class LancamentoApplicationServiceTest {
 
     @Mock
     private LancamentoRepositoryPort repository;
@@ -55,7 +55,7 @@ class LancamentoServiceTest {
     private PessoaRepositoryPort pessoaRepository;
 
     @InjectMocks
-    private LancamentoService service;
+    private LancamentoApplicationService service;
 
     private final UUID lancamentoId = UUID.randomUUID();
     private final UUID categoriaId = UUID.randomUUID();

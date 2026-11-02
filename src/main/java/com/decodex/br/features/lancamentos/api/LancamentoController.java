@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.in.web;
+package com.decodex.br.features.lancamentos.api;
 
 import java.net.URI;
 
@@ -22,8 +22,7 @@ import com.decodex.br.application.dto.lancamento.LancamentoFilter;
 import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.LancamentoInputPort;
-import com.decodex.br.adapters.in.web.documentation.LancamentoControllerDoc;
+import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 
 import jakarta.validation.Valid;
 
@@ -31,11 +30,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/lancamentos")
 public class LancamentoController implements LancamentoControllerDoc {
 
-    private final LancamentoInputPort lancamentoInputPort;
+    private final LancamentoUseCase lancamentoInputPort;
     private final LancamentoDTOMapper mapper;
 
     public LancamentoController(
-            LancamentoInputPort lancamentoInputPort,
+            LancamentoUseCase lancamentoInputPort,
             LancamentoDTOMapper mapper) {
         this.lancamentoInputPort = lancamentoInputPort;
         this.mapper = mapper;

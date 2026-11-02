@@ -1,4 +1,4 @@
-package com.decodex.br.domain.service;
+package com.decodex.br.features.lancamentos.application;
 
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.domain.model.Categoria;

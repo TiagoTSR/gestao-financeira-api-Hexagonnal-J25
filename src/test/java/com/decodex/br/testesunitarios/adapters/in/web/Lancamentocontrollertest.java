@@ -26,7 +26,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.decodex.br.adapters.in.web.LancamentoController;
+import com.decodex.br.features.lancamentos.api.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoResponseDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
@@ -39,12 +39,12 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 
 @ExtendWith(MockitoExtension.class)
 class LancamentoControllerUnitarioTest {
 
-    @Mock private LancamentoInputPort lancamentoInputPort;
+    @Mock private LancamentoUseCase lancamentoInputPort;
     @Spy private LancamentoDTOMapper mapper = LancamentoDTOMapper.INSTANCE;
 
     @InjectMocks private LancamentoController controller;

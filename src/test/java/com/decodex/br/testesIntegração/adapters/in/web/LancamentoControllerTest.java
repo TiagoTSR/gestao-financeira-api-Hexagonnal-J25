@@ -25,7 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.decodex.br.adapters.in.web.LancamentoController;
+import com.decodex.br.features.lancamentos.api.LancamentoController;
 import com.decodex.br.application.dto.lancamento.LancamentoCreateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoUpdateDTO;
 import com.decodex.br.application.dto.lancamento.LancamentoFilter;
@@ -36,7 +36,7 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.LancamentoInputPort;
+import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -54,7 +54,7 @@ class LancamentoControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private LancamentoInputPort lancamentoInputPort;
+    private LancamentoUseCase lancamentoInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;

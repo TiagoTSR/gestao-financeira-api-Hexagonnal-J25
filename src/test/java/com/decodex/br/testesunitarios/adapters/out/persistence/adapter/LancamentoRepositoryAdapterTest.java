@@ -27,7 +27,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import com.decodex.br.adapters.out.persistence.adapter.LancamentoRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.LancamentoEntity;
 import com.decodex.br.adapters.out.persistence.mapper.LancamentoMapper;
 import com.decodex.br.adapters.out.persistence.repository.LancamentoRepository;
@@ -39,6 +38,7 @@ import com.decodex.br.domain.model.Pessoa;
 import com.decodex.br.domain.model.TipoLancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.features.lancamentos.infrastructure.persistence.LancamentoRepositoryAdapter;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes unitários - LancamentoRepositoryAdapter")

@@ -1,4 +1,4 @@
-package com.decodex.br.domain.port.in;
+package com.decodex.br.features.lancamentos.application.port.in;
 
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ import com.decodex.br.domain.model.Lancamento;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
-public interface LancamentoInputPort {
+public interface LancamentoUseCase {
 	
 	PageResult<Lancamento> findAll(LancamentoFilter filter, PageRequest pageRequest);
 

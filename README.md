@@ -124,9 +124,13 @@ src/main/java/com/decodex/br/
 │   │   ├── api/              # Controller REST e documentação OpenAPI
 │   │   ├── application/      # Caso de uso e portas da funcionalidade
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
-│   └── pessoa/               # Slice migrado
+│   ├── pessoa/               # Slice migrado
+│   │   ├── api/              # Controller REST e documentação OpenAPI
+│   │   ├── application/      # Caso de uso e portas da funcionalidade
+│   │   └── infrastructure/   # Adapter de persistência da funcionalidade
+│   └── lancamentos/          # Slice migrado
 │       ├── api/              # Controller REST e documentação OpenAPI
-│       ├── application/      # Caso de uso e portas da funcionalidade
+│       ├── application/      # Caso de uso e parcelamento
 │       └── infrastructure/   # Adapter de persistência da funcionalidade
 └── config/                   # Configurações Spring (Security, CORS, RabbitMQ, RateLimit)
 ```
