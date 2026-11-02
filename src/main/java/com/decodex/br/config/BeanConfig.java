@@ -15,6 +15,9 @@ import com.decodex.br.features.pessoa.application.port.in.PessoaUseCase;
 import com.decodex.br.features.pessoa.application.port.out.PessoaQueryPort;
 import com.decodex.br.features.lancamentos.application.LancamentoApplicationService;
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
+import com.decodex.br.domain.port.out.RelatorioProducerPort;
+import com.decodex.br.features.relatorios.application.RelatorioAsyncApplicationService;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioSolicitacaoStore;
 
 @Configuration
 public class BeanConfig {
@@ -42,6 +45,13 @@ public class BeanConfig {
                 lancamentoRepositoryPort,
                 categoriaRepositoryPort,
                 pessoaRepositoryPort);
+    }
+
+    @Bean
+    public RelatorioAsyncApplicationService relatorioAsyncApplicationService(
+            RelatorioSolicitacaoStore relatorioSolicitacaoStore,
+            RelatorioProducerPort relatorioProducerPort) {
+        return new RelatorioAsyncApplicationService(relatorioSolicitacaoStore, relatorioProducerPort);
     }
 
     @Bean

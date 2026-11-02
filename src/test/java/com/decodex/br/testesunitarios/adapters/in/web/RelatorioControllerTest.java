@@ -7,7 +7,10 @@ import com.decodex.br.application.dto.relatorio.RelatorioSolicitacaoRequestDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.domain.model.StatusRelatorio;
 import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
-import com.decodex.br.domain.port.in.RelatorioAsyncInputPort;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequester;
+import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
+import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioRequesterContextPort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +37,10 @@ class RelatorioControllerTest {
     private GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort;
 
     @Mock
-    private RelatorioAsyncInputPort relatorioAsyncInputPort;
+    private RelatorioAsyncUseCase relatorioAsyncUseCase;
+
+    @Mock
+    private RelatorioRequesterContextPort requesterContext;
 
     @InjectMocks
     private RelatorioController controller;
@@ -80,13 +86,18 @@ class RelatorioControllerTest {
         RelatorioSolicitacaoRequestDTO request = new RelatorioSolicitacaoRequestDTO("PDF", LocalDate.now(), LocalDate.now());
         RelatorioProtocoloResponseDTO dto = new RelatorioProtocoloResponseDTO(protocolo, StatusRelatorio.PENDENTE, "Solicitado com sucesso");
 
-        when(relatorioAsyncInputPort.solicitar(request)).thenReturn(dto);
+        UUID tenantId = UUID.randomUUID();
+        when(requesterContext.currentRequester()).thenReturn(new RelatorioRequester(tenantId, "usuario"));
+        when(relatorioAsyncUseCase.solicitar(new SolicitarRelatorioCommand(
+                request.tipo(), request.inicio(), request.fim(), tenantId, "usuario"))).thenReturn(dto);
 
         ResponseEntity<RelatorioProtocoloResponseDTO> response = controller.solicitarRelatorio(request);
 
         assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(protocolo, response.getBody().protocolo());
+        verify(relatorioAsyncUseCase).solicitar(new SolicitarRelatorioCommand(
+                request.tipo(), request.inicio(), request.fim(), tenantId, "usuario"));
     }
 
     @Test
@@ -97,7 +108,7 @@ class RelatorioControllerTest {
                 protocolo, "PDF", StatusRelatorio.CONCLUIDO, null, LocalDateTime.now(), LocalDateTime.now()
         );
 
-        when(relatorioAsyncInputPort.consultarStatus(protocolo)).thenReturn(statusDTO);
+        when(relatorioAsyncUseCase.consultarStatus(protocolo)).thenReturn(statusDTO);
 
         ResponseEntity<RelatorioStatusResponseDTO> response = controller.consultarStatus(protocolo);
 
@@ -113,7 +124,7 @@ class RelatorioControllerTest {
         byte[] bytes = new byte[]{10, 20, 30};
         RelatorioDownloadDTO downloadDTO = new RelatorioDownloadDTO(bytes, "relatorio.pdf", "application/pdf");
 
-        when(relatorioAsyncInputPort.baixar(protocolo)).thenReturn(downloadDTO);
+        when(relatorioAsyncUseCase.baixar(protocolo)).thenReturn(downloadDTO);
 
         ResponseEntity<byte[]> response = controller.baixarRelatorio(protocolo);
 

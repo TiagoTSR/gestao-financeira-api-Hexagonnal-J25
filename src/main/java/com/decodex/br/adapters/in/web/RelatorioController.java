@@ -6,7 +6,10 @@ import com.decodex.br.application.dto.relatorio.RelatorioProtocoloResponseDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioSolicitacaoRequestDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
 import com.decodex.br.domain.port.in.GerarRelatorioEstatisticaInputPort;
-import com.decodex.br.domain.port.in.RelatorioAsyncInputPort;
+import com.decodex.br.features.relatorios.application.model.RelatorioRequester;
+import com.decodex.br.features.relatorios.application.model.SolicitarRelatorioCommand;
+import com.decodex.br.features.relatorios.application.port.in.RelatorioAsyncUseCase;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioRequesterContextPort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -32,12 +35,15 @@ public class RelatorioController implements RelatorioControllerDoc {
     private static final String EXCEL_MEDIA_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     private final GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort;
-    private final RelatorioAsyncInputPort relatorioAsyncInputPort;
+    private final RelatorioAsyncUseCase relatorioAsyncUseCase;
+    private final RelatorioRequesterContextPort requesterContext;
 
     public RelatorioController(GerarRelatorioEstatisticaInputPort gerarRelatorioInputPort,
-                               RelatorioAsyncInputPort relatorioAsyncInputPort) {
+                               RelatorioAsyncUseCase relatorioAsyncUseCase,
+                               RelatorioRequesterContextPort requesterContext) {
         this.gerarRelatorioInputPort = gerarRelatorioInputPort;
-        this.relatorioAsyncInputPort = relatorioAsyncInputPort;
+        this.relatorioAsyncUseCase = relatorioAsyncUseCase;
+        this.requesterContext = requesterContext;
     }
 
     @Override
@@ -73,21 +79,28 @@ public class RelatorioController implements RelatorioControllerDoc {
     @Override
     @PostMapping("/solicitar")
     public ResponseEntity<RelatorioProtocoloResponseDTO> solicitarRelatorio(@RequestBody RelatorioSolicitacaoRequestDTO request) {
-        RelatorioProtocoloResponseDTO response = relatorioAsyncInputPort.solicitar(request);
+        RelatorioRequester requester = requesterContext.currentRequester();
+        SolicitarRelatorioCommand command = new SolicitarRelatorioCommand(
+                request.tipo(),
+                request.inicio(),
+                request.fim(),
+                requester.tenantId(),
+                requester.usuario());
+        RelatorioProtocoloResponseDTO response = relatorioAsyncUseCase.solicitar(command);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     @Override
     @GetMapping("/{protocolo}/status")
     public ResponseEntity<RelatorioStatusResponseDTO> consultarStatus(@PathVariable UUID protocolo) {
-        RelatorioStatusResponseDTO response = relatorioAsyncInputPort.consultarStatus(protocolo);
+        RelatorioStatusResponseDTO response = relatorioAsyncUseCase.consultarStatus(protocolo);
         return ResponseEntity.ok(response);
     }
 
     @Override
     @GetMapping("/{protocolo}/download")
     public ResponseEntity<byte[]> baixarRelatorio(@PathVariable UUID protocolo) {
-        RelatorioDownloadDTO download = relatorioAsyncInputPort.baixar(protocolo);
+        RelatorioDownloadDTO download = relatorioAsyncUseCase.baixar(protocolo);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, download.contentType())
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + download.nomeArquivo() + "\"")

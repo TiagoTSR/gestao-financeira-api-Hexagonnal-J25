@@ -128,14 +128,17 @@ src/main/java/com/decodex/br/
 │   │   ├── api/              # Controller REST e documentação OpenAPI
 │   │   ├── application/      # Caso de uso e portas da funcionalidade
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
-│   └── lancamentos/          # Slice migrado
-│       ├── api/              # Controller REST e documentação OpenAPI
-│       ├── application/      # Caso de uso e parcelamento
-│       └── infrastructure/   # Adapter de persistência da funcionalidade
+│   ├── lancamentos/          # Slice migrado
+│   │   ├── api/              # Controller REST e documentação OpenAPI
+│   │   ├── application/      # Caso de uso e parcelamento
+│   │   └── infrastructure/   # Adapter de persistência da funcionalidade
+│   └── relatorios/           # Solicitação, consulta e download assíncronos
+│       ├── application/      # Caso de uso e portas
+│       └── infrastructure/   # Persistência, contexto do solicitante e transações
 └── config/                   # Configurações Spring (Security, CORS, RabbitMQ, RateLimit)
 ```
 
-A migração está sendo feita de forma incremental. O modelo de domínio `Categoria` e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados.
+A migração está sendo feita de forma incremental. Os modelos de domínio e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados. O consumo de mensagens de relatórios RabbitMQ permanece no adaptador legado nesta etapa.
 
 ---
 
