@@ -132,6 +132,9 @@ src/main/java/com/decodex/br/
 │   │   ├── api/              # Controller REST e documentação OpenAPI
 │   │   ├── application/      # Caso de uso e parcelamento
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
+│   ├── autenticacao/         # Cadastro e ciclo de vida do refresh token
+│   │   ├── application/      # Casos de uso e portas
+│   │   └── infrastructure/   # Adapter para codificação de senha
 │   └── relatorios/           # Solicitação, consulta e download assíncronos
 │       ├── application/      # Caso de uso e portas
 │       └── infrastructure/   # Persistência, geração, contexto do solicitante e transações

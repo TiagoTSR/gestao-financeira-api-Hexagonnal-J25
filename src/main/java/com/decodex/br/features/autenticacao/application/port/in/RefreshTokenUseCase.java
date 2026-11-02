@@ -1,8 +1,8 @@
-package com.decodex.br.domain.port.in;
+package com.decodex.br.features.autenticacao.application.port.in;
 
 import com.decodex.br.domain.model.RefreshToken;
 
-public interface RefreshTokenInputPort {
+public interface RefreshTokenUseCase {
 
     RefreshToken create(String username);
 

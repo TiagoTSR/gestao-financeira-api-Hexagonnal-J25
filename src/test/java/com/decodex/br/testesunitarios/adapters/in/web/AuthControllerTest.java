@@ -21,18 +21,21 @@ import com.decodex.br.adapters.in.web.AuthController;
 import com.decodex.br.adapters.in.web.AuthCookieManager;
 import com.decodex.br.adapters.in.web.TokenResponseAssembler;
 import com.decodex.br.application.dto.auth.LoginRequestDTO;
+import com.decodex.br.application.dto.auth.RegisterRequestDTO;
 import com.decodex.br.application.dto.auth.TokenResponseDTO;
 import com.decodex.br.config.security.TokenService;
 import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.model.Usuario;
-import com.decodex.br.domain.port.in.RefreshTokenInputPort;
+import com.decodex.br.features.autenticacao.application.port.in.RefreshTokenUseCase;
+import com.decodex.br.features.autenticacao.application.port.in.RegisterUserUseCase;
+import com.decodex.br.features.autenticacao.application.model.RegisterUserCommand;
+import com.decodex.br.features.autenticacao.application.model.RegisteredUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Spy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Instant;
 import java.util.Collections;
 
@@ -47,7 +50,10 @@ class AuthControllerTest {
     private TokenService tokenService;
 
     @Mock
-    private RefreshTokenInputPort refreshTokenInputPort;
+    private RefreshTokenUseCase refreshTokenUseCase;
+
+    @Mock
+    private RegisterUserUseCase registerUserUseCase;
 
     @Mock
     private UserDetailsService userDetailsService;
@@ -64,9 +70,6 @@ class AuthControllerTest {
     @Mock
     private com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
     @Spy
     private AuthCookieManager cookieManager = new AuthCookieManager();
 
@@ -80,12 +83,11 @@ class AuthControllerTest {
         authController = new AuthController(
                 authenticationManager,
                 tokenService,
-                refreshTokenInputPort,
+                refreshTokenUseCase,
                 userDetailsService,
                 cookieManager,
                 tokenResponseAssembler,
-                usuarioRepositoryPort,
-                passwordEncoder
+                registerUserUseCase
         );
     }
 
@@ -100,7 +102,7 @@ class AuthControllerTest {
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("mocked-jwt-token");
-        when(refreshTokenInputPort.create("admin")).thenReturn(refreshToken);
+        when(refreshTokenUseCase.create("admin")).thenReturn(refreshToken);
 
         ResponseEntity<TokenResponseDTO> responseEntity = authController.login(loginRequest, response);
 
@@ -124,10 +126,10 @@ class AuthControllerTest {
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        when(refreshTokenInputPort.verifyAndGet("valid-refresh-token")).thenReturn(oldRefreshToken);
+        when(refreshTokenUseCase.verifyAndGet("valid-refresh-token")).thenReturn(oldRefreshToken);
         when(userDetailsService.loadUserByUsername("admin")).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("new-access-token");
-        when(refreshTokenInputPort.create("admin")).thenReturn(newRefreshToken);
+        when(refreshTokenUseCase.create("admin")).thenReturn(newRefreshToken);
 
         ResponseEntity<TokenResponseDTO> responseEntity = authController.refresh(request, response);
 
@@ -156,7 +158,25 @@ class AuthControllerTest {
         ResponseEntity<Void> responseEntity = authController.logout(request, response);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-        verify(refreshTokenInputPort).deleteByToken("some-refresh-token");
+        verify(refreshTokenUseCase).deleteByToken("some-refresh-token");
         verify(response, times(2)).addHeader(eq(org.springframework.http.HttpHeaders.SET_COOKIE), anyString());
+    }
+
+    @Test
+    @DisplayName("Deve delegar cadastro ao caso de uso e retornar usuário criado")
+    void deveCadastrarUsuario() {
+        java.util.UUID userId = java.util.UUID.randomUUID();
+        when(registerUserUseCase.register(any())).thenReturn(
+                new RegisteredUser(userId, "novo-usuario", "novo@email.com"));
+
+        ResponseEntity<com.decodex.br.application.dto.auth.UsuarioResponseDTO> responseEntity =
+                authController.register(new RegisterRequestDTO("novo-usuario", "123456", "novo@email.com"));
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(responseEntity.getBody()).isNotNull();
+        assertThat(responseEntity.getBody().id()).isEqualTo(userId);
+        assertThat(responseEntity.getBody().username()).isEqualTo("novo-usuario");
+        verify(registerUserUseCase).register(new RegisterUserCommand(
+                "novo-usuario", "123456", "novo@email.com"));
     }
 }

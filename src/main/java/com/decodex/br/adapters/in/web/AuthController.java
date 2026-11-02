@@ -7,8 +7,9 @@ import com.decodex.br.application.dto.auth.TokenResponseDTO;
 import com.decodex.br.config.security.TokenService;
 import com.decodex.br.domain.exception.RefreshTokenException;
 import com.decodex.br.domain.model.RefreshToken;
-import com.decodex.br.domain.port.in.RefreshTokenInputPort;
-import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
+import com.decodex.br.features.autenticacao.application.model.RegisterUserCommand;
+import com.decodex.br.features.autenticacao.application.port.in.RefreshTokenUseCase;
+import com.decodex.br.features.autenticacao.application.port.in.RegisterUserUseCase;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -25,52 +26,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.decodex.br.application.dto.auth.RegisterRequestDTO;
 import com.decodex.br.application.dto.auth.UsuarioResponseDTO;
-import com.decodex.br.domain.exception.RegraDeNegocioException;
-import com.decodex.br.domain.model.Usuario;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.decodex.br.features.autenticacao.application.model.RegisteredUser;
 
 @RestController
 public class AuthController implements AuthControllerDoc {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final RefreshTokenInputPort refreshTokenInputPort;
+    private final RefreshTokenUseCase refreshTokenUseCase;
     private final UserDetailsService userDetailsService;
     private final AuthCookieManager cookieManager;
     private final TokenResponseAssembler tokenResponseAssembler;
-    private final UsuarioRepositoryPort usuarioRepositoryPort;
-    private final PasswordEncoder passwordEncoder;
+    private final RegisterUserUseCase registerUserUseCase;
 
     @Autowired
     public AuthController(
             AuthenticationManager authenticationManager,
             TokenService tokenService,
-            RefreshTokenInputPort refreshTokenInputPort,
+            RefreshTokenUseCase refreshTokenUseCase,
             @Lazy UserDetailsService userDetailsService,
             AuthCookieManager cookieManager,
             TokenResponseAssembler tokenResponseAssembler,
-            @Lazy UsuarioRepositoryPort usuarioRepositoryPort,
-            @Lazy PasswordEncoder passwordEncoder) {
+            RegisterUserUseCase registerUserUseCase) {
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
-        this.refreshTokenInputPort = refreshTokenInputPort;
+        this.refreshTokenUseCase = refreshTokenUseCase;
         this.userDetailsService = userDetailsService;
         this.cookieManager = cookieManager;
         this.tokenResponseAssembler = tokenResponseAssembler;
-        this.usuarioRepositoryPort = usuarioRepositoryPort;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    public AuthController(
-            AuthenticationManager authenticationManager,
-            TokenService tokenService,
-            RefreshTokenInputPort refreshTokenInputPort,
-            @Lazy UserDetailsService userDetailsService,
-            @Lazy UsuarioRepositoryPort usuarioRepositoryPort,
-            @Lazy PasswordEncoder passwordEncoder) {
-        this(authenticationManager, tokenService, refreshTokenInputPort, userDetailsService,
-                new AuthCookieManager(), new TokenResponseAssembler(usuarioRepositoryPort),
-                usuarioRepositoryPort, passwordEncoder);
+        this.registerUserUseCase = registerUserUseCase;
     }
 
     @Override
@@ -85,7 +69,7 @@ public class AuthController implements AuthControllerDoc {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
         String token = tokenService.generateToken(userDetails);
-        RefreshToken refreshToken = refreshTokenInputPort.create(userDetails.getUsername());
+        RefreshToken refreshToken = refreshTokenUseCase.create(userDetails.getUsername());
 
         cookieManager.setAuthCookies(response, token, refreshToken.getToken());
 
@@ -103,12 +87,12 @@ public class AuthController implements AuthControllerDoc {
             throw new RefreshTokenException("Refresh token ausente. Por favor, faça login novamente.");
         }
 
-        RefreshToken validRefreshToken = refreshTokenInputPort.verifyAndGet(tokenStr);
+        RefreshToken validRefreshToken = refreshTokenUseCase.verifyAndGet(tokenStr);
         String username = validRefreshToken.getUsuario().getUsername();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         String newAccessToken = tokenService.generateToken(userDetails);
-        RefreshToken newRefreshToken = refreshTokenInputPort.create(username);
+        RefreshToken newRefreshToken = refreshTokenUseCase.create(username);
 
         cookieManager.setAuthCookies(response, newAccessToken, newRefreshToken.getToken());
 
@@ -130,7 +114,7 @@ public class AuthController implements AuthControllerDoc {
 
         String tokenStr = cookieManager.extrairRefreshToken(request);
         if (tokenStr != null && !tokenStr.isBlank()) {
-            refreshTokenInputPort.deleteByToken(tokenStr);
+            refreshTokenUseCase.deleteByToken(tokenStr);
         }
 
         cookieManager.clearAuthCookies(response);
@@ -143,23 +127,14 @@ public class AuthController implements AuthControllerDoc {
     public ResponseEntity<UsuarioResponseDTO> register(
             @RequestBody @Valid RegisterRequestDTO request) {
 
-        if (usuarioRepositoryPort.findByUsername(request.username()).isPresent()) {
-            throw new RegraDeNegocioException("Já existe um usuário cadastrado com o username: " + request.username());
-        }
-        if (usuarioRepositoryPort.findByUsernameOrEmail(request.email(), request.email()).isPresent()) {
-            throw new RegraDeNegocioException("Já existe um usuário cadastrado com o e-mail: " + request.email());
-        }
-
-        Usuario usuario = new Usuario(
-                request.username().trim(),
-                passwordEncoder.encode(request.password().trim()),
-                request.email().trim().toLowerCase()
-        );
-
-        Usuario salvo = usuarioRepositoryPort.save(usuario);
-
         return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
-                .body(new UsuarioResponseDTO(salvo.getId(), salvo.getUsername(), salvo.getEmail()));
+                .body(toResponse(registerUserUseCase.register(new RegisterUserCommand(
+                        request.username(),
+                        request.password(),
+                        request.email()))));
+    }
+
+    private UsuarioResponseDTO toResponse(RegisteredUser user) {
+        return new UsuarioResponseDTO(user.id(), user.username(), user.email());
     }
 }
-

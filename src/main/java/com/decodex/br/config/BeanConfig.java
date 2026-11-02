@@ -3,10 +3,16 @@ package com.decodex.br.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.decodex.br.domain.port.in.RefreshTokenInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
 import com.decodex.br.domain.port.out.LancamentoRepositoryPort;
 import com.decodex.br.domain.port.out.PessoaRepositoryPort;
+import com.decodex.br.domain.port.out.RefreshTokenRepositoryPort;
+import com.decodex.br.domain.port.out.UsuarioRepositoryPort;
+import com.decodex.br.features.autenticacao.application.RefreshTokenApplicationService;
+import com.decodex.br.features.autenticacao.application.RegisterUserApplicationService;
+import com.decodex.br.features.autenticacao.application.port.in.RefreshTokenUseCase;
+import com.decodex.br.features.autenticacao.application.port.in.RegisterUserUseCase;
+import com.decodex.br.features.autenticacao.application.port.out.PasswordHasher;
 import com.decodex.br.features.categoria.application.CategoriaApplicationService;
 import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
@@ -65,10 +71,17 @@ public class BeanConfig {
     }
 
     @Bean
-    public RefreshTokenInputPort refreshTokenInputPort(
-            com.decodex.br.domain.port.out.RefreshTokenRepositoryPort refreshTokenRepositoryPort,
-            com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort) {
-        return new com.decodex.br.domain.service.RefreshTokenService(refreshTokenRepositoryPort, usuarioRepositoryPort);
+    public RefreshTokenUseCase refreshTokenUseCase(
+            RefreshTokenRepositoryPort refreshTokenRepositoryPort,
+            UsuarioRepositoryPort usuarioRepositoryPort) {
+        return new RefreshTokenApplicationService(refreshTokenRepositoryPort, usuarioRepositoryPort);
+    }
+
+    @Bean
+    public RegisterUserUseCase registerUserUseCase(
+            UsuarioRepositoryPort usuarioRepositoryPort,
+            PasswordHasher passwordHasher) {
+        return new RegisterUserApplicationService(usuarioRepositoryPort, passwordHasher);
     }
 
 }
