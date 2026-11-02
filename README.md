@@ -110,7 +110,7 @@ src/main/java/com/decodex/br/
 ├── application/              # Camada de aplicação
 │   ├── dto/                  # Objetos de transferência de dados (Request/Response)
 │   └── usecase/              # Casos de uso especializados
-├── adapters/                 # Adaptadores de Infraestrutura
+├── adapters/                 # Adaptadores compartilhados ainda em migração
 │   ├── in/                   # Adaptadores de Entrada
 │   │   ├── web/              # Controladores REST Spring MVC
 │   │   └── messaging/        # Consumidores RabbitMQ (Queues e DLQ)
@@ -119,8 +119,15 @@ src/main/java/com/decodex/br/
 │       ├── pdf/              # Geração de PDF via OpenHtmlToPdf + Thymeleaf
 │       ├── excel/            # Geração de planilhas via Apache POI
 │       └── messaging/        # Produtor RabbitMQ
+├── features/
+│   └── categoria/            # Primeiro slice migrado
+│       ├── api/              # Controller REST e documentação OpenAPI
+│       ├── application/      # Caso de uso e portas da funcionalidade
+│       └── infrastructure/   # Adapter de persistência da funcionalidade
 └── config/                   # Configurações Spring (Security, CORS, RabbitMQ, RateLimit)
 ```
+
+A migração está sendo feita de forma incremental. O modelo de domínio `Categoria` e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados.
 
 ---
 

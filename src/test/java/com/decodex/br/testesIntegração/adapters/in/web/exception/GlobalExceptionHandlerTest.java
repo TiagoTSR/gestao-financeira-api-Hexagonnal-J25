@@ -16,9 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.decodex.br.adapters.in.web.CategoriaController;
+import com.decodex.br.features.categoria.api.CategoriaController;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -31,7 +31,7 @@ class GlobalExceptionHandlerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private CategoriaInputPort categoriaInputPort;
+    private CategoriaUseCase categoriaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;

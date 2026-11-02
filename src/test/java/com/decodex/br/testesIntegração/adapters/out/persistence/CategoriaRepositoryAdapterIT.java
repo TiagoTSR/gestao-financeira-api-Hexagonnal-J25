@@ -13,7 +13,6 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.decodex.br.adapters.out.persistence.adapter.CategoriaRepositoryAdapter;
 import com.decodex.br.adapters.out.persistence.entity.CategoriaEntity;
 import com.decodex.br.adapters.out.persistence.mapper.CategoriaMapper;
 import com.decodex.br.adapters.out.persistence.repository.CategoriaRepository;
@@ -22,6 +21,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
+import com.decodex.br.features.categoria.infrastructure.persistence.CategoriaRepositoryAdapter;
 import com.decodex.br.testesIntegração.PostgresIntegrationBase;
 
 @DataJpaTest

@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.out.persistence.adapter;
+package com.decodex.br.features.categoria.infrastructure.persistence;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +22,10 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
+import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
 
 @Component
-public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort {
+public class CategoriaRepositoryAdapter implements CategoriaRepositoryPort, CategoriaQueryPort {
 
     private static final Set<String> CAMPOS_ORDENAVEIS = Set.of("id", "nome");
 

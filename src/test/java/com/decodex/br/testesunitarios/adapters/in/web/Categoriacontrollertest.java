@@ -26,7 +26,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.decodex.br.adapters.in.web.CategoriaController;
+import com.decodex.br.features.categoria.api.CategoriaController;
 import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaResponseDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
@@ -35,13 +35,13 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 
 @ExtendWith(MockitoExtension.class)
 class CategoriaControllerUnitarioTest {
 
     @Mock
-    private CategoriaInputPort categoriaInputPort;
+    private CategoriaUseCase categoriaInputPort;
 
     @InjectMocks
     private CategoriaController controller;

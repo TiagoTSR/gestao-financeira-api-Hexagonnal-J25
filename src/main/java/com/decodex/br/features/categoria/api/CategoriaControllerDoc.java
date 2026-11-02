@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.in.web.documentation;
+package com.decodex.br.features.categoria.api;
 
 import java.util.UUID;
 

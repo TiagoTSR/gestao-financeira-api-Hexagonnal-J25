@@ -19,10 +19,20 @@ class ArchitectureTest {
                     "org.springframework..",
                     "jakarta..");
 
+    private static final ArchRule featureApplicationMustNotDependOnAdaptersOrConfiguration = noClasses()
+            .that().resideInAPackage("..features..application..")
+            .should().dependOnClassesThat()
+            .resideInAnyPackage(
+                    "..adapters..",
+                    "..config..",
+                    "org.springframework..",
+                    "jakarta..");
+
     @Test
-    void domainModelsMustRemainIndependentFromFrameworkAndInfrastructure() {
+    void domainModelsAndFeatureApplicationMustRemainIndependentFromOuterLayers() {
         JavaClasses classes = new ClassFileImporter().importPackages("com.decodex.br");
 
         domainModelsMustNotDependOnOuterLayers.check(classes);
+        featureApplicationMustNotDependOnAdaptersOrConfiguration.check(classes);
     }
 }

@@ -1,4 +1,4 @@
-package com.decodex.br.testesunitarios.domain.service;
+package com.decodex.br.testesunitarios.features.categoria;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,17 +28,21 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
-import com.decodex.br.domain.service.CategoriaService;
+import com.decodex.br.features.categoria.application.CategoriaApplicationService;
+import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes unitários para CategoriaService")
-class CategoriaServiceTest {
+@DisplayName("Testes unitários para CategoriaApplicationService")
+class CategoriaApplicationServiceTest {
 
     @Mock
     private CategoriaRepositoryPort repository;
 
+    @Mock
+    private CategoriaQueryPort query;
+
     @InjectMocks
-    private CategoriaService service;
+    private CategoriaApplicationService service;
 
     private final UUID categoriaId = UUID.randomUUID();
     private final UUID idInexistente = UUID.randomUUID();
@@ -58,14 +62,14 @@ class CategoriaServiceTest {
         PageResult<Categoria> pageResult = new PageResult<>(
             List.of(categoria), 0, 10, 1L, 1
         );
-        when(repository.findAll(any(CategoriaFilter.class), eq(pageRequest))).thenReturn(pageResult);
+        when(query.findAll(any(CategoriaFilter.class), eq(pageRequest))).thenReturn(pageResult);
 
         PageResult<Categoria> result = service.findAll(filter, pageRequest);
 
         assertThat(result.content()).hasSize(1).contains(categoria);
         assertThat(result.page()).isZero();
         assertThat(result.totalElements()).isEqualTo(1L);
-        verify(repository, times(1)).findAll(any(CategoriaFilter.class), eq(pageRequest));
+        verify(query, times(1)).findAll(any(CategoriaFilter.class), eq(pageRequest));
     }
 
     @Test

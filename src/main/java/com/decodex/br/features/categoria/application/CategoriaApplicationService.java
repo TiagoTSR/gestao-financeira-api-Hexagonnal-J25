@@ -1,25 +1,29 @@
-package com.decodex.br.domain.service;
+package com.decodex.br.features.categoria.application;
 
 import java.util.UUID;
 
-import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.application.dto.categoria.CategoriaFilter;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
 import com.decodex.br.domain.port.out.CategoriaRepositoryPort;
+import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
+import com.decodex.br.features.categoria.application.port.out.CategoriaQueryPort;
 
-public class CategoriaService implements CategoriaInputPort {
+public class CategoriaApplicationService implements CategoriaUseCase {
 
-	private final CategoriaRepositoryPort repository;
+    private final CategoriaRepositoryPort repository;
+    private final CategoriaQueryPort query;
 
-    public CategoriaService(CategoriaRepositoryPort repository) {
+    public CategoriaApplicationService(CategoriaRepositoryPort repository, CategoriaQueryPort query) {
         this.repository = repository;
+        this.query = query;
     }
 
+    @Override
     public PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest) {
-        return repository.findAll(filter, pageRequest);
+        return query.findAll(filter, pageRequest);
     }
 
     @Override

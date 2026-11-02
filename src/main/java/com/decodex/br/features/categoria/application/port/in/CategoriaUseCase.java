@@ -1,4 +1,4 @@
-package com.decodex.br.domain.port.in;
+package com.decodex.br.features.categoria.application.port.in;
 
 import java.util.UUID;
 
@@ -7,9 +7,9 @@ import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
 
-public interface CategoriaInputPort {
-	
-	PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest);
+public interface CategoriaUseCase {
+
+    PageResult<Categoria> findAll(CategoriaFilter filter, PageRequest pageRequest);
 
     Categoria findById(UUID id);
 
@@ -18,5 +18,4 @@ public interface CategoriaInputPort {
     Categoria update(UUID id, Categoria categoria);
 
     void delete(UUID id);
-
 }

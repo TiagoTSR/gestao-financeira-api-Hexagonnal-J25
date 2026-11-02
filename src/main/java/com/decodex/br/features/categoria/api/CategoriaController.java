@@ -1,4 +1,4 @@
-package com.decodex.br.adapters.in.web;
+package com.decodex.br.features.categoria.api;
 
 import java.net.URI;
 
@@ -21,8 +21,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
-import com.decodex.br.adapters.in.web.documentation.CategoriaControllerDoc;
+import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 
 import jakarta.validation.Valid;
 
@@ -30,9 +29,9 @@ import jakarta.validation.Valid;
 @RequestMapping("/categorias")
 public class CategoriaController implements CategoriaControllerDoc {
 
-    private final CategoriaInputPort inputPort;
+    private final CategoriaUseCase inputPort;
 
-    public CategoriaController(CategoriaInputPort inputPort) {
+    public CategoriaController(CategoriaUseCase inputPort) {
         this.inputPort = inputPort;
     }
 

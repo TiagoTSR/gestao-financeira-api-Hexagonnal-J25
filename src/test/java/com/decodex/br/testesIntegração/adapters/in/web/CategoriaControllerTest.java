@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.decodex.br.adapters.in.web.CategoriaController;
+import com.decodex.br.features.categoria.api.CategoriaController;
 import com.decodex.br.application.dto.categoria.CategoriaCreateDTO;
 import com.decodex.br.application.dto.categoria.CategoriaUpdateDTO;
 import com.decodex.br.domain.exception.ResourceNotFoundException;
@@ -31,7 +31,7 @@ import com.decodex.br.application.dto.categoria.CategoriaFilter;
 import com.decodex.br.domain.model.Categoria;
 import com.decodex.br.domain.pagination.PageRequest;
 import com.decodex.br.domain.pagination.PageResult;
-import com.decodex.br.domain.port.in.CategoriaInputPort;
+import com.decodex.br.features.categoria.application.port.in.CategoriaUseCase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -49,7 +49,7 @@ class CategoriaControllerTest {
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     @MockitoBean
-    private CategoriaInputPort categoriaInputPort;
+    private CategoriaUseCase categoriaInputPort;
 
     @MockitoBean
     private com.decodex.br.config.security.TokenService tokenService;
