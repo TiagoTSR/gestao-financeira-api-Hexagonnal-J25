@@ -1,4 +1,4 @@
-﻿package com.decodex.br.testesunitarios.adapters.out.pdf;
+package com.decodex.br.testesunitarios.adapters.out.pdf;
 
 import com.decodex.br.adapters.out.pdf.OpenHtmlToPdfAdapter;
 import com.decodex.br.domain.model.*;
