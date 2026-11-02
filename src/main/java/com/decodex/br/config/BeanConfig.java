@@ -17,6 +17,9 @@ import com.decodex.br.features.lancamentos.application.LancamentoApplicationServ
 import com.decodex.br.features.lancamentos.application.port.in.LancamentoUseCase;
 import com.decodex.br.domain.port.out.RelatorioProducerPort;
 import com.decodex.br.features.relatorios.application.RelatorioAsyncApplicationService;
+import com.decodex.br.features.relatorios.application.RelatorioProcessingApplicationService;
+import com.decodex.br.features.relatorios.application.port.in.ProcessarRelatorioUseCase;
+import com.decodex.br.features.relatorios.application.port.out.RelatorioFileGenerator;
 import com.decodex.br.features.relatorios.application.port.out.RelatorioSolicitacaoStore;
 
 @Configuration
@@ -52,6 +55,13 @@ public class BeanConfig {
             RelatorioSolicitacaoStore relatorioSolicitacaoStore,
             RelatorioProducerPort relatorioProducerPort) {
         return new RelatorioAsyncApplicationService(relatorioSolicitacaoStore, relatorioProducerPort);
+    }
+
+    @Bean
+    public ProcessarRelatorioUseCase processarRelatorioUseCase(
+            RelatorioSolicitacaoStore relatorioSolicitacaoStore,
+            RelatorioFileGenerator relatorioFileGenerator) {
+        return new RelatorioProcessingApplicationService(relatorioSolicitacaoStore, relatorioFileGenerator);
     }
 
     @Bean

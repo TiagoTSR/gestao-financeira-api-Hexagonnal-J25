@@ -134,11 +134,11 @@ src/main/java/com/decodex/br/
 │   │   └── infrastructure/   # Adapter de persistência da funcionalidade
 │   └── relatorios/           # Solicitação, consulta e download assíncronos
 │       ├── application/      # Caso de uso e portas
-│       └── infrastructure/   # Persistência, contexto do solicitante e transações
+│       └── infrastructure/   # Persistência, geração, contexto do solicitante e transações
 └── config/                   # Configurações Spring (Security, CORS, RabbitMQ, RateLimit)
 ```
 
-A migração está sendo feita de forma incremental. Os modelos de domínio e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados. O consumo de mensagens de relatórios RabbitMQ permanece no adaptador legado nesta etapa.
+A migração está sendo feita de forma incremental. Os modelos de domínio e componentes JPA compartilhados permanecem nas camadas comuns até que os slices dependentes também sejam migrados. O listener RabbitMQ compartilhado delega o processamento de relatórios ao respectivo slice.
 
 ---
 
