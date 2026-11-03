@@ -260,6 +260,8 @@ JWT_EXPIRATION_HOURS=8
 JWT_REFRESH_EXPIRATION_DAYS=7
 ```
 
+`JWT_SECRET` é obrigatória e não pode estar vazia. Configure-a também nas variáveis de ambiente do serviço de backend no Railway; sem essa chave, a aplicação não inicia, pois ela é usada para assinar os tokens JWT.
+
 ---
 
 ## 💻 Como Executar Localmente

@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,14 @@ public class TokenService {
     private String secret;
 
     public record TokenPayload(String username, UUID tenantId) {}
+
+    @PostConstruct
+    void validateSecret() {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "A variável JWT_SECRET precisa estar configurada para iniciar a aplicação.");
+        }
+    }
 
     public String generateToken(UserDetails userDetails, UUID tenantId) {
         try {

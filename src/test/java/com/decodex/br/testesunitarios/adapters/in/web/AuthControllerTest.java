@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -94,7 +95,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("Deve autenticar com sucesso e retornar token JWT e Cookie Set-Cookie")
     void deveAutenticarERetornarToken() {
-        LoginRequestDTO loginRequest = new LoginRequestDTO("admin", "123456");
+        LoginRequestDTO loginRequest = new LoginRequestDTO(" ADMIN@EMAIL.COM ", " 123456 ");
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
         Usuario userDomain = new Usuario(java.util.UUID.randomUUID(), "admin", "hash", "admin@email.com");
         RefreshToken refreshToken = new RefreshToken(java.util.UUID.randomUUID(), "mocked-refresh-token", userDomain, Instant.now().plusSeconds(3600));
@@ -110,6 +111,10 @@ class AuthControllerTest {
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().token()).isEqualTo("mocked-jwt-token");
 
+        verify(authenticationManager).authenticate(argThat(auth ->
+                auth instanceof UsernamePasswordAuthenticationToken token
+                        && token.getPrincipal().equals("admin@email.com")
+                        && token.getCredentials().equals("123456")));
         verify(response, times(2)).addHeader(
             eq(org.springframework.http.HttpHeaders.SET_COOKIE),
             anyString()

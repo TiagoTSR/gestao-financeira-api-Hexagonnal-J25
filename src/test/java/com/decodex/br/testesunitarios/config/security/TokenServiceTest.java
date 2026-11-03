@@ -1,6 +1,7 @@
 package com.decodex.br.testesunitarios.config.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,16 @@ class TokenServiceTest {
 
         String username = tokenService.validateToken(token);
         assertThat(username).isEqualTo("admin");
+    }
+
+    @Test
+    @DisplayName("Deve falhar com mensagem clara quando JWT_SECRET estiver vazia")
+    void deveFalharQuandoSecretEstiverVazia() {
+        ReflectionTestUtils.setField(tokenService, "secret", " ");
+
+        assertThatThrownBy(() -> ReflectionTestUtils.invokeMethod(tokenService, "validateSecret"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("JWT_SECRET");
     }
 
     @Test

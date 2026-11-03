@@ -13,6 +13,7 @@ import com.decodex.br.features.autenticacao.application.port.in.RegisterUserUseC
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -63,8 +64,12 @@ public class AuthController implements AuthControllerDoc {
             @RequestBody @Valid LoginRequestDTO loginRequest,
             HttpServletResponse response) {
 
+        String username = loginRequest.username().trim();
+        if (username.contains("@")) {
+            username = username.toLowerCase(Locale.ROOT);
+        }
         var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
+                new UsernamePasswordAuthenticationToken(username, loginRequest.password().trim())
         );
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
 

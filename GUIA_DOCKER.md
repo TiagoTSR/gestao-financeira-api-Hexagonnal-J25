@@ -38,7 +38,7 @@ docker compose up -d meu-postgres
 
 * **API:** `http://localhost:8080`
 * **Swagger UI:** `http://localhost:8080/swagger-ui.html`
-* **PostgreSQL:** porta `5435` (usuário: `postgres`, banco: `rest_spring`, senha: `T2143Lo67r8`)
+* **PostgreSQL:** porta `5435` (usuário: `postgres`, banco: `rest_spring`, senha: `99999999`)
 
 ---
 
