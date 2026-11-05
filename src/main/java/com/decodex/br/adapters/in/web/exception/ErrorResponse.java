@@ -1,26 +1,26 @@
 package com.decodex.br.adapters.in.web.exception;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.time.Instant;
+import java.util.List;
 
-public class ErrorResponse {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ErrorResponse(
+        Instant timestamp,
+        int status,
+        String error,
+        String message,
+        String path,
+        List<FieldValidationError> details
+) {
+    public record FieldValidationError(String field, String message) {}
 
-    private LocalDateTime timestamp;
-    private int status;
-    private String error;
-    private String message;
-    private String path;
-
-    public ErrorResponse(int status, String error, String message, String path) {
-        this.timestamp = LocalDateTime.now();
-        this.status = status;
-        this.error = error;
-        this.message = message;
-        this.path = path;
+    public static ErrorResponse of(int status, String error, String message, String path) {
+        return new ErrorResponse(Instant.now(), status, error, message, path, null);
     }
 
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public int getStatus() { return status; }
-    public String getError() { return error; }
-    public String getMessage() { return message; }
-    public String getPath() { return path; }
+    public static ErrorResponse of(int status, String error, String message, String path,
+                                   List<FieldValidationError> details) {
+        return new ErrorResponse(Instant.now(), status, error, message, path, details);
+    }
 }

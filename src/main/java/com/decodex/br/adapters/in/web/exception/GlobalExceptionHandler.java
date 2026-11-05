@@ -1,152 +1,170 @@
 package com.decodex.br.adapters.in.web.exception;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.decodex.br.domain.exception.RefreshTokenException;
+import com.decodex.br.domain.exception.RegraDeNegocioException;
+import com.decodex.br.domain.exception.RelatorioPdfException;
+import com.decodex.br.domain.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.decodex.br.domain.exception.RegraDeNegocioException;
-import com.decodex.br.domain.exception.RelatorioPdfException;
-import com.decodex.br.domain.exception.ResourceNotFoundException;
+import java.util.List;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(RegraDeNegocioException.class)
-    public ResponseEntity<ErrorResponse> handleRegraDeNegocio(
-            RegraDeNegocioException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
+    private final DataIntegrityMessageResolver dataIntegrityMessageResolver;
+
+    public GlobalExceptionHandler(DataIntegrityMessageResolver resolver) {
+        this.dataIntegrityMessageResolver = resolver;
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
-            DataIntegrityViolationException ex,
-            HttpServletRequest request) {
-        String mensagem = "Operação não permitida: violação de integridade de dados.";
-        String causa = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
-        if (causa.contains("uk_categoria_tenant_nome") || causa.contains("uk_categoria_nome") || causa.contains("categoria_nome_key")) {
-            mensagem = "Já existe uma categoria cadastrada com este nome.";
-        } else if (causa.contains("uk_usuario_email") || causa.contains("usuario_email_key")) {
-            mensagem = "Já existe um usuário cadastrado com este e-mail.";
-        } else if (causa.contains("uk_usuario_username") || causa.contains("usuario_username_key")) {
-            mensagem = "Já existe um usuário cadastrado com este nome de usuário.";
-        } else if (causa.contains("fk_lancamento_pessoa") || causa.contains("lancamento_pessoa_id")) {
-            mensagem = "Não é possível excluir esta pessoa pois existem lançamentos financeiros vinculados a ela.";
-        } else if (causa.contains("fk_lancamento_categoria") || causa.contains("lancamento_categoria_id")) {
-            mensagem = "Não é possível excluir esta categoria pois existem lançamentos financeiros vinculados a ela.";
-        }
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", mensagem, request);
+    // ---------- 4xx: erros esperados (log DEBUG/WARN, sem stack trace) ----------
+
+    @ExceptionHandler(RegraDeNegocioException.class)
+    public ResponseEntity<ErrorResponse> handleBusiness(RegraDeNegocioException ex, HttpServletRequest req) {
+        log.debug("Regra de negócio violada em {}: {}", req.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), req);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFound(
-            ResourceNotFoundException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), request);
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
+        log.debug("Recurso não encontrado em {}: {}", req.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), req);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Void> handleEntityNotFound(EntityNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return ResponseEntity.badRequest().body(errors);
+    public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, "Recurso não encontrado.", req);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
-            IllegalArgumentException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage(), request);
-    }
-
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleMessageNotReadable(
-            HttpMessageNotReadableException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Bad Request",
-                "Requisição inválida. Verifique o formato do JSON ou os valores dos campos.",
-                request);
-    }
-
-    @ExceptionHandler(com.decodex.br.domain.exception.RefreshTokenException.class)
-    public ResponseEntity<ErrorResponse> handleRefreshToken(
-            com.decodex.br.domain.exception.RefreshTokenException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request);
-    }
-
-    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(
-            org.springframework.security.core.AuthenticationException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Unauthorized", "Usuário ou senha inválidos.", request);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(
-            Exception ex,
-            HttpServletRequest request) {
-        log.error("Erro inesperado no endpoint {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
-                ((ex.getMessage() != null && !ex.getMessage().isBlank()) ? ex.getMessage() : "Erro inesperado"), request);
-    }
-
-    private ResponseEntity<ErrorResponse> buildErrorResponse(
-            HttpStatus status, String error, String message, HttpServletRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                error,
-                message,
-                request.getRequestURI());
-        return ResponseEntity.status(status).body(errorResponse);
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        log.debug("Argumento inválido em {}: {}", req.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.BAD_REQUEST, safe(ex.getMessage(), "Requisição inválida."), req);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(
-            MethodArgumentTypeMismatchException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
+                                                            HttpServletRequest req) {
+        String msg = "Valor inválido para o parâmetro '%s'.".formatted(ex.getName());
+        return build(HttpStatus.BAD_REQUEST, msg, req);
+    }
 
-        return buildErrorResponse(
-                HttpStatus.BAD_REQUEST,
-                "Bad Request",
-                "Valor inválido para o parâmetro '" + ex.getName() + "'.",
-                request);
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException ex,
+                                                           HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST,
+                "Corpo da requisição inválido ou malformado.", req);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,
+                                                          HttpServletRequest req) {
+        List<ErrorResponse.FieldValidationError> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(this::toFieldError)
+                .toList();
+
+        var body = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Erro de validação nos campos informados.",
+                req.getRequestURI(),
+                details);
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex,
+                                                                   HttpServletRequest req) {
+        List<ErrorResponse.FieldValidationError> details = ex.getConstraintViolations().stream()
+                .map(v -> new ErrorResponse.FieldValidationError(
+                        v.getPropertyPath().toString(), v.getMessage()))
+                .toList();
+
+        var body = ErrorResponse.of(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                "Erro de validação nos parâmetros informados.",
+                req.getRequestURI(),
+                details);
+
+        return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
+                                                             HttpServletRequest req) {
+        String cause = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : null;
+
+        String message = dataIntegrityMessageResolver.resolve(cause);
+        if (message == null) {
+            log.warn("Violação de integridade não mapeada em {}: {}", req.getRequestURI(), cause);
+            message = "Operação não permitida por restrição de integridade de dados.";
+        }
+        return build(HttpStatus.CONFLICT, message, req);
+    }
+
+    @ExceptionHandler(RefreshTokenException.class)
+    public ResponseEntity<ErrorResponse> handleRefreshToken(RefreshTokenException ex, HttpServletRequest req) {
+        log.debug("Refresh token inválido em {}: {}", req.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, "Sessão expirada ou inválida.", req);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException ex, HttpServletRequest req) {
+        log.debug("Falha de autenticação em {}: {}", req.getRequestURI(), ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, "Credenciais inválidas.", req);
     }
 
     @ExceptionHandler(RelatorioPdfException.class)
-    public ResponseEntity<ErrorResponse> handleRelatorioPdf(
-            RelatorioPdfException ex,
-            HttpServletRequest request) {
-        return buildErrorResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Erro ao gerar relatório",
-                ex.getMessage(),
-                request);
+    public ResponseEntity<ErrorResponse> handleRelatorioPdf(RelatorioPdfException ex, HttpServletRequest req) {
+        log.error("Erro ao gerar relatório em {}: {}", req.getRequestURI(), ex.getMessage(), ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível gerar o relatório.", req);
+    }
+
+    // ---------- 5xx: erros inesperados (log ERROR + stack trace, resposta genérica) ----------
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest req) {
+        log.error("Erro inesperado em {}: {}", req.getRequestURI(), ex.getMessage(), ex);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Erro interno. Tente novamente mais tarde.", req);
+    }
+
+    // ---------- Helpers ----------
+
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest req) {
+        return ResponseEntity.status(status)
+                .body(ErrorResponse.of(status.value(), status.getReasonPhrase(), message, req.getRequestURI()));
+    }
+
+    private ErrorResponse.FieldValidationError toFieldError(FieldError fe) {
+        String msg = fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Valor inválido.";
+        return new ErrorResponse.FieldValidationError(fe.getField(), msg);
+    }
+
+    private String safe(String value, String fallback) {
+        return (value == null || value.isBlank()) ? fallback : value;
     }
 }
