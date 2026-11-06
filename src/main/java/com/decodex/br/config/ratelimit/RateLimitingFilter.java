@@ -13,8 +13,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,20 +29,23 @@ public class RateLimitingFilter implements Filter {
     private final int capacity;
     private final int durationInMinutes;
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public RateLimitingFilter(
             @Value("${api.rate-limit.enabled:true}") boolean enabled,
             @Value("${api.rate-limit.capacity:100000}") int capacity,
-            @Value("${api.rate-limit.duration-in-minutes:1}") int durationInMinutes
+            @Value("${api.rate-limit.duration-in-minutes:1}") int durationInMinutes,
+            ObjectMapper objectMapper
     ) {
         this.enabled = enabled;
         this.capacity = capacity;
         this.durationInMinutes = durationInMinutes;
+        this.objectMapper = objectMapper;
     }
 
     public RateLimitingFilter(int capacity, int durationInMinutes) {
-        this(true, capacity, durationInMinutes);
+        this(true, capacity, durationInMinutes, new ObjectMapper());
     }
 
     @Override
@@ -81,11 +88,15 @@ public class RateLimitingFilter implements Filter {
             httpServletResponse.setContentType("application/json");
             httpServletResponse.setCharacterEncoding("UTF-8");
             
-            String jsonError = String.format(
-                "{\"status\":429,\"error\":\"Too Many Requests\",\"message\":\"Limite de requisições excedido. Tente novamente em %d segundos.\",\"path\":\"%s\"}",
-                waitForRefill,
-                httpServletRequest.getRequestURI()
-            );
+            Map<String, Object> errorBody = new LinkedHashMap<>();
+            errorBody.put("status", 429);
+            errorBody.put("error", "Too Many Requests");
+            errorBody.put("message", String.format(
+                    "Limite de requisições excedido. Tente novamente em %d segundos.",
+                    waitForRefill));
+            errorBody.put("path", httpServletRequest.getRequestURI());
+
+            String jsonError = objectMapper.writeValueAsString(errorBody);
             httpServletResponse.getWriter().write(jsonError);
         }
     }
