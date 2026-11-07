@@ -198,7 +198,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<encoding>UTF-8</encoding>
-					<useIncrementalCompilation>false</useIncrementalCompilation>
+					<useIncrementalCompilation>true</useIncrementalCompilation>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>

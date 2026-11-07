@@ -5,6 +5,7 @@ import com.decodex.br.domain.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
@@ -28,7 +29,7 @@ class OpenHtmlToPdfAdapterTest {
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setCharacterEncoding("UTF-8");
 
-        TemplateEngine templateEngine = new TemplateEngine();
+        TemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(resolver);
 
         adapter = new OpenHtmlToPdfAdapter(templateEngine);
