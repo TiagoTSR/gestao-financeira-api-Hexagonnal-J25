@@ -8,7 +8,7 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,11 +74,12 @@ class RabbitMqConfigTest {
     }
 
     @Test
-    @DisplayName("Deve instanciar Jackson2JsonMessageConverter e RabbitTemplate")
+    @DisplayName("Deve instanciar JacksonJsonMessageConverter e RabbitTemplate")
     void deveConfigurarMessageConverterETemplate() {
         MessageConverter converter = config.jacksonMessageConverter();
         assertNotNull(converter);
-        assertInstanceOf(Jackson2JsonMessageConverter.class, converter);
+    
+        assertInstanceOf(JacksonJsonMessageConverter.class, converter);
 
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         RabbitTemplate template = config.rabbitTemplate(connectionFactory, converter);
