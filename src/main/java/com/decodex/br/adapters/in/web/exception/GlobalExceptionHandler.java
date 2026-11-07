@@ -32,8 +32,9 @@ public class GlobalExceptionHandler {
 
     private final DataIntegrityMessageResolver dataIntegrityMessageResolver;
 
-    public GlobalExceptionHandler(DataIntegrityMessageResolver resolver) {
-        this.dataIntegrityMessageResolver = resolver;
+    // ✅ Injeção via construtor (Spring resolve o @Component automaticamente)
+    public GlobalExceptionHandler(DataIntegrityMessageResolver dataIntegrityMessageResolver) {
+        this.dataIntegrityMessageResolver = dataIntegrityMessageResolver;
     }
 
     // ---------- 4xx: erros esperados (log DEBUG/WARN, sem stack trace) ----------
@@ -113,9 +114,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrity(DataIntegrityViolationException ex,
                                                              HttpServletRequest req) {
-        String cause = ex.getMostSpecificCause() != null
-                ? ex.getMostSpecificCause().getMessage()
-                : null;
+        // ✅ getMostSpecificCause() nunca retorna null — check removido
+        String cause = ex.getMostSpecificCause().getMessage();
 
         String message = dataIntegrityMessageResolver.resolve(cause);
         if (message == null) {

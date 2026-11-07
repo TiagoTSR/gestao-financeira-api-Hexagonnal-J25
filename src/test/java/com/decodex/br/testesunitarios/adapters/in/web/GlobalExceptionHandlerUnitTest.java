@@ -6,11 +6,13 @@ import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import com.decodex.br.adapters.in.web.exception.DataIntegrityMessageResolver;
 import com.decodex.br.adapters.in.web.exception.ErrorResponse;
 import com.decodex.br.adapters.in.web.exception.GlobalExceptionHandler;
 
@@ -24,63 +26,45 @@ class GlobalExceptionHandlerUnitTest {
 
     @BeforeEach
     void setUp() {
-        handler = new GlobalExceptionHandler();
+        handler = new GlobalExceptionHandler(new DataIntegrityMessageResolver());
         request = mock(HttpServletRequest.class);
         when(request.getRequestURI()).thenReturn("/api/test");
     }
 
-    @Test
-    @DisplayName("Deve tratar violação de constraint de categoria tenant com mensagem amigável")
-    void deveTratarConstraintCategoriaTenant() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("violates uk_categoria_tenant_nome");
-        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrityViolation(ex, request);
+    @ParameterizedTest(name = "[{index}] constraint={0} → \"{1}\"")
+    @DisplayName("Deve mapear violações de integridade para mensagens amigáveis")
+    @CsvSource({
+            // constraint no cause                 | mensagem esperada
+            "uk_categoria_tenant_nome, Já existe uma categoria com este nome.",
+            "uk_categoria_nome,        Já existe uma categoria com este nome.",
+            "fk_lancamento_categoria,  Categoria possui lançamentos vinculados e não pode ser excluída.",
+            "fk_lancamento_pessoa,     Pessoa possui lançamentos vinculados e não pode ser excluída.",
+            "uk_usuario_email,         Já existe um usuário com este e-mail.",
+            "uk_usuario_username,      Já existe um usuário com este nome de usuário."
+    })
+    void deveMapearViolacaoDeIntegridade(String constraint, String mensagemEsperada) {
+        DataIntegrityViolationException ex =
+                new DataIntegrityViolationException("violates " + constraint);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrity(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Já existe uma categoria cadastrada com este nome.");
+    
+        assertThat(response.getBody().message()).isEqualTo(mensagemEsperada);
     }
 
-    @Test
-    @DisplayName("Deve tratar violação de FK de exclusão de categoria com mensagem amigável")
-    void deveTratarConstraintFkLancamentoCategoria() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("violates foreign key fk_lancamento_categoria");
-        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrityViolation(ex, request);
+    @org.junit.jupiter.api.Test
+    @DisplayName("Deve retornar mensagem genérica para constraint não mapeada")
+    void deveRetornarMensagemGenericaParaConstraintNaoMapeada() {
+        DataIntegrityViolationException ex =
+                new DataIntegrityViolationException("other constraint");
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrity(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Não é possível excluir esta categoria pois existem lançamentos financeiros vinculados a ela.");
-    }
-
-    @Test
-    @DisplayName("Deve tratar violação de FK de exclusão de pessoa com mensagem amigável")
-    void deveTratarConstraintFkLancamentoPessoa() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("violates foreign key fk_lancamento_pessoa");
-        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrityViolation(ex, request);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Não é possível excluir esta pessoa pois existem lançamentos financeiros vinculados a ela.");
-    }
-
-    @Test
-    @DisplayName("Deve tratar violação de unicidade de email de usuário")
-    void deveTratarConstraintUsuarioEmail() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("violates uk_usuario_email");
-        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrityViolation(ex, request);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Já existe um usuário cadastrado com este e-mail.");
-    }
-
-    @Test
-    @DisplayName("Deve tratar violação de integridade genérica")
-    void deveTratarViolacaoGenerica() {
-        DataIntegrityViolationException ex = new DataIntegrityViolationException("other constraint");
-        ResponseEntity<ErrorResponse> response = handler.handleDataIntegrityViolation(ex, request);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getMessage()).isEqualTo("Operação não permitida: violação de integridade de dados.");
+        assertThat(response.getBody().message())
+                .isEqualTo("Operação não permitida por restrição de integridade de dados.");
     }
 }
