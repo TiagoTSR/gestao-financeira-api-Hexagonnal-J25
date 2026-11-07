@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class OpenHtmlToPdfAdapter implements RelatorioPdfPort {
         context.setVariable("totalRegistros", lancamentos.size());
         context.setVariable("dataInicio", inicio.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
         context.setVariable("dataFim", fim.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        context.setVariable("dataGeracao", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy '\u00e0s' HH:mm:ss")));
+        context.setVariable("dataGeracao", LocalDateTime.now(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd/MM/yyyy '\u00e0s' HH:mm:ss")));
 
         String htmlContent;
         try {
