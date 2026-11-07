@@ -1,7 +1,6 @@
 package com.decodex.br.adapters.in.web;
 
 import com.decodex.br.adapters.in.web.documentation.RelatorioControllerDoc;
-import com.decodex.br.application.dto.relatorio.RelatorioDownloadDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioProtocoloResponseDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioSolicitacaoRequestDTO;
 import com.decodex.br.application.dto.relatorio.RelatorioStatusResponseDTO;
