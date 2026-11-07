@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -29,23 +29,23 @@ public class RateLimitingFilter implements Filter {
     private final int capacity;
     private final int durationInMinutes;
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
     @Autowired
     public RateLimitingFilter(
             @Value("${api.rate-limit.enabled:true}") boolean enabled,
             @Value("${api.rate-limit.capacity:100000}") int capacity,
             @Value("${api.rate-limit.duration-in-minutes:1}") int durationInMinutes,
-            ObjectMapper objectMapper
+            JsonMapper jsonMapper
     ) {
         this.enabled = enabled;
         this.capacity = capacity;
         this.durationInMinutes = durationInMinutes;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
     }
 
     public RateLimitingFilter(int capacity, int durationInMinutes) {
-        this(true, capacity, durationInMinutes, new ObjectMapper());
+        this(true, capacity, durationInMinutes, new JsonMapper());
     }
 
     @Override
@@ -96,7 +96,7 @@ public class RateLimitingFilter implements Filter {
                     waitForRefill));
             errorBody.put("path", httpServletRequest.getRequestURI());
 
-            String jsonError = objectMapper.writeValueAsString(errorBody);
+            String jsonError = jsonMapper.writeValueAsString(errorBody);
             httpServletResponse.getWriter().write(jsonError);
         }
     }
