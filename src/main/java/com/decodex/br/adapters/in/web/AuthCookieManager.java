@@ -3,6 +3,7 @@ package com.decodex.br.adapters.in.web;
 import com.decodex.br.application.dto.auth.RefreshRequestDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,17 @@ public class AuthCookieManager {
     public static final String COOKIE_REFRESH_TOKEN = "refreshToken";
     public static final Duration ACCESS_TOKEN_MAX_AGE = Duration.ofMinutes(15);
     public static final Duration REFRESH_TOKEN_MAX_AGE = Duration.ofDays(7);
+
+    private final boolean cookieSecure;
+    private final String cookieSameSite;
+
+    public AuthCookieManager(
+            @Value("${api.security.cookie.secure:false}") boolean cookieSecure,
+            @Value("${api.security.cookie.same-site:Lax}") String cookieSameSite
+    ) {
+        this.cookieSecure = cookieSecure;
+        this.cookieSameSite = cookieSameSite;
+    }
 
     public void setAuthCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         adicionarCookie(response, COOKIE_ACCESS_TOKEN, accessToken, ACCESS_TOKEN_MAX_AGE);
@@ -44,13 +56,16 @@ public class AuthCookieManager {
     }
 
     private void adicionarCookie(HttpServletResponse response, String nome, String valor, Duration maxAge) {
-        var cookie = ResponseCookie.from(nome, valor)
+        ResponseCookie.ResponseCookieBuilder cookieBuilder = ResponseCookie.from(nome, valor)
                 .httpOnly(true)
-                .secure(false)
                 .path("/")
                 .maxAge(maxAge)
-                .sameSite("Lax")
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                .sameSite(cookieSameSite);
+
+        if (cookieSecure) {
+            cookieBuilder.secure(true);
+        }
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
 }
