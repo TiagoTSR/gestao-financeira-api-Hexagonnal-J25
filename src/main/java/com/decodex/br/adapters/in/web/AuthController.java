@@ -59,13 +59,13 @@ public class AuthController implements AuthControllerDoc {
         this.registerUserUseCase = registerUserUseCase;
     }
 
-    @GetMapping(value = {"/auth/csrf", "/csrf"})
+    @GetMapping(value = { "/auth/csrf", "/csrf" })
     public ResponseEntity<Void> csrf() {
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    @PostMapping(value = {"/auth/login", "/login"})
+    @PostMapping(value = { "/auth/login", "/login" })
     public ResponseEntity<TokenResponseDTO> login(
             @RequestBody @Valid LoginRequestDTO loginRequest,
             HttpServletResponse response) {
@@ -75,9 +75,11 @@ public class AuthController implements AuthControllerDoc {
             username = username.toLowerCase(Locale.ROOT);
         }
         var auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, loginRequest.password().trim())
-        );
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+                new UsernamePasswordAuthenticationToken(username, loginRequest.password().trim()));
+        // authenticate() throws AuthenticationException on failure; never returns null
+        if (!(auth.getPrincipal() instanceof UserDetails userDetails)) {
+            throw new org.springframework.security.authentication.BadCredentialsException("Credenciais inválidas");
+        }
 
         String token = tokenService.generateToken(userDetails);
         RefreshToken refreshToken = refreshTokenUseCase.create(userDetails.getUsername());
@@ -87,7 +89,7 @@ public class AuthController implements AuthControllerDoc {
         return ResponseEntity.ok(tokenResponseAssembler.montar(userDetails, token, refreshToken.getToken()));
     }
 
-    @PostMapping(value = {"/auth/refresh", "/refresh"})
+    @PostMapping(value = { "/auth/refresh", "/refresh" })
     public ResponseEntity<TokenResponseDTO> refresh(
             @RequestBody(required = false) RefreshRequestDTO body,
             HttpServletRequest request,
@@ -99,15 +101,20 @@ public class AuthController implements AuthControllerDoc {
         }
 
         RefreshToken validRefreshToken = refreshTokenUseCase.verifyAndGet(tokenStr);
+        if (validRefreshToken.getUsuario() == null) {
+            throw new RefreshTokenException("Usuário associado ao refresh token não encontrado.");
+        }
         String username = validRefreshToken.getUsuario().getUsername();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // loadUserByUsername throws UsernameNotFoundException if not found; never returns null
 
         String newAccessToken = tokenService.generateToken(userDetails);
         RefreshToken newRefreshToken = refreshTokenUseCase.create(username);
 
         cookieManager.setAuthCookies(response, newAccessToken, newRefreshToken.getToken());
 
-        return ResponseEntity.ok(tokenResponseAssembler.montar(userDetails, newAccessToken, newRefreshToken.getToken()));
+        return ResponseEntity
+                .ok(tokenResponseAssembler.montar(userDetails, newAccessToken, newRefreshToken.getToken()));
     }
 
     @Override
@@ -118,7 +125,7 @@ public class AuthController implements AuthControllerDoc {
     }
 
     @Override
-    @PostMapping(value = {"/auth/logout", "/logout"})
+    @PostMapping(value = { "/auth/logout", "/logout" })
     public ResponseEntity<Void> logout(
             HttpServletRequest request,
             HttpServletResponse response) {
@@ -134,7 +141,7 @@ public class AuthController implements AuthControllerDoc {
     }
 
     @Override
-    @PostMapping(value = {"/auth/register", "/auth/cadastrar"})
+    @PostMapping(value = { "/auth/register", "/auth/cadastrar" })
     public ResponseEntity<UsuarioResponseDTO> register(
             @RequestBody @Valid RegisterRequestDTO request) {
 

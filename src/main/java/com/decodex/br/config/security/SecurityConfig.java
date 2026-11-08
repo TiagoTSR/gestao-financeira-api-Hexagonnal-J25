@@ -36,11 +36,10 @@ public class SecurityConfig {
     private final boolean swaggerEnabled;
 
     public SecurityConfig(
-        @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
-        @Lazy com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter,
-        @Value("${api.security.cors.allowed-origins:http://localhost:3000,http://localhost:4200,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:4200,http://127.0.0.1:5173}") String origins,
-        @Value("${springdoc.swagger-ui.enabled:false}") boolean swaggerEnabled
-    ) {
+            @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
+            @Lazy com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter,
+            @Value("${api.security.cors.allowed-origins:http://localhost:3000,http://localhost:4200,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:4200,http://127.0.0.1:5173}") String origins,
+            @Value("${springdoc.swagger-ui.enabled:false}") boolean swaggerEnabled) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.rateLimitingFilter = rateLimitingFilter;
         this.swaggerEnabled = swaggerEnabled;
@@ -54,7 +53,6 @@ public class SecurityConfig {
     public CsrfTokenRepository csrfTokenRepository() {
         CookieCsrfTokenRepository repository = new CookieCsrfTokenRepository();
         repository.setCookiePath("/");
-        repository.setCookieCustomizer(cookie -> cookie.httpOnly(false));
         return repository;
     }
 
@@ -62,37 +60,37 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         try {
             http
-                .cors(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exceptions -> exceptions
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType("application/json");
-                        response.setCharacterEncoding("UTF-8");
-                        response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token ausente, inválido ou expirado.\"}");
+                    .cors(Customizer.withDefaults())
+                    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                    .exceptionHandling(exceptions -> exceptions
+                            .authenticationEntryPoint((request, response, authException) -> {
+                                response.setStatus(jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED);
+                                response.setContentType("application/json");
+                                response.setCharacterEncoding("UTF-8");
+                                response.getWriter().write(
+                                        "{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token ausente, inválido ou expirado.\"}");
+                            }))
+                    .authorizeHttpRequests(authorize -> {
+                        authorize
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/auth/**", "/csrf").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/**", "/login").permitAll()
+                                .requestMatchers("/relatorios/painel", "/api/relatorios/painel").permitAll();
+
+                        if (swaggerEnabled) {
+                            authorize.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                                    .permitAll();
+                        }
+
+                        authorize.anyRequest().authenticated();
                     })
-                )
-                .authorizeHttpRequests(authorize -> {
-                    authorize
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/**", "/csrf").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/**", "/login").permitAll()
-                        .requestMatchers("/relatorios/painel", "/api/relatorios/painel").permitAll();
-
-                    // Em producao, a documentacao Swagger e OpenAPI fica desativada
-                    if (swaggerEnabled) {
-                        authorize.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
-                    }
-
-                    authorize.anyRequest().authenticated();
-                })
-                .addFilterBefore(rateLimitingFilter, org.springframework.security.web.session.DisableEncodeUrlFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(csrf -> csrf
-                    .csrfTokenRepository(csrfTokenRepository())
-                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                )
-                .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class);
+                    .addFilterBefore(rateLimitingFilter,
+                            org.springframework.security.web.session.DisableEncodeUrlFilter.class)
+                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                    .csrf(csrf -> csrf
+                            .csrfTokenRepository(csrfTokenRepository())
+                            .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                    .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class);
 
             return http.build();
         } catch (Exception e) {
@@ -106,23 +104,21 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of(
-            "Authorization", 
-            "Content-Type", 
-            "Accept", 
-            "Origin", 
-            "X-Requested-With", 
-            "X-Tenant-ID",
-            "X-XSRF-TOKEN"
-        ));
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "X-Tenant-ID",
+                "X-XSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         configuration.setExposedHeaders(List.of(
-            "Authorization", 
-            "Set-Cookie", 
-            "X-XSRF-TOKEN",
-            "X-Rate-Limit-Limit", 
-            "X-Rate-Limit-Remaining", 
-            "X-Rate-Limit-Retry-After-Seconds"
-        ));
+                "Authorization",
+                "Set-Cookie",
+                "X-XSRF-TOKEN",
+                "X-Rate-Limit-Limit",
+                "X-Rate-Limit-Remaining",
+                "X-Rate-Limit-Retry-After-Seconds"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
