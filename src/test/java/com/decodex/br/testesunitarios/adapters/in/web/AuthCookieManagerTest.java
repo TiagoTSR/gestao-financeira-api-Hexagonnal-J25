@@ -29,7 +29,7 @@ class AuthCookieManagerTest {
 
     @BeforeEach
     void setUp() {
-        cookieManager = new AuthCookieManager();
+        cookieManager = new AuthCookieManager(false, "Lax");
         response = mock(HttpServletResponse.class);
         request = mock(HttpServletRequest.class);
     }
@@ -84,5 +84,15 @@ class AuthCookieManagerTest {
 
         assertThat(cookieManager.extrairRefreshToken(request)).isNull();
         assertThat(cookieManager.extrairRefreshToken(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Deve configurar atributo Secure nos cookies quando cookieSecure for true")
+    void deveConfigurarAtributoSecureEmProducao() {
+        AuthCookieManager secureCookieManager = new AuthCookieManager(true, "Strict");
+        secureCookieManager.setAuthCookies(response, "token-sec", "refresh-sec");
+
+        verify(response, times(2)).addHeader(eq(HttpHeaders.SET_COOKIE), contains("Secure"));
+        verify(response, times(2)).addHeader(eq(HttpHeaders.SET_COOKIE), contains("SameSite=Strict"));
     }
 }

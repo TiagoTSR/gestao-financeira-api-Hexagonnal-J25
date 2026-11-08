@@ -72,7 +72,7 @@ class AuthControllerTest {
     private com.decodex.br.domain.port.out.UsuarioRepositoryPort usuarioRepositoryPort;
 
     @Spy
-    private AuthCookieManager cookieManager = new AuthCookieManager();
+    private AuthCookieManager cookieManager = new AuthCookieManager(false, "Lax");
 
     private TokenResponseAssembler tokenResponseAssembler;
 
@@ -88,8 +88,7 @@ class AuthControllerTest {
                 userDetailsService,
                 cookieManager,
                 tokenResponseAssembler,
-                registerUserUseCase
-        );
+                registerUserUseCase);
     }
 
     @Test
@@ -98,7 +97,8 @@ class AuthControllerTest {
         LoginRequestDTO loginRequest = new LoginRequestDTO(" ADMIN@EMAIL.COM ", " 123456 ");
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
         Usuario userDomain = new Usuario(java.util.UUID.randomUUID(), "admin", "hash", "admin@email.com");
-        RefreshToken refreshToken = new RefreshToken(java.util.UUID.randomUUID(), "mocked-refresh-token", userDomain, Instant.now().plusSeconds(3600));
+        RefreshToken refreshToken = new RefreshToken(java.util.UUID.randomUUID(), "mocked-refresh-token", userDomain,
+                Instant.now().plusSeconds(3600));
 
         when(authenticationManager.authenticate(any())).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
@@ -111,14 +111,13 @@ class AuthControllerTest {
         assertThat(responseEntity.getBody()).isNotNull();
         assertThat(responseEntity.getBody().token()).isEqualTo("mocked-jwt-token");
 
-        verify(authenticationManager).authenticate(argThat(auth ->
-                auth instanceof UsernamePasswordAuthenticationToken token
+        verify(authenticationManager)
+                .authenticate(argThat(auth -> auth instanceof UsernamePasswordAuthenticationToken token
                         && token.getPrincipal().equals("admin@email.com")
                         && token.getCredentials().equals("123456")));
         verify(response, times(2)).addHeader(
-            eq(org.springframework.http.HttpHeaders.SET_COOKIE),
-            anyString()
-        );
+                eq(org.springframework.http.HttpHeaders.SET_COOKIE),
+                anyString());
     }
 
     @Test
@@ -126,11 +125,13 @@ class AuthControllerTest {
     void deveRotacionarTokensNoRefresh() {
         Cookie cookie = new Cookie("refreshToken", "valid-refresh-token");
         Usuario userDomain = new Usuario(java.util.UUID.randomUUID(), "admin", "hash", "admin@email.com");
-        RefreshToken oldRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "valid-refresh-token", userDomain, Instant.now().plusSeconds(3600));
-        RefreshToken newRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "new-refresh-token", userDomain, Instant.now().plusSeconds(3600));
+        RefreshToken oldRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "valid-refresh-token", userDomain,
+                Instant.now().plusSeconds(3600));
+        RefreshToken newRefreshToken = new RefreshToken(java.util.UUID.randomUUID(), "new-refresh-token", userDomain,
+                Instant.now().plusSeconds(3600));
         UserDetails userDetails = new User("admin", "password", Collections.emptyList());
 
-        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        when(request.getCookies()).thenReturn(new Cookie[] { cookie });
         when(refreshTokenUseCase.verifyAndGet("valid-refresh-token")).thenReturn(oldRefreshToken);
         when(userDetailsService.loadUserByUsername("admin")).thenReturn(userDetails);
         when(tokenService.generateToken(userDetails)).thenReturn("new-access-token");
@@ -150,15 +151,15 @@ class AuthControllerTest {
         when(request.getCookies()).thenReturn(null);
 
         assertThatThrownBy(() -> authController.refresh(request, response))
-            .isInstanceOf(RefreshTokenException.class)
-            .hasMessageContaining("Refresh token ausente");
+                .isInstanceOf(RefreshTokenException.class)
+                .hasMessageContaining("Refresh token ausente");
     }
 
     @Test
     @DisplayName("Deve limpar cookies e deletar token do banco no logout")
     void deveLimparDadosNoLogout() {
         Cookie cookie = new Cookie("refreshToken", "some-refresh-token");
-        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
+        when(request.getCookies()).thenReturn(new Cookie[] { cookie });
 
         ResponseEntity<Void> responseEntity = authController.logout(request, response);
 
@@ -174,8 +175,8 @@ class AuthControllerTest {
         when(registerUserUseCase.register(any())).thenReturn(
                 new RegisteredUser(userId, "novo-usuario", "novo@email.com"));
 
-        ResponseEntity<com.decodex.br.application.dto.auth.UsuarioResponseDTO> responseEntity =
-                authController.register(new RegisterRequestDTO("novo-usuario", "123456", "novo@email.com"));
+        ResponseEntity<com.decodex.br.application.dto.auth.UsuarioResponseDTO> responseEntity = authController
+                .register(new RegisterRequestDTO("novo-usuario", "123456", "novo@email.com"));
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(responseEntity.getBody()).isNotNull();
