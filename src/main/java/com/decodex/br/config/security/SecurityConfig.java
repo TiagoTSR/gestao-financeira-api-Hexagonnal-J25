@@ -38,7 +38,7 @@ public class SecurityConfig {
     public SecurityConfig(
             @Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
             @Lazy com.decodex.br.config.ratelimit.RateLimitingFilter rateLimitingFilter,
-            @Value("${api.security.cors.allowed-origins:http://localhost:3000,http://localhost:4200,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:4200,http://127.0.0.1:5173}") String origins,
+            @Value("${api.security.cors.allowed-origins:http://localhost:3000,http://localhost:4200,http://localhost:5173,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:4200,http://127.0.0.1:5173,https://gestao-financeira-front-angular.vercel.app}") String origins,
             @Value("${springdoc.swagger-ui.enabled:false}") boolean swaggerEnabled) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.rateLimitingFilter = rateLimitingFilter;
