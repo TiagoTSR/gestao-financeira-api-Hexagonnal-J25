@@ -11,14 +11,14 @@ import com.decodex.br.adapters.out.persistence.entity.RefreshTokenEntity;
 import com.decodex.br.adapters.out.persistence.entity.UsuarioEntity;
 import com.decodex.br.adapters.out.persistence.mapper.RefreshTokenMapper;
 import com.decodex.br.adapters.out.persistence.mapper.RefreshTokenMapperImpl;
-import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapper;
+import com.decodex.br.adapters.out.persistence.mapper.UsuarioMapperImpl;
 import com.decodex.br.domain.model.RefreshToken;
 import com.decodex.br.domain.model.Usuario;
 
 @DisplayName("Testes unitários para RefreshTokenMapper")
 class RefreshTokenMapperTest {
 
-    private final RefreshTokenMapper mapper = new RefreshTokenMapperImpl(UsuarioMapper.INSTANCE);
+    private final RefreshTokenMapper mapper = new RefreshTokenMapperImpl(new UsuarioMapperImpl());
 
     @Test
     @DisplayName("Deve converter RefreshTokenEntity para RefreshToken (Dominio) corretamente")
